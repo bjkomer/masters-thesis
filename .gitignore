@@ -9,6 +9,9 @@
 *.pdf
 *.gz
 
+*.bbl
+*.blg
+
 # Swap files
 
 *.swp

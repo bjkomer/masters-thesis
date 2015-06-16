@@ -1,8 +1,26 @@
+# LaTex output files
+
 *.out
 *.aux
 *.lot
 *.lof
+*.log
 *.toc
 *.pdf
-*.zip
 *.gz
+
+# Swap files
+
+*.swp
+
+# Downloads
+
+*.zip
+
+# Images
+
+*.png
+
+# Ignore uw-ethesis reference material
+
+uw-ethesis*

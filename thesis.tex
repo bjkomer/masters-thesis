@@ -1,0 +1,507 @@
+% uWaterloo Thesis Template for LaTeX 
+% Last Updated May 24, 2011 by Stephen Carr, IST Client Services
+% FOR ASSISTANCE, please send mail to rt-IST-CSmathsci@ist.uwaterloo.ca
+
+% Effective October 2006, the University of Waterloo 
+% requires electronic thesis submission. See the uWaterloo thesis regulations at
+% http://www.grad.uwaterloo.ca/Thesis_Regs/thesistofc.asp.
+
+% DON'T FORGET TO ADD YOUR OWN NAME AND TITLE in the "hyperref" package
+% configuration below. THIS INFORMATION GETS EMBEDDED IN THE PDF FINAL PDF DOCUMENT.
+% You can view the information if you view Properties of the PDF document.
+
+% Many faculties/departments also require one or more printed
+% copies. This template attempts to satisfy both types of output. 
+% It is based on the standard "book" document class which provides all necessary 
+% sectioning structures and allows multi-part theses.
+
+% DISCLAIMER
+% To the best of our knowledge, this template satisfies the current uWaterloo requirements.
+% However, it is your responsibility to assure that you have met all 
+% requirements of the University and your particular department.
+% Many thanks to the feedback from many graduates that assisted the development of this template.
+
+% -----------------------------------------------------------------------
+
+% By default, output is produced that is geared toward generating a PDF 
+% version optimized for viewing on an electronic display, including 
+% hyperlinks within the PDF.
+ 
+% E.g. to process a thesis called "mythesis.tex" based on this template, run:
+
+% pdflatex mythesis	-- first pass of the pdflatex processor
+% bibtex mythesis	-- generates bibliography from .bib data file(s) 
+% pdflatex mythesis	-- fixes cross-references, bibliographic references, etc
+% pdflatex mythesis	-- fixes cross-references, bibliographic references, etc
+
+% If you use the recommended LaTeX editor, Texmaker, you would open the mythesis.tex
+% file, then click the pdflatex button. Then run BibTeX (under the Tools menu).
+% Then click the pdflatex button two more times. If you have an index as well,
+% you'll need to run MakeIndex from the Tools menu as well, before running pdflatex
+% the last two times.
+
+% N.B. The "pdftex" program allows graphics in the following formats to be
+% included with the "\includegraphics" command: PNG, PDF, JPEG, TIFF
+% Tip 1: Generate your figures and photos in the size you want them to appear
+% in your thesis, rather than scaling them with \includegraphics options.
+% Tip 2: Any drawings you do should be in scalable vector graphic formats:
+% SVG, PNG, WMF, EPS and then converted to PNG or PDF, so they are scalable in
+% the final PDF as well.
+% Tip 3: Photographs should be cropped and compressed so as not to be too large.
+
+% To create a PDF output that is optimized for double-sided printing: 
+%
+% 1) comment-out the \documentclass statement in the preamble below, and
+% un-comment the second \documentclass line.
+%
+% 2) change the value assigned below to the boolean variable
+% "PrintVersion" from "false" to "true".
+
+% --------------------- Start of Document Preamble -----------------------
+
+% Specify the document class, default style attributes, and page dimensions
+% For hyperlinked PDF, suitable for viewing on a computer, use this:
+\documentclass[letterpaper,12pt,titlepage,oneside,final]{book}
+ 
+% For PDF, suitable for double-sided printing, change the PrintVersion variable below
+% to "true" and use this \documentclass line instead of the one above:
+%\documentclass[letterpaper,12pt,titlepage,openright,twoside,final]{book}
+
+% Some LaTeX commands I define for my own nomenclature.
+% If you have to, it's better to change nomenclature once here than in a 
+% million places throughout your thesis!
+\newcommand{\package}[1]{\textbf{#1}} % package names in bold text
+\newcommand{\cmmd}[1]{\textbackslash\texttt{#1}} % command name in tt font 
+\newcommand{\href}[1]{#1} % does nothing, but defines the command so the
+    % print-optimized version will ignore \href tags (redefined by hyperref pkg).
+%\newcommand{\texorpdfstring}[2]{#1} % does nothing, but defines the command
+% Anything defined here may be redefined by packages added below...
+
+% This package allows if-then-else control structures.
+\usepackage{ifthen}
+\newboolean{PrintVersion}
+\setboolean{PrintVersion}{false} 
+% CHANGE THIS VALUE TO "true" as necessary, to improve printed results for hard copies
+% by overriding some options of the hyperref package below.
+
+%\usepackage{nomencl} % For a nomenclature (optional; available from ctan.org)
+\usepackage{amsmath,amssymb,amstext} % Lots of math symbols and environments
+\usepackage[pdftex]{graphicx} % For including graphics N.B. pdftex graphics driver 
+
+% Hyperlinks make it very easy to navigate an electronic document.
+% In addition, this is where you should specify the thesis title
+% and author as they appear in the properties of the PDF document.
+% Use the "hyperref" package 
+% N.B. HYPERREF MUST BE THE LAST PACKAGE LOADED; ADD ADDITIONAL PKGS ABOVE
+\usepackage[pdftex,letterpaper=true,pagebackref=false]{hyperref} % with basic options
+		% N.B. pagebackref=true provides links back from the References to the body text. This can cause trouble for printing.
+\hypersetup{
+    plainpages=false,       % needed if Roman numbers in frontpages
+    pdfpagelabels=true,     % adds page number as label in Acrobat's page count
+    bookmarks=true,         % show bookmarks bar?
+    unicode=false,          % non-Latin characters in Acrobat’s bookmarks
+    pdftoolbar=true,        % show Acrobat’s toolbar?
+    pdfmenubar=true,        % show Acrobat’s menu?
+    pdffitwindow=false,     % window fit to page when opened
+    pdfstartview={FitH},    % fits the width of the page to the window
+    pdftitle={uWaterloo\ LaTeX\ Thesis\ Template},    % title: CHANGE THIS TEXT!
+%    pdfauthor={Author},    % author: CHANGE THIS TEXT! and uncomment this line
+%    pdfsubject={Subject},  % subject: CHANGE THIS TEXT! and uncomment this line
+%    pdfkeywords={keyword1} {key2} {key3}, % list of keywords, and uncomment this line if desired
+    pdfnewwindow=true,      % links in new window
+    colorlinks=true,        % false: boxed links; true: colored links
+    linkcolor=blue,         % color of internal links
+    citecolor=green,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan           % color of external links
+}
+\ifthenelse{\boolean{PrintVersion}}{   % for improved print quality, change some hyperref options
+\hypersetup{	% override some previously defined hyperref options
+%    colorlinks,%
+    citecolor=black,%
+    filecolor=black,%
+    linkcolor=black,%
+    urlcolor=black}
+}{} % end of ifthenelse (no else)
+
+% Setting up the page margins...
+% uWaterloo thesis requirements specify a minimum of 1 inch (72pt) margin at the
+% top, bottom, and outside page edges and a 1.125 in. (81pt) gutter
+% margin (on binding side). While this is not an issue for electronic
+% viewing, a PDF may be printed, and so we have the same page layout for
+% both printed and electronic versions, we leave the gutter margin in.
+% Set margins to minimum permitted by uWaterloo thesis regulations:
+\setlength{\marginparwidth}{0pt} % width of margin notes
+% N.B. If margin notes are used, you must adjust \textwidth, \marginparwidth
+% and \marginparsep so that the space left between the margin notes and page
+% edge is less than 15 mm (0.6 in.)
+\setlength{\marginparsep}{0pt} % width of space between body text and margin notes
+\setlength{\evensidemargin}{0.125in} % Adds 1/8 in. to binding side of all 
+% even-numbered pages when the "twoside" printing option is selected
+\setlength{\oddsidemargin}{0.125in} % Adds 1/8 in. to the left of all pages
+% when "oneside" printing is selected, and to the left of all odd-numbered
+% pages when "twoside" printing is selected
+\setlength{\textwidth}{6.375in} % assuming US letter paper (8.5 in. x 11 in.) and 
+% side margins as above
+\raggedbottom
+
+% The following statement specifies the amount of space between
+% paragraphs. Other reasonable specifications are \bigskipamount and \smallskipamount.
+\setlength{\parskip}{\medskipamount}
+
+% The following statement controls the line spacing.  The default
+% spacing corresponds to good typographic conventions and only slight
+% changes (e.g., perhaps "1.2"), if any, should be made.
+\renewcommand{\baselinestretch}{1} % this is the default line space setting
+
+% By default, each chapter will start on a recto (right-hand side)
+% page.  We also force each section of the front pages to start on 
+% a recto page by inserting \cleardoublepage commands.
+% In many cases, this will require that the verso page be
+% blank and, while it should be counted, a page number should not be
+% printed.  The following statements ensure a page number is not
+% printed on an otherwise blank verso page.
+\let\origdoublepage\cleardoublepage
+\newcommand{\clearemptydoublepage}{%
+  \clearpage{\pagestyle{empty}\origdoublepage}}
+\let\cleardoublepage\clearemptydoublepage
+
+%======================================================================
+%   L O G I C A L    D O C U M E N T -- the content of your thesis
+%======================================================================
+\begin{document}
+
+% For a large document, it is a good idea to divide your thesis
+% into several files, each one containing one chapter.
+% To illustrate this idea, the "front pages" (i.e., title page,
+% declaration, borrowers' page, abstract, acknowledgements,
+% dedication, table of contents, list of tables, list of figures,
+% nomenclature) are contained within the file "uw-ethesis-frontpgs.tex" which is
+% included into the document by the following statement.
+%----------------------------------------------------------------------
+% FRONT MATERIAL
+%----------------------------------------------------------------------
+\input{thesis-frontpgs} 
+
+%----------------------------------------------------------------------
+% MAIN BODY
+%----------------------------------------------------------------------
+% Because this is a short document, and to reduce the number of files
+% needed for this template, the chapters are not separate
+% documents as suggested above, but you get the idea. If they were
+% separate documents, they would each start with the \chapter command, i.e, 
+% do not contain \documentclass or \begin{document} and \end{document} commands.
+%======================================================================
+\chapter{Figure out chapters and sections}
+%======================================================================
+
+\section{Motivation}
+
+[talk about humans being a very good control system, want to build a robotic system that leverages some of the abilities humans have, by building it with a biologically realistic neural simulator. Can also be run on low power neural hardware in the future]
+
+Humans have an exceptional ability to be able to adapt to their surroundings. When picking up a new object, there are a many unknown forces, torques, and inertial effects that this object will apply to the arm. Despite this, humans are very good at manipulating objects and the necessary changes in timing and muscle tensions to do so are calculated with ease, even if the object has never been encountered before. This can be largely attributed to the plasticity of neural connections in the motor control area of the brain.
+
+This ability for quick and easy adaptation to new dynamic properties of a system would be extremely useful in robotics. Applying similar methods of control that have been developed over millions of years of evolution in the brain to a robotic control system could result in major improvements. This is especially useful now that the demands of a lot of robotic systems are now more general purpose than they were in the past. Robots started out mainly performing simple and repetitive tasks in stable environments, such as automation in manufacturing [[throw in some references]]. Now they are being used increasingly in more complex situations requiring a diverse amount of control, such as search and rescue missions, performing medical procedures, and assisting the elderly [[put references here]]. When the precise environment that the robot will operate in is not fully known, it is useful for any control system that it uses to be able to handle unknown environments.
+
+Another advantage the brain has when it comes to control, is that it uses very little power, about XXX Watts on average [[quote power amount here]]. Hardware inspired by the brain is being designed to take advantage of this low power paradigm. This style of hardware, known as neuromorphic hardware, is typically massively parallel and runs in an analog rather than digital domain.
+
+\section{Introduction}
+
+%[basic characteristics, four rotors, rotating different ways]
+%[something about vertical take off and landing]
+%[light-weight]
+%[very maneuverable]
+
+A quadcopter is a very versatile aerial vehicle. They typically consist of a central body with four upright rotors equally spaced around the body. This configuration allows them to be lightweight and simplifies construction. They also have the ability to take off and land vertically without external assistance, meaning they can be used in a lot more situations than aircraft that require a runway or other particular conditions to take off. They can also change directions fairly easily mid flight, and have the ability to hover at a particular location. Due to their low cost, lightweight, and easy to use nature, they are an excellent aircraft to use for research purposes.
+
+[battery heaviest part, low power controller means it can last longer and/or be lighter, good candidate for neural control]
+Short battery life is one of the main weaknesses of quadcopters. Small and simple quadcopters used by hobbyists typically only last 10 to 20 minutes before they are out of power [[put in source]]. The more expensive industrial grade quadcopters can last 1 to 2 hours before they need to be recharged [[check this]] [[put in source]], but this is still not long enough for some applications. Battery weight is one of the main issues hindering the maximum flight time of quadcopters. If a larger battery is used to attempt to increase the maximum flight time, the quadcopter will be heavier and therefore require more power to fly, and in turn drain the battery faster. Two possible solutions to this problem are lighter batteries and more energy efficient operation. The latter can be achieved by the use of neuromorphic hardware to run the flight control system.
+
+[something about how adaptive control is awesome]
+In addition to the low power consumption of neuromorphic hardware, the types of neural algorithms that can be run on these systems are extremely useful. In particular, the learning capabilities of brain-like algorithms can be used to develop controllers that are able to adapt to unknown environments with non-linear dynamics. In this thesis I will explore an adaptive control algorithm for quadcopter flight constructed using simulated biologically plausible neurons.
+
+[talk about what each section of the thesis will talk about]
+The next section of this thesis will give an overview of how quadcopters are able to fly, followed by a section detailing the mathematics underlying the dynamics of a quadcopter system. The next section will describe the physical simulation of the quadcopter. Following this will be an overview of the control theory used in developing the control system. This will cover standard PD control, adaptive control, and adaptive control in a simulated biological neural system. The next section will cover the initial design of the controller model, as well as many of the iterations of improvements along the way to the final design. The next section will describe the implementation of the system as well as experiments run to quantify its performance. The final section will provide a discussion of the results and outline areas of future work.
+
+\section{Flight Control}
+
+%[mention the six states: x,y,z,roll,pitch,yaw -> have a diagram to explain them]
+%[different modes of flight control (up/down, horizontal, rotate, hover), diagrams for each]
+%[thrust is always perpendicular to the body]
+%[two ways to do it, rotor aligned axis, and 45 degrees from that]
+
+The system state of a quadcopter is six dimensional. Three dimensions for position (x, y, and z) and three dimensions for orientation (roll, pitch, and yaw). There are four control inputs, which are typically taken to be the rotational velocity of each of the four rotors. For a physical quadcopter, these inputs would be the voltages applied to each of these rotors, in which a transformation can be obtained using the rotor parameters to estimate the velocity. For simplicity of the simulation, the velocity is used directly in this thesis. [continue...]
+
+[talk about perpendicular thrust, as well as torque on the body, and that is how each of the movements is done]
+The rotors will always generate a thrust that is perpendicular to the body of the aircraft. In addition to this thrust, torques are generated by each rotor based on which direction they are spinning as well as their distance from the center of the body. For the quadcopter to be able to control its orientation, half of the rotors are spinning clockwise and the other half are spinning counter-clockwise. The pairs opposite of each other across the body are spinning in the same direction. This allows the torques created to be able to balance each other out and allow the quadcopter to be able to maintain a steady orientation. By varying the relative speeds of each rotor, the quadcopter is able to create a net torque in a specific direction, causing a rotation about any axis.
+
+There are four common ‘actions’ that a quadcopter can perform to move around in it’s environment, with a distinct pattern of rotor actuation for each one. These actions are: tilt forward/backward, tilt left/right, rotate, and move up/down. A quadcopter can perform any combination of these actions, and with different magnitudes of each. The relative rotor speeds required for each are shown in Figure XXX below [[put in diagram from wikipedia, or make your own]]
+
+\section{Dynamics}
+
+%[go through all of the equations for dynamics]
+
+The structure of a quadcopter is shown in Figure XXX, along with the coordinate frame and relevant forces and torques created by the rotors.
+[fix this phrase a ton] There are two important frames of reference when studying quadcopters. The inertial frame is used to represent the state of the quadcopter relative to the outside world, and the body frame is fixed around the center of mass of the quadcopter and used to represent local effects on the quadcopter.
+Typically you are interested in the state of the quadcopter in the inertial frame, but the control of the quadcopter is easier to represent in the body frame. 
+
+[put diagram around here]
+
+The rotation matrix shown in Figure XXX can be used to convert coordinates from the body frame to the inertial frame. To convert the other way, from inertial frame to body frame, the inverse of the matrix is used. Since this matrix is orthogonal, its inverse is equal to its transpose.
+
+[rotation matrix here]
+
+The transformation matrices for the angular velocities between the inertial and body frames are shown below in Figure XXX.
+
+[matrices here]
+
+The quadcopter is assumed to be symmetrical with equal length arms for each rotor. Aligning the arms along the body x and y axes gives the diagonal inertia matrix in Equation XXX. Due to symmetry, Ixx = Iyy.
+
+[put inertial matrix here]
+
+The angular velocity of each rotor generates a thrust force perpendicular to the body frame, as well as a torque about the rotor axis. This relationship is shown in Equation XXX. Where k is the lift constant, b is the drag constant, and IM is the moment of inertia of the rotor.
+
+[equations here]
+
+Typically the effect of the angular acceleration is considered small and omitted in most analyses, so it will not be present in the remainder of the dynamics derivations.
+
+Note that the forces and torques generated are always proportional to the square of the rotor angular velocity, so it is simpler to work with this term instead of the angular velocity itself. [put this part under simulation instead]
+
+Combining the forces of all four rotors leads to Equation XXX below. Where T is the thrust in the direction of the z-axis of the body. Combining the torques of all four rotors leads to Equation XXX, where the vector tau represents the torques across each of the principal body axes (tau-? for roll, tau-? for pitch, and tau-? for yaw). The distance between the rotor and the center of mass of the quadcopter is denoted by l. 
+
+[put the two equations here]
+
+[[put some description explaining these equations here]]
+
+\section{Simulation}
+
+%[maybe move this section later in the thesis, possibly put pure python sim here and v-rep sim elsewhere (with implementation?)]
+%[talk about V-REP, throw in a reference for it]
+%[possibly mention MORSE and choosing VREP over it]
+%[talk about pure python simulator built from dynamics equations]
+%[VREP is used because it allows complex environments and sensors]
+
+The quadcopter model was validated and tested using a computer simulation environment. The advantage of starting with a simulation rather than going straight to physical hardware is that it is quicker and easier to prototype new control algorithms, and it is much less costly to do so. For this project I decided to use the Virtual Robotics Experimentation Platform (V-REP) as the physical simulation environment. [[[Reference Here]]] This is an open-source software package that is free to use for educational purposes. It contains models of various robotic platforms, including a model of a quadcopter. It allows the construction of intricate 3D virtual environments for the quadcopter to interact with, as well as many virtual sensors that can be equipped to the quadcopter, such as cameras.
+
+[possible bit about choosing the simulator]
+Two other strong candidates for the physics simulator where MORSE [reference] and Gazebo [reference]. [continue with a little blurb about them and why they were not chosen, and reference the comparison table]
+
+[possible table comparing V-REP/MORSE/Gazebo with pros and cons of each]
+
+The simulation environment in V-REP was was set up to be a large open space with small obstacles and walls along the ground. The quadcopter model is initialized to start in the center of the space, 0.5 meters above the ground. This model is the one provided with the V-REP software courtesy of Eric Rohmer and Lyall Randell [[reference]]. The quadcopter’s target is a small semi-transparent green sphere. The goal of the control system is to make the quadcopter move to the target’s location with the target’s orientation. Throughout the environment there are various wind tunnels. These wind tunnels are zones of space which will exert an external force on the quadcopter in a particular direction if the quadcopter is within the zone. There are also zones which can exert various nonlinear forces on the quadcopter. For example, one zone could push the quadcopter in the z direction with a force proportional to the square of its horizontal velocity. In addition to these zones, the quadcopter can also pick up and drop off boxes of various mass. These are used to test how well the controller can adapt to changes in its dynamics.
+
+\section{Control}
+
+%[go over standard control, talk about PD and PID systems]
+%[put in a block diagram of a simple PID system -> maybe show spots where disturbances can enter]
+%[talk about applying PD and PID control to a quadcopter]
+%[mention limits of PID control that adaptive control is trying to solve]
+
+The canonical method for building a control system is to use a PID controller. This is a closed loop controller that works by applying gains to an error signal and feeding the result as input to the plant (system being controlled). PID stands for Proportional, Integral, and Derivative, which refers to the three types of gains that are used. One gain is applied directly to the error (proportional), a second gain is applied to the derivative of the error, and the third gain is applied to the integral of the error. Each of these gains serves a unique purpose and the careful tuning of all three is required to get the desired performance of the controller. The proportional gain is the main one that drives the system. It responds directly to the error and brings the system towards its target point. The larger the gain, the faster this will be done. The problem with only using this gain, is that it does not account for any inertia in the system and will often cause the entity being controlled to overshoot its target, especially when the gain is large. In some cases the overshoot can be so large that the system will be unstable and oscillate out of control. This is where the derivative gain comes in. It is sensitive to the rate of change of the error, and attempts to bring this rate towards zero. The faster the system is moving towards its target state, the more this gain acts to slow it down. It effectively provides a form of damping to the system to reduce the amount of overshoot. Depending on how this parameter is tuned, and the properties of the system at hand, it can remove overshooting entirely. Due to unmodeled disturbances or changing external inputs, there may be a steady state error in the system. This is where the controller has reached a stable state, yet there is still an error being measured. The integral term is designed to account for this by keeping a running sum of the error over time. Eventually this integral error should be large enough that it will drive the system to close the steady state error gap.
+
+\section{Adaptive Control}
+
+%[name a few other adaptive control methods and give references]
+%[go over the slotine adaptive control stuff, throw in a bunch of references]
+%[maybe throw in a bunch of the equations and derivations I did on paper]
+%[mention getting the slotine stuff working on the python simulator]
+%[talk about how Nengo can be used to do adaptive control with learning]
+
+Sometimes the kinematics and dynamics of the system being controlled are unknown, or change over time in an unknown fashion. A controller that works well for the system initially may not be well suited when the system undergoes changes. In this situation it is useful to have a controller that can adapt to these changes.
+
+The foundation of adaptive control is based on parameter estimation. First, a mathematical model of the system to be controlled is generated based on physical laws. This model is typically of the form shown in Equation XXX.
+
+[put in the M(q)ddq + C(q,dq)dq + g(q) = tau equation]
+
+Where q is the vector of state variables, M(q) is a mass/inertia matrix, C(q,dq) is the coriolis term [???], g(q) is the gravitational force, and tau is a vector representing the input to the system.
+
+[[[[[a lot more stuff to go here, need to understand it more first]]]]]
+
+It is difficult to come up with a mathematical model of a system with enough detail to account for everything. There are always assumptions and approximations that are made for the model to be manageable. In addition to this, external forces from the environment may influence the model and it is not always possible to know the form of these forces as the environment can be largely unknown. One way to get around this is to use a set of basis functions as the model, and the weights applied to each element of the basis are the constant parameters. If the basis is designed such that it can represent any computable function to a reasonable degree of accuracy, it will be effective in the adaptive control problem. Gaussian basis functions are commonly used in adaptive control [[reference]], but it is possible to use neural networks as well [[reference]].
+
+\section{Neural Simulation}
+
+%[brief description of the NEF and Nengo and how it can be used, mostly just put references here]
+
+\section{Adaptive Control in Nengo}
+
+%[Brief overview of Nengo (can be made longer with subsections if need be)]
+%[Talk about the PES rule, how it relates to the slotine stuff]
+%[talk about how there is no need to tune the KI term with the PES rule, this adaptive I term is easier to use]
+
+The adaptive control methods described above can be applied to a network built using the Neural Engineering Framework. An ensemble of simulated neurons is used as the set of basis functions for the physical model, and the decoders of these neurons are used as the vector of unknown constant parameters. A learning rule known as the Prescribed Error Sensitivity or PES rule is used to update the decoder values [[reference here?]]. 
+
+This works by first creating a connection from an ensemble of spiking neurons representing the state of the system to a node representing the output of the controller. This is known as the learned connection and can be initially set to perform any transformation, but is typically initialized for the output to be random or zero. If the designer has an approximation of what the final learned transformation should look like, they can set this to be the initial transformation. This will allow the system to converge to the final transformation quicker.
+
+This connection will be modulated by an error signal. This error signal can come from anywhere in the network. The PES learning rule will attempt to reduce the error signal by changing the value of the decoders on the learned connection. The direction in which the decoder values change is dependent on the sign of the error. The magnitude of the change in decoder values at each time step is dependant on both the magnitude of the error as well as a learning rate parameter. The learning rate is a dimensionless parameter that needs to be tuned for the specific application. It is dependant on the simulation time step, the number of neurons in the state population, as well as how responsive the model needs to be to changes. [[check to make sure this is true!!]] A larger learning rate will cause larger reactions to error, effectively making the system trust its current measurements more than historical ones. A smaller timestep means that these changes will occur more frequently, so the net change over time will be greater. A larger number of neurons means that the changes will be greater, as there will be more decoders changing and the overall transformation is a sum of these decoders [[check to make sure this is true!!]].
+[[talk about differing dimensions in these populations?]]
+
+A simple example of using the PES learning rule to control an inverted pendulum is shown in Figure XXX. [[describe how the model works in the figure description, talk about the different dimensionalities of each population]]
+
+[put in a simple network diagram showing the PES rule, and possibly an equation with its math]
+
+\section{Controller Model}
+
+%[show one model of the controller, the original one, talk about how it works]
+%[something about how it is a target controller, rather than path]
+%[maybe put some bit explaining the rationale behind the gains? Stuff like what increasing and decreasing specific gains does (might be better to just have this in the PID control section above)]
+
+The goal of the controller is to actuate the quadcopter in such a way that it travels to a desired position in a reasonable amount of time. This position is specified as a set of x, y, and z coordinates and a particular yaw direction. The controller is given the state error of the quadcopter and its target, as well as the current linear and angular velocities of the quadcopter. It needs to use this information to generate a suitable control signal.
+This is done by using a PD controller which generates a four dimensional output signal in the space of possible quadcopter motions. The gain matrix that performs this operation can be seen in Figure XXX. This signal is then transformed into the four dimensional rotor velocity space to provide the actuation associated with the desired movement commands. This is done by multiplying by the matrix in Figure XXX. The design of this matrix depends upon the orientation of the rotor blades to the x and y axes. This transformation matrix assumes that the rotor axes are offset from the x-y axes by 45 degrees.
+Translation in the x and y directions are dependent on the states of both x and y as well as roll and pitch. This is because a roll in the quadcopter causes a component of thrust to be applied in the y direction, and a pitch causes a component of thrust to be applied in the x direction.
+A delicate balance needs to be found between each of the gains in order to create a stable, functioning controller. The setpoints for each of the velocities as well as roll and pitch is zero.
+
+[gain matrix figures]
+
+[talk about egocentric state as the error]
+The state error is measured relative to the body frame. This is because most sensors on a real quadcopter would return measurements relative to the sensor device itself, which is located on the quadcopter. Absolute measurements could still be obtained with a GPS device, but this would typically have much less accuracy and is harder to use for finer tuned control. In this manner, the state of the quadcopter can be defined relative to its target, making the state the same as the error.
+
+[talk about building the model in Nengo]
+This controller model can be designed with a Nengo network. A 12 dimensional ensemble representing the state error can be projected to a 4 dimensional ensemble representing the desired control command. The transformation done through this projection will be by the 12x4 PD gain matrix of the controller. This 4 dimensional ensemble is then projected to another 4 dimensional ensemble which represents the 4 desired angular velocities of the quadcopter’s rotors. This is done through a transformation by the 4x4 rotor matrix. This rotor velocity ensemble is connected to a node representing the physical quadcopter, which in turn feeds back into the state error ensemble. The network diagram is shown in Figure XXX below. This network can be simplified further by multiplying the gain matrix with the rotor matrix to give a single transformation matrix from state error to rotor velocity. This simplified and functionally equivalent network is shown in Figure XXX. The larger network is used in the remainder of this thesis because it is more explicit with how each signal is used and allows greater flexibility in design improvements and debugging of the system. [make this last line sound better]
+
+[Figure of simple control model without adaptation]
+[Also figure of simplified model without task space representation]
+
+\section{Iterations}
+
+%[show different iterations of the controller, explain strengths and weaknesses]
+%[have diagrams of each, similar to the powerpoint presentation]
+%[talk about Hyperopt parameter tuning]
+
+The first iteration of the controller uses an adaptive population to influence the task space command. A projection from the adaptive population to the task population is modulated by the state error undergoing the control transform. The PES learning rule is applied to this connection, which seeks to build a transformation that minimizes the error coming in from this modulatory connection. The effect is similar to that of the I term in a PID controller, except that it uses all state information to come up with the integral gain, and can perform nonlinear transforms to accomplish this. Without this adaptive component, the quadcopter will have a large steady state error in the z direction, and will fall to the ground as soon as the simulation starts.
+This model is very effective at learning the weight of the quadcopter and adapting to any external forces in the z direction. Gains were initially chosen manually by surveying other quadcopter models and trying a couple gains until decent results were found [reference v-rep quadcopter, and a few other places?]
+[[put in some plots showing adaptation speed at simulation start, talk about parameters that change this speed -> maybe show all gains used with the plot?]]
+
+When an external force is applied in the horizontal plane, this model does a very bad job of correcting itself from it. It will settle to a stable point in space with a constant offset from the target location. This is due to how the error is specified. Since both position and angle gains are being combined into the same dimension to produce the task space error, there are multiple pairs of measurements that will produce the same error. What is happening is that the adaptive population is being given an effective error reading of zero even though the quadcopter is not at the desired position. For example, if wind is producing a force in the x-direction, in order for the quadcopter to remain stationary, it must have a pitch angle that allows its thrust to compensate for both the gravitational force and the translational force.
+
+[[show FBD of quadcopter with pitch angle and forces balancing]]
+
+Since the quadcopter has a non-zero pitch, the control signal produced by this pitch multiplied by its gain will be non-zero. In order to have zero error, the product of the x-position error and its gain must match this value. This causes the quadcopter to move away from the target x-position in order to maintain zero control error. This is an undesirable side-effect of this controller design. In fact, there is a whole space of angle-position measurement pairs that produce zero error. The reason this controller works so well under normal operation despite this is that only one point in that space is ever stable at any particular time. When the only force acting on the quadcopter is gravity, that point is at the target location with roll and pitch angles of zero radians. As external forces are applied along the horizontal plane, this stable point shifts to new locations.
+
+[[show diagram with parabola of 0 error states]]
+
+One way to overcome this is to modify the error signal that the adaptive population uses. The only important state variables that need to match the target are x,y,z position and yaw angle. The state velocities should all be zero as well. Since roll and pitch are not supposed to be controlled, they should really be left out of the error that the adaptive population uses since they don’t correspond to an actual error in the desired state. This information is still important to allow the quadcopter to fly properly, and it needs to know roll and pitch information for stable flight. If this information is removed from the controller entirely it cannot fly.
+One solution is to omit the roll and pitch information only from the adaptive population, while still using it for the baseline controller. This is done by generating a separate gain matrix to use on the modulatory connection to the learned transformation. The new network diagram of the model is shown below in Figure XXX.
+
+[[show network diagram with adaptive transform]]
+
+This controller is now able to adapt to external horizontal forces, but normal flight is a lot less stable and prone to overshooting targets. One possible reason for this is that the gains might need to be re-tuned to work with this new controller setup. There are 15 different gains in this controller, which makes tuning them manually a difficult and laborious task.
+This is a task well suited for automated parameter optimization. The tool that I chose to use for this is Hyperopt. Hyperopt is a python package designed to perform parameter optimization over a search space for a given function. As long as you can set your problem up in a way that it becomes a function that takes any number of parameters and returns a single error metric to be minimized, it can be used with Hyperopt. [[blather on about how hyperopt builds a surrogate model based on the problem, and how it has the option for smarter than random methods for picking points, as well as interesting ways to set up the search space]]
+In order to use Hyperopt, the controller model must be encapsulated in some function that returns a useful metric of how well the controller works. This was done by creating a set of target points for the quadcopter to move through over a period of time and an additional population computing a scalar measure of the error of the quadcopter from the target. This error metric was taken to be a weighted Euclidean norm of each of the dimensions of the state. States that were deemed more important (such as x,y, and z position) were given higher weights in this calculation. States that were less important (such as roll and pitch) were given lower weights. Paired with this error was a status signal of whether or not the quadcopter should be at the target by now, or if it is okay that it is still in flight. As the quadcopter cannot be expected to move instantaneously between targets, it should not be penalized for having an error when it was just told to move to a different location. This status signal is set to 0 right after a new target is required, and then set to 1 again around the time when the quadcopter is expected to have reached the new target. The error at each time step is multiplied by this status signal before being recorded. The delay in switching back on the status signal can be used to give an indication of how important it is that the quadcopter reaches the target quickly. A longer delay means the optimization will find parameters that allow the quadcopter to reach the target very precisely with little oscillations, but could take a long time. A shorter delay will prefer controllers that get to the target quickly, but may overshoot, have a steady state error, or jitter once they reach the target.
+Model creation, running the physics simulator, sending the target commands, stopping the physics simulator, and returning the error metric are all encapsulated in a single Python function. This function was then given to Hyperopt, which ran it many times and kept track of the parameters used for the best result. There were about 3000 [[check this!!]] evaluations of different parameter sets, and each run took about 26 seconds [[check this!!]]. Hyperopt is able to go through a set number of evaluation points in one run, and then pick up where it left off in a separate run. This allowed these runs to be completed overnight over the course of multiple nights to get the final results, shown in Table XXX. These are by no means the optimal gain parameters, as the function being optimized does not represent the full operational space of the controller, and the method for generating the error metric was very simplistic. The more complex the set of targets in the objective function, the longer each run will take to complete, meaning less of the parameter space can be explored in the same amount of time. A tradeoff had to be made between the amount of data to evaluate and the quality of each data point. Nevertheless, these gains turned out to produce a controller that works exceptionally well and is faster, more responsive, and more accurate than the previous controller.
+
+[[show a diagram or table of the target points used in the hyperopt objective function?]]
+
+[talk about adaptive gains not needing to match regular ones, and go into how hyperparameter optimization is useful here. Talk about building an objective function to test parameter settings, and how it is not perfect and can be improved]
+
+There is still much room for improvement on this controller. While it can adapt to horizontal forces, it does so quite slowly. This is because the adaptive component of the controller is always fighting against the command given by the standard component. There is an implicit target roll and pitch angle of zero radians that the controller is trying to achieve even if that is not the correct angle to be at. One approach to overcome this is to have a second adaptive population that tries to learn what roll and pitch angle will allow the quadcopter to be stationary, and then feed these angles to the basic controller. This way the controller will no longer be actively trying to bring the quadcopter away from its setpoint, yet still has the angle information required for it to be able to fly. The performance of this controller is shown in Figure XXX below.
+
+[[show plots of angle adapt controller]]
+
+There is still a problem with the implementation of this controller. Since the adaptive component is driven by state error, as soon as the target is moved to a new location, a large error will be produced. This error will cause the adaptive transformation to change, even if it was already at its optimal configuration. This can cause problems in control, such as the overshoot seen in Figure XXX above. The summation of the control signal of the underlying controller and the signal from the adaptation to the error creates a control signal that is too large for the desired performance. To account for this, a time delayed filter is applied to a population representing the target location. This filtered location is then subtracted from an unfiltered location and stored in a new population. The signal coming from this new population can be used to inhibit the angle learning population. If the target hasn’t moved for a while, the value being projected from this population [[give it some name to use!!]] will be close to zero, meaning there is no inhibition. If the target is suddenly moved, this population will output the difference between the two target positions and inhibit the adaptation in any dimension that has a difference. Over time the filtered target will start to match the unfiltered target, and the extent in which the angle adaptive population can adapt to any errors increases. The network diagram for this model can be seen in Figure XXX. It’s performance on the target following task can be seen in Figure XXX.
+
+[[put in network diagram, as well as one plot of performance]]
+
+This controller performs extremely well in both operation under normal conditions and in the presence of unknown external forces.
+
+\section{Implementation}
+
+%[talk about how Nengo is connected to V-REP?]
+%[Have a diagram about information flow?]
+%[talk about the remote Api, setting flags in V-REP lua scripts, setting signals, sending plotting data. Talk about the run_model script and specific target patterns (or put that under experiments?)]
+
+Each of these controllers is implemented as a Nengo model in Python. The main communication channel between V-REP and Nengo is the Quadcopter Node. This Node contains a callable Python class that manages the communication between the two systems at every time step and from the Nengo network’s point of view represents the entirety of the physics simulation. Connections can be made to and from this node just like any other Node in a Nengo network. A connection to the V-REP remote API server is established when this Node is created. This node outputs the 6 dimensional state of the quadcopter, the 6 dimensional derivative of the state of the quadcopter, as well as the 6 dimensional state of the target. These values are obtained by making a remote API call to read these values from the current state of the simulation. The input to the Quadcopter Node is a 4 dimensional signal representing the velocity commands to give to each of the four rotors. These commands are packed into a string signal and sent to the V-REP simulation. A Lua script is run within V-REP each time step, and this script unpacks these velocity commands. It then issues them to the physical quadcopter model. The physics engine calculates the appropriate forces and torques that will be applied to the quadcopter as well as the resulting changes in state (position, velocity, orientation, and angular velocity) after one time step. This new state will now be read by the Nengo script in its next time step.
+
+Nengo is run with a time step of 1ms, as this is the standard time step for most models and is sufficient for modelling spike timing effects in populations of LIF neurons while still running at a reasonable speed on most computer processors. The V-REP simulation on the other hand is run at a 10ms time step. Ideally it would also be run at 1ms, but the simulator has trouble rendering and making calculations that quickly. To account for this, Nengo only communicates with V-REP every 10 of its time steps. A synchronization trigger command is also issued every 10 time steps from Nengo. The V-REP simulation will only move forward one time step each time this trigger is issued, and Nengo will pause simulation until V-REP has completed this time step. This ensures that the timing of each simulation is always synchronized. There is some processing overhead in ensuring the synchronization of these two systems, but it is worth it for the improved accuracy of the overall simulation. 
+
+\section{Experiments}
+
+%[Run different models in different situations, PD, PID, Adaptive, (possibly different adaptive models)]
+%[have some measure of goodness to run against -> measure of error throughout a run, -> speed of adaptation to picking up boxes or wind tunnel]
+%[also put in an adaptive controller that is either allocentric or context sensitive, see if it does better on those measures]
+%[lots of graphs and pretty pictures, maybe even a screenshot or two]
+
+To get a sense of how well the neural adaptive controller performs, some reference implementations were created to use as benchmarks. Five different non-neural controllers were used, a standard PD controller, a standard PID controller, an improved PID controller, an improved PID controller with a faster integral gain, and an adaptive controller. [fix this sentence up, or just put them all in a table with a description]. A couple iterations of the neural adaptive controller are used in the benchmarking. These are the standard adaptive controller, the modified error adaptive controller, the angle corrective controller, the target modulated angle corrective controller, the allocentric controller, and the context sensitive controller. [just stick these in a table with descriptions as well]
+
+[[show the math behind each of the controllers, mention the gravity compensation term used to account for the mass of the quadcopter, and how it is not needed in the adaptive models or PIDt. Have block diagrams or nengo diagrams of each]]
+
+For each reference implementation, a gravity compensation term had to be calculated and applied to the controllers in order to obtain reasonable performance. The magnitude of this term was determined empirically and is proportional to the mass of the quadcopter. The rotor velocity signal is the sum of the gravity compensation term and the output of the controller. The adaptive controllers do not need this extra term as they are able to learn how to compensate for the effects of gravity very quickly.
+
+A series of simple point to point control tasks are used to give an indication of performance. These tasks are: movement in the vertical direction, movement in the horizontal direction, rotation about the yaw axis, movement into a wind tunnel, and a movement that requires a change in x, y, and z position as well as yaw angle. These tasks are summarized in Table XXX below.
+
+[[Show table with different movement types, along with brief descriptions (i.e. move 2 units in the y direction into wind tunnel with 1 Newton of force in the x direction)]]
+[[maybe have multiple distances for each, and then average the RMS error, and report that for each model on the same graph? Should also have at least one plot from a single run, but its probably easiest to do massive comparisons with a single RMS number]]
+
+\begin{center}
+\begin{tabular}{| l | p{9cm} |}
+
+\hline
+Task & Description \\ \hline
+Vertical & Fly two meters upwards \\ \hline
+Horizontal & Fly one meter in the x direction \\ \hline
+Rotation & Rotate 45 degrees \\ \hline
+Combination & \\ \hline
+Wind & Fly one meter in the y direction. Enter a wind tunnel after 0.75 meters. This wind tunnel exerts a force of 0.6 N in the x direction \\ \hline
+Combination with External Force & \\ \hline
+
+\end{tabular}
+\end{center}
+
+[put some stuff in here with noise as well?]
+
+[also do experiments moving throughout a weird force field, and seeing improvement the more times it does it. This will have to be the allocentric model]
+
+The performance of the adaptive controller is quite strong, but it’s performance is still relatively close to that of the modified PID controllers. Where the adaptive controller really excels is when there are nonlinear external forces being applied
+
+\section{Results}
+
+%[Talk about the results, give advantages and disadvantages of each]
+
+While the neural adaptive controller did not perform strictly the best in all tasks, it had the strongest overall performance. 
+
+\section{Discussion and Future Work}
+
+
+
+% The \appendix statement indicates the beginning of the appendices.
+\appendix
+
+% Add a title page before the appendices and a line in the Table of Contents
+\chapter*{APPENDICES}
+\addcontentsline{toc}{chapter}{APPENDICES}
+%======================================================================
+\chapter[Name in Contents]{Longer name found in the body}
+\label{AppendixA}
+% Tip 4: Example of how to get a shorter chapter title for the Table of Contents 
+%======================================================================
+
+%----------------------------------------------------------------------
+% END MATERIAL
+%----------------------------------------------------------------------
+
+% B I B L I O G R A P H Y
+% -----------------------
+
+% The following statement selects the style to use for references.  It controls the sort order of the entries in the bibliography and also the formatting for the in-text labels.
+\bibliographystyle{plain}
+% This specifies the location of the file containing the bibliographic information.  
+% It assumes you're using BibTeX (if not, why not?).
+\cleardoublepage % This is needed if the book class is used, to place the anchor in the correct page,
+                 % because the bibliography will start on its own page.
+                 % Use \clearpage instead if the document class uses the "oneside" argument
+\phantomsection  % With hyperref package, enables hyperlinking from the table of contents to bibliography             
+% The following statement causes the title "References" to be used for the bibliography section:
+\renewcommand*{\bibname}{References}
+
+% Add the References to the Table of Contents
+\addcontentsline{toc}{chapter}{\textbf{References}}
+
+\bibliography{thesis}
+% Tip 5: You can create multiple .bib files to organize your references. 
+% Just list them all in the \bibliogaphy command, separated by commas (no spaces).
+
+% The following statement causes the specified references to be added to the bibliography% even if they were not 
+% cited in the text. The asterisk is a wildcard that causes all entries in the bibliographic database to be included (optional).
+\nocite{*}
+
+\end{document}

@@ -715,6 +715,24 @@ Combination with External Force & \\ \hline
 
 %[also do experiments moving throughout a weird force field, and seeing improvement the more times it does it. This will have to be the allocentric model]
 
+Three metrics are used to evaluate performance on these tasks. 
+The first is the Root Mean Squared (RMS) error of the difference between the quadcopter's current state and its target state.
+The quadcopter's state consists of position, velocity, orientation, and angular velocity.
+These state variables are combined by computing the length of the resulting 12 dimensional error vector to produce a single quantity.
+This value is calculated at each time step for the duration of the run and then averaged by the number of time steps in the run.
+For point to point control this error is sometimes not the most informative because as soon as the target point has changed a large error value will be recorded even if the quadcopter is moving optimally towards its target.
+
+The second metric is a modified version of the RMS error designed to take the desired trajectory into account.
+This works by ignoring any error along the direction to the target as long as the current velocity is also in that direction.
+It also ignores any error caused by the velocity in the correct direction as long as the quadcopter is not currently at its target.
+There are also weights placed on specific types of errors to reflect an increased desire to minimize those errors.
+For example, errors caused by overshooting the target are weighted more heavily.
+
+The third metric is the time taken for the quadcopter to reach its target within a particular tolerance. 
+This metric favours controllers that can reach the target quickly.
+This metric does not worry about overshoot and non-optimal trajectories as long as steady state is achieved at the target in the end.
+
+
 The performance of the adaptive controller is quite strong, but it’s performance is still relatively close to that of the modified PID controllers. 
 Where the adaptive controller really excels is when there are external forces being applied that are functions of the system state. 
 The adaptive controller is designed to be able to account for both linear and nonlinear functions of the system state.

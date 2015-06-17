@@ -192,24 +192,29 @@
 % separate documents, they would each start with the \chapter command, i.e, 
 % do not contain \documentclass or \begin{document} and \end{document} commands.
 %======================================================================
-\chapter{Figure out chapters and sections}
+\chapter{Introduction}
 %======================================================================
 
 \section{Motivation}
 
 %[talk about humans being a very good control system, want to build a robotic system that leverages some of the abilities humans have, by building it with a biologically realistic neural simulator. Can also be run on low power neural hardware in the future]
 
-Humans have an exceptional ability to be able to adapt to their surroundings. 
-When picking up a new object, there are a many unknown forces, torques, and inertial effects that this object will apply to the arm. 
-Despite this, humans are very good at manipulating objects and the necessary changes in timing and muscle tensions to do so are calculated with ease, even if the object has never been encountered before. 
-This can be largely attributed to the plasticity of neural connections in the motor control area of the brain.
+Humans have an exceptional ability to be able to adapt to their surroundings.
+In particular the human motor control system is able to compensate for changes in forces, torques, and inertial effects on the body.
+For example, when picking up an object such as a hammer, the weight of the hammer will apply external forces to the hand.
+This will change the dynamic properties of the hand and arm movements, yet the human motor control system is able to easily compensate for these changes and control their movement with the object.
+%Skilfully manipulating an object requires
+Even if an object has never been encountered before, the human brain is able to calculate the correct changes in timing and muscle tensions in order to skilfully manipulate the object. %For example, humans are able to use hammers with a variety of styles and weights
+%When picking up a new object, there are a many unknown forces, torques, and inertial effects that this object will apply to the arm. 
+%Despite all of these unknowns, humans are very good at manipulating objects and the necessary changes in timing and muscle tensions to do so are calculated with ease, even if the object has never been encountered before. 
+This ability can be largely attributed to the plasticity of neural connections in the motor control area of the brain.
 
 This ability for quick and easy adaptation to new dynamic properties of a system would be extremely useful in robotics. 
 Applying similar methods of control that have been developed over millions of years of evolution in the brain to a robotic control system could result in major improvements. 
 This is especially useful now that the demands of many robotic systems are now more general purpose than they were in the past. 
 Robots started out mainly performing simple and repetitive tasks in stable environments, such as automation in manufacturing [[throw in some references]]. 
 Now they are being used increasingly in more complex situations requiring a diverse amount of control, such as search and rescue missions, performing medical procedures, and assisting the elderly [[put references here]]. 
-When the precise environment that the robot will operate in is not fully known, it is useful for any control system that it uses to be able to handle unknown environments.
+When the precise environment that the robot will operate in is not fully known, it is useful for any control system that the robot uses to be adaptable to those environments.
 
 Another advantage the brain has when it comes to control, is that it uses very little power, about XXX Watts on average [[quote power amount here]]. 
 Hardware inspired by the brain is being designed to take advantage of this low power paradigm. 
@@ -251,6 +256,10 @@ The next section will cover the initial design of the controller model, as well 
 The next section will describe the implementation of the system as well as experiments run to quantify its performance. 
 The final section will provide a discussion of the results and outline areas of future work.
 
+%======================================================================
+\chapter{Background Information}
+%======================================================================
+
 \section{Flight Control}
 
 %[mention the six states: x,y,z,roll,pitch,yaw -> have a diagram to explain them]
@@ -290,19 +299,38 @@ To convert the other way, from inertial frame to body frame, the inverse of the 
 Since this matrix is orthogonal, its inverse is equal to its transpose.
 
 %[rotation matrix here]
+\begin{center}
+$
+R = 
+\begin{bmatrix}
+C_{\psi}C_{\theta} & C_{\psi}S_{\theta}S_{\phi} - S_{\psi}C_{\phi} & C_{\psi}S_{\theta}C_{\phi} + S_{\psi}S_{\phi} \\
+S_{\psi}C_{\theta} & S_{\psi}S_{\theta}S_{\phi} + C_{\psi}C_{\phi} & S_{\psi}S_{\theta}C_{\phi} - C_{\psi}S_{\phi} \\
+-S_{\theta} & C_{\theta}S_{\phi} & C_{\theta}C_{\phi}
+\end{bmatrix}
+$
+\end{center}
 
 The transformation matrices for the angular velocities between the inertial and body frames are shown below in Figure XXX.
 
 %[matrices here]
 
 The quadcopter is assumed to be symmetrical with equal length arms for each rotor. 
-Aligning the arms along the body x and y axes gives the diagonal inertia matrix in Equation XXX. Due to symmetry, $Ixx = Iyy$.
+Aligning the arms along the body x and y axes gives the diagonal inertia matrix in Equation XXX. Due to symmetry, $I_{xx} = I_{yy}$.
 
 %[put inertial matrix here]
+\begin{center}
+$
+\begin{bmatrix}
+I_{xx} & 0 & 0 \\
+0 & I_{yy} & 0 \\
+0 & 0 & I_{zz}
+\end{bmatrix}
+$
+\end{center}
 
 The angular velocity of each rotor generates a thrust force perpendicular to the body frame, as well as a torque about the rotor axis. 
 This relationship is shown in Equation XXX. 
-Where k is the lift constant, b is the drag constant, and IM is the moment of inertia of the rotor.
+Where $k$ is the lift constant, $b$ is the drag constant, and $I_{M}$ is the moment of inertia of the rotor.
 
 %[equations here]
 
@@ -310,11 +338,36 @@ Typically the effect of the angular acceleration is considered small and omitted
 
 Note that the forces and torques generated are always proportional to the square of the rotor angular velocity, so it is simpler to work with this term instead of the angular velocity itself. [put this part under simulation instead]
 
-Combining the forces of all four rotors leads to Equation XXX below. Where T is the thrust in the direction of the z-axis of the body. 
-Combining the torques of all four rotors leads to Equation XXX, where the vector tau represents the torques across each of the principal body axes (tau-? for roll, tau-? for pitch, and tau-? for yaw). 
-The distance between the rotor and the center of mass of the quadcopter is denoted by l. 
+Combining the forces of all four rotors leads to Equation XXX below. Where $T$ is the thrust in the direction of the z-axis of the body. 
+Combining the torques of all four rotors leads to Equation XXX, where the vector tau represents the torques across each of the principal body axes ($\tau_{\phi}$ for roll, $\tau_{\theta}$ for pitch, and $\tau_{\psi}$ for yaw). 
+The distance between the rotor and the center of mass of the quadcopter is denoted by $l$. 
 
 %[put the two equations here]
+\begin{center}
+$$
+T = \sum_{i=1}^{4} f_{i} = k\sum_{i=1}^{4} w^{2}_{i} , T_{B} = 
+\begin{bmatrix}
+0 \\
+0 \\
+T
+\end{bmatrix}
+$$
+
+$$
+\tau_{B} = 
+\begin{bmatrix}
+\tau_{\phi} \\
+\tau_{\theta} \\
+\tau_{\psi}
+\end{bmatrix}
+=
+\begin{bmatrix}
+lk(-w_{2}^{2}+w_{4}^{2}) \\
+lk(-w_{1}^{2}+w_{3}^{2}) \\
+\sum_{i=1}^{4}\tau_{M_{i}}
+\end{bmatrix}
+$$
+\end{center}
 
 %[[put some description explaining these equations here]]
 
@@ -440,6 +493,10 @@ A larger number of neurons means that the changes will be greater, as there will
 A simple example of using the PES learning rule to control an inverted pendulum is shown in Figure XXX. [[describe how the model works in the figure description, talk about the different dimensionalities of each population]]
 
 %[put in a simple network diagram showing the PES rule, and possibly an equation with its math]
+
+%======================================================================
+\chapter{Implementation}
+%======================================================================
 
 \section{Controller Model}
 
@@ -609,6 +666,10 @@ A synchronization trigger command is also issued every 10 time steps from Nengo.
 This ensures that the timing of each simulation is always synchronized. 
 There is some processing overhead in ensuring the synchronization of these two systems, but it is worth it for the improved accuracy of the overall simulation. 
 
+%======================================================================
+\chapter{Analysis}
+%======================================================================
+
 \section{Experiments}
 
 %[Run different models in different situations, PD, PID, Adaptive, (possibly different adaptive models)]
@@ -655,7 +716,13 @@ Combination with External Force & \\ \hline
 %[also do experiments moving throughout a weird force field, and seeing improvement the more times it does it. This will have to be the allocentric model]
 
 The performance of the adaptive controller is quite strong, but it’s performance is still relatively close to that of the modified PID controllers. 
-Where the adaptive controller really excels is when there are nonlinear external forces being applied
+Where the adaptive controller really excels is when there are external forces being applied that are functions of the system state. 
+The adaptive controller is designed to be able to account for both linear and nonlinear functions of the system state.
+
+To quantify the performance of the quadcopter controllers under the influence of these more interesting forces, a new set of benchmark tasks is used.
+These tasks are listed in Table XXX below.
+
+%put table with strange forces here, include downward force proportional to horizontal velocity, sideways force proportional to position/velocity, etc.
 
 \section{Results}
 

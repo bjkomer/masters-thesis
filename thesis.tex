@@ -252,13 +252,11 @@ This thesis explores an adaptive control algorithm for quadcopter flight constru
 
 %[talk about what each section of the thesis will talk about]
 \Chapref{chap:background} gives an overview of how quadcopters are able to fly, followed by a section detailing the mathematics underlying the dynamics of a quadcopter system. 
-% TODO: remove all of this 'next section' crap and make it more clear
-The next section describes the physical simulation of the quadcopter. 
-Following this is an overview of the control theory used in developing the control system, including standard PD control, adaptive control, and adaptive control in a simulated biological neural system. 
+Following the mathematical characterization is a description of how the quadcopter is modelled in a simulation environment.
+\Chapref{chap:control} gives an overview of the control theory used in developing the control system, including standard PID control, adaptive control, and adaptive control in a simulated biological neural system. 
 \Chapref{chap:implementation} covers the initial design of the controller model, as well as many of the iterations of improvements leading to the final design.
-% TODO: remove all of this 'next section' crap and make it more clear
-The next section will describe the implementation of the system as well as experiments run to quantify its performance. 
-The final section discusses the results and outline areas of future work.
+\Chapref{chap:analysis} describes the set of experiments performed and metrics used to quantify performance of the various controllers. 
+The final section discusses the results and outlines areas of future work.
 
 %======================================================================
 \chapter{Background Information} \label{chap:background}
@@ -287,6 +285,8 @@ By varying the relative speeds of each rotor, the quadcopter is able to create a
 A quadcopter performs four common ‘actions’ to move around in its environment, with a distinct pattern of rotor actuation for each one. 
 These actions are: tilt forward/backward, tilt left/right, rotate, and move up/down. 
 A quadcopter can perform any combination of these actions, and with different magnitudes of each. The relative rotor speeds required for each are shown in Figure XXX below [[put in diagram from wikipedia, or make your own]]
+
+
 
 \section{Dynamics}
 
@@ -422,6 +422,8 @@ lk(-w_{1}^{2}+w_{3}^{2}) \\
 %[talk about pure python simulator built from dynamics equations]
 %[VREP is used because it allows complex environments and sensors]
 
+%should probably include somewhere what values were used for each of the 'parameters' in the simulation, i.e. mass, inertia, lengths of rotor arms, etc
+
 The quadcopter model was validated and tested using a computer simulation environment. 
 The advantage of starting with a simulation rather than going straight to physical hardware is that it is quicker and easier to prototype new control algorithms, and it is much less costly to do so. 
 For this project I decided to use the Virtual Robotics Experimentation Platform (V-REP)\cite{vrep} as the physical simulation environment.
@@ -431,7 +433,7 @@ It allows the construction of intricate 3D virtual environments for the quadcopt
 
 %[possible bit about choosing the simulator]
 Two other strong candidates for the physics simulator where MORSE [reference] and Gazebo [reference]. 
-[continue with a little blurb about them and why they were not chosen, and reference the comparison table]
+%[continue with a little blurb about them and why they were not chosen, and reference the comparison table]
 
 %[possible table comparing V-REP/MORSE/Gazebo with pros and cons of each]
 
@@ -446,7 +448,9 @@ For example, one zone could push the quadcopter in the z direction with a force 
 In addition to these zones, the quadcopter can also pick up and drop off boxes of various mass. 
 These are used to test how well the controller can adapt to changes in its dynamics.
 
-\section{Control}
+\chapter{Control} \label{chap:control}
+
+\section{PID Control}
 
 %[go over standard control, talk about PD and PID systems]
 %[put in a block diagram of a simple PID system -> maybe show spots where disturbances can enter]
@@ -536,6 +540,13 @@ A simple example of using the PES learning rule to control an inverted pendulum 
 
 %[put in a simple network diagram showing the PES rule, and possibly an equation with its math]
 
+
+
+% Should a chapter on simulation go here??
+%======================================================================
+%\chapter{Simulation} \label{chap:simulation}
+%======================================================================
+
 %======================================================================
 \chapter{Implementation} \label{chap:implementation}
 %======================================================================
@@ -552,11 +563,32 @@ The controller is given the state error of the quadcopter and its target, as wel
 It needs to use this information to generate a suitable control signal.
 
 This is done by using a PD controller which generates a four dimensional output signal in the space of possible quadcopter motions. 
-The gain matrix that performs this operation can be seen in Figure XXX. 
+The gain matrix that performs this operation can be seen in \eqref{eq:gain_matrix}. 
 This signal is then transformed into the four dimensional rotor velocity space to provide the actuation associated with the desired movement commands. 
-This is done by multiplying by the matrix in Figure XXX. 
+This is done by multiplying by the matrix in \eqref{eq:rotor_transform}. 
 The design of this matrix depends upon the orientation of the rotor blades to the x and y axes. 
 This transformation matrix assumes that the rotor axes are offset from the x-y axes by 45 degrees.
+
+\begin{equation} \label{eq:gain_matrix}
+K =
+\setcounter{MaxMatrixCols}{12}
+\begin{bmatrix}
+0 & 0 & k_{2} & 0 & 0 & -k_{4} & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & k_{1} & 0 & 0 & -k_{3} & 0 & -k_{5} & 0 & 0 & k_{7} & 0 & 0 \\
+-k_{1} & 0 & 0 & k_{3} & 0 & 0 & 0 & -k_{5} & 0 & 0 & k_{7} & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -k_{6} & 0 & 0 & k_{8}
+\end{bmatrix}
+\end{equation}
+
+\begin{equation} \label{eq:rotor_transform}
+T_{R} = 
+\begin{bmatrix}
+1 & -1 & 1 & 1 \\
+1 & -1 & -1 & -1 \\
+1 & 1 & -1 & 1 \\
+1 & 1 & 1 & -1
+\end{bmatrix}
+\end{equation}
 
 Translation in the x and y directions are dependent on the states of both x and y as well as roll and pitch. 
 This is because a roll in the quadcopter causes a component of thrust to be applied in the y direction, and a pitch causes a component of thrust to be applied in the x direction.

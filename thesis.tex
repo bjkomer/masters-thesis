@@ -166,6 +166,9 @@
   \clearpage{\pagestyle{empty}\origdoublepage}}
 \let\cleardoublepage\clearemptydoublepage
 
+% Allow chapter references to be capitalized
+\newcommand{\Chapref}[1]{Chapter~\ref{#1}} 
+
 %======================================================================
 %   L O G I C A L    D O C U M E N T -- the content of your thesis
 %======================================================================
@@ -227,37 +230,38 @@ This style of hardware, known as neuromorphic hardware, is typically massively p
 %[light-weight]
 %[very maneuverable]
 
-A quadcopter is a very versatile aerial vehicle. 
-They typically consist of a central body with four upright rotors equally spaced around the body. 
+Quadcopters are very versatile aerial vehicles, typically consisting of a central body with four upright rotors equally spaced around the body. 
 This configuration allows them to be lightweight and simplifies construction. 
 They also have the ability to take off and land vertically without external assistance, meaning they can be used in a lot more situations than aircraft that require a runway or other particular conditions to take off. 
-They can also change directions fairly easily mid flight, and have the ability to hover at a particular location. Due to their low cost, light weight, and easy to use nature, they are an excellent aircraft to use for research purposes.
+They can also change directions fairly easily mid flight, and have the ability to hover at a particular location. Due to their low cost, light weight, and ease of use, they are an excellent aircraft to use for research purposes.
 
 %[battery heaviest part, low power controller means it can last longer and/or be lighter, good candidate for neural control]
 Despite all of these positive qualities, one of the main weaknesses of quadcopters is their short battery life. 
-Small and simple quadcopters used by hobbyists typically only last 10 to 20 minutes before they are out of power [[put in source]]. 
+Small and simple quadcopters used by hobbyists typically last only 10 to 20 minutes before they run out of power [[put in source]]. 
 The more expensive industrial grade quadcopters can last 1 to 2 hours before they need to be recharged [[check this]] [[put in source]], but this duration is still not long enough for some applications. 
 For example, if a quadcopter is being used in a search and rescue mission it may need to remain flying for a long time without recharging, especially if it is operating in a remote area. 
-Battery weight is one of the main issues hindering the maximum flight time of quadcopters. If a larger battery is used to attempt to increase the maximum flight time, the quadcopter will be heavier and therefore require more power to fly, and in turn drain the battery faster. 
-Two possible solutions to this problem are lighter batteries and more energy efficient operation.
+Battery weight is one of the main issues hindering the maximum flight time of quadcopters. 
+If a larger battery is used in attempts to increase the maximum flight time, the quadcopter will be heavier and therefore require more power to fly, which in turn will drain the battery faster. 
+Two possible solutions to this problem are lighter batteries and more energy-efficient operation.
 The latter can be achieved by the use of neuromorphic hardware to run the flight control system.
 
 %[something about how adaptive control is awesome]
-In addition to the low power consumption of neuromorphic hardware, the types of neural algorithms that can be run on these systems are extremely useful. 
+In addition to the low power consumption of neuromorphic hardware, they also have the advantage of using various types of neural algorithms that can be extremely useful for control.
 In particular, the learning capabilities of brain-like algorithms can be used to develop controllers that are able to adapt to unknown environments with non-linear dynamics. 
-In this thesis I will explore an adaptive control algorithm for quadcopter flight constructed using simulated biologically plausible neurons.
+This thesis explores an adaptive control algorithm for quadcopter flight constructed using simulated biologically plausible neurons.
 
 %[talk about what each section of the thesis will talk about]
-The next section of this thesis will give an overview of how quadcopters are able to fly, followed by a section detailing the mathematics underlying the dynamics of a quadcopter system. 
-The next section will describe the physical simulation of the quadcopter. 
-Following this will be an overview of the control theory used in developing the control system. 
-This will cover standard PD control, adaptive control, and adaptive control in a simulated biological neural system. 
-The next section will cover the initial design of the controller model, as well as many of the iterations of improvements along the way to the final design. 
+\Chapref{chap:background} gives an overview of how quadcopters are able to fly, followed by a section detailing the mathematics underlying the dynamics of a quadcopter system. 
+% TODO: remove all of this 'next section' crap and make it more clear
+The next section describes the physical simulation of the quadcopter. 
+Following this is an overview of the control theory used in developing the control system, including standard PD control, adaptive control, and adaptive control in a simulated biological neural system. 
+\Chapref{chap:implementation} covers the initial design of the controller model, as well as many of the iterations of improvements leading to the final design.
+% TODO: remove all of this 'next section' crap and make it more clear
 The next section will describe the implementation of the system as well as experiments run to quantify its performance. 
-The final section will provide a discussion of the results and outline areas of future work.
+The final section discusses the results and outline areas of future work.
 
 %======================================================================
-\chapter{Background Information}
+\chapter{Background Information} \label{chap:background}
 %======================================================================
 
 \section{Flight Control}
@@ -267,20 +271,20 @@ The final section will provide a discussion of the results and outline areas of 
 %[thrust is always perpendicular to the body]
 %[two ways to do it, rotor aligned axis, and 45 degrees from that]
 
-The system state of a quadcopter is six dimensional. 
-Three dimensions for position (x, y, and z) and three dimensions for orientation (roll, pitch, and yaw). 
+The system state of a quadcopter is six dimensional: three for position (x, y, and z) and three for orientation (roll, pitch, and yaw). 
 There are four control inputs, which are typically taken to be the rotational velocity of each of the four rotors. 
-For a physical quadcopter, these inputs would be the voltages applied to each of these rotors, in which a transformation can be obtained using the rotor parameters to estimate the velocity. 
+For a physical quadcopter, these inputs are the voltages applied to each of these rotors.
+A transformation in these voltages can be obtained using the physical rotor parameters to estimate the rotor velocity.
 For simplicity of the simulation, the velocity is used directly in this thesis. [continue...]
 
 %[talk about perpendicular thrust, as well as torque on the body, and that is how each of the movements is done]
 The rotors will always generate a thrust that is perpendicular to the body of the aircraft. 
-In addition to this thrust, torques are generated by each rotor based on which direction they are spinning as well as their distance from the center of the body.
-For the quadcopter to be able to control its orientation, half of the rotors are spinning clockwise and the other half are spinning counter-clockwise. 
-The pairs opposite of each other across the body are spinning in the same direction. This allows the torques created to be able to balance each other out and allow the quadcopter to be able to maintain a steady orientation. 
+In addition to this thrust, torque is generated by each rotor based on their spin direction  as well as their distance from the center of the body.
+For the quadcopter to be able to control its orientation, half of the rotors spin clockwise and the other half spin counter-clockwise. 
+The pairs diagonally opposite each other across the body spin in the same direction, allowing the torques to balance one another out and the quadcopter to maintain a steady orientation. 
 By varying the relative speeds of each rotor, the quadcopter is able to create a net torque in a specific direction, causing a rotation about any axis.
 
-There are four common ‘actions’ that a quadcopter can perform to move around in it’s environment, with a distinct pattern of rotor actuation for each one. 
+A quadcopter performs four common ‘actions’ to move around in its environment, with a distinct pattern of rotor actuation for each one. 
 These actions are: tilt forward/backward, tilt left/right, rotate, and move up/down. 
 A quadcopter can perform any combination of these actions, and with different magnitudes of each. The relative rotor speeds required for each are shown in Figure XXX below [[put in diagram from wikipedia, or make your own]]
 
@@ -482,11 +486,10 @@ In this situation it is useful to have a controller that can adapt to these chan
 
 The foundation of adaptive control is based on parameter estimation. 
 First, a mathematical model of the system to be controlled is generated based on physical laws. 
-This model is typically of the form shown in Equation XXX.
-\begin{center}
-$M(q)\ddot{q} + C(q,\dot{q})\dot{q} + g(q) = \tau$
-%[put in the M(q)ddq + C(q,dq)dq + g(q) = tau equation]
-\end{center}
+This model is typically of the form shown in \eqref{eq:physical_equation}.
+\begin{equation} \label{eq:physical_equation}
+M(q)\ddot{q} + C(q,\dot{q})\dot{q} + g(q) = \tau
+\end{equation}
 
 Where $q$ is the vector of state variables, $M(q)$ is a mass/inertia matrix, $C(q,\dot{q})$ is the coriolis term [???], $g(q)$ is the gravitational force, and $\tau$ is a vector representing the input to the system.
 
@@ -534,7 +537,7 @@ A simple example of using the PES learning rule to control an inverted pendulum 
 %[put in a simple network diagram showing the PES rule, and possibly an equation with its math]
 
 %======================================================================
-\chapter{Implementation}
+\chapter{Implementation} \label{chap:implementation}
 %======================================================================
 
 \section{Controller Model}
@@ -706,7 +709,7 @@ This ensures that the timing of each simulation is always synchronized.
 There is some processing overhead in ensuring the synchronization of these two systems, but it is worth it for the improved accuracy of the overall simulation. 
 
 %======================================================================
-\chapter{Analysis}
+\chapter{Analysis} \label{chap:analysis}
 %======================================================================
 
 \section{Experiments}

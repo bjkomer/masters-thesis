@@ -294,66 +294,106 @@ Typically you are interested in the state of the quadcopter in the inertial fram
 
 %[put diagram around here]
 
-The rotation matrix shown in Figure XXX can be used to convert coordinates from the body frame to the inertial frame. 
+The rotation matrix shown in \eqref{eq:rotation_matrix} can be used to convert coordinates from the body frame to the inertial frame. 
 To convert the other way, from inertial frame to body frame, the inverse of the matrix is used. 
 Since this matrix is orthogonal, its inverse is equal to its transpose.
 
 %[rotation matrix here]
-\begin{center}
-$
+\begin{equation} \label{eq:rotation_matrix}
 R = 
 \begin{bmatrix}
 C_{\psi}C_{\theta} & C_{\psi}S_{\theta}S_{\phi} - S_{\psi}C_{\phi} & C_{\psi}S_{\theta}C_{\phi} + S_{\psi}S_{\phi} \\
 S_{\psi}C_{\theta} & S_{\psi}S_{\theta}S_{\phi} + C_{\psi}C_{\phi} & S_{\psi}S_{\theta}C_{\phi} - C_{\psi}S_{\phi} \\
 -S_{\theta} & C_{\theta}S_{\phi} & C_{\theta}C_{\phi}
 \end{bmatrix}
-$
-\end{center}
+\end{equation}
 
-The transformation matrices for the angular velocities between the inertial and body frames are shown below in Figure XXX.
+The transformation matrices for the angular velocities between the inertial and body frames are shown below in \eqref{eq:global_angular_velocity} and \eqref{eq:local_angular_velocity}.
 
 %[matrices here]
+\begin{equation} \label{eq:global_angular_velocity}
+\dot{\eta} = W_{\eta}^{-1}\nu, 
+\begin{bmatrix}
+\dot{\phi} \\
+\dot{\theta} \\
+\dot{\psi}
+\end{bmatrix}
+=
+\begin{bmatrix}
+1 & S_{\phi}T_{\theta} & C_{\phi}T_{\theta} \\
+0 & C_{\phi} & -S_{\phi} \\
+0 & S_{\phi}/C_{\theta} & C_{\phi}/C_{\theta}
+\end{bmatrix}
+\begin{bmatrix}
+p \\
+q \\
+r
+\end{bmatrix}
+\end{equation}
+
+\begin{equation} \label{eq:local_angular_velocity}
+\nu = W_{\eta}\dot{\eta},
+\begin{bmatrix}
+p \\
+q \\
+r
+\end{bmatrix}
+=
+\begin{bmatrix}
+1 & 0 & -S_{\theta} \\
+0 & C_{\phi} & C_{\theta}S_{\phi} \\
+0 & -S_{\phi} & C_{\theta}C_{\phi}
+\end{bmatrix}
+\begin{bmatrix}
+\dot{\phi} \\
+\dot{\theta} \\
+\dot{\psi}
+\end{bmatrix}
+\end{equation}
 
 The quadcopter is assumed to be symmetrical with equal length arms for each rotor. 
-Aligning the arms along the body x and y axes gives the diagonal inertia matrix in Equation XXX. Due to symmetry, $I_{xx} = I_{yy}$.
+Aligning the arms along the body x and y axes gives the diagonal inertia matrix in \eqref{eq:inertia_matrix}. 
+Due to symmetry, $I_{xx} = I_{yy}$.
 
 %[put inertial matrix here]
-\begin{center}
-$
+\begin{equation} \label{eq:inertia_matrix}
 \begin{bmatrix}
 I_{xx} & 0 & 0 \\
 0 & I_{yy} & 0 \\
 0 & 0 & I_{zz}
 \end{bmatrix}
-$
-\end{center}
+\end{equation}
 
 The angular velocity of each rotor generates a thrust force perpendicular to the body frame, as well as a torque about the rotor axis. 
-This relationship is shown in Equation XXX. 
-Where $k$ is the lift constant, $b$ is the drag constant, and $I_{M}$ is the moment of inertia of the rotor.
+This relationship is shown in \eqref{eq:rotor_force} and \eqref{eq:rotor_torque}. 
+Where $\omega$ is the angular velocity of the $i$th rotor, $k$ is the lift constant, $b$ is the drag constant, and $I_{M}$ is the moment of inertia of the rotor.
 
 %[equations here]
+\begin{equation} \label{eq:rotor_force}
+f_{i} = kw_{i}^{2}
+\end{equation}
+\begin{equation} \label{eq:rotor_torque}
+\tau_{M_{i}} = b\omega_{i}^{2} + I_{M}\dot{\omega_{i}}
+\end{equation}
 
 Typically the effect of the angular acceleration is considered small and omitted in most analyses, so it will not be present in the remainder of the dynamics derivations.
 
 Note that the forces and torques generated are always proportional to the square of the rotor angular velocity, so it is simpler to work with this term instead of the angular velocity itself. [put this part under simulation instead]
 
-Combining the forces of all four rotors leads to Equation XXX below. Where $T$ is the thrust in the direction of the z-axis of the body. 
-Combining the torques of all four rotors leads to Equation XXX, where the vector tau represents the torques across each of the principal body axes ($\tau_{\phi}$ for roll, $\tau_{\theta}$ for pitch, and $\tau_{\psi}$ for yaw). 
+Combining the forces of all four rotors leads to \eqref{eq:thrust} below. Where $T$ is the thrust in the direction of the z-axis of the body. 
+Combining the torques of all four rotors leads to \eqref{eq:torque}, where the vector tau represents the torques across each of the principal body axes ($\tau_{\phi}$ for roll, $\tau_{\theta}$ for pitch, and $\tau_{\psi}$ for yaw). 
 The distance between the rotor and the center of mass of the quadcopter is denoted by $l$. 
 
 %[put the two equations here]
-\begin{center}
-$$
+\begin{equation} \label{eq:thrust}
 T = \sum_{i=1}^{4} f_{i} = k\sum_{i=1}^{4} w^{2}_{i} , T_{B} = 
 \begin{bmatrix}
 0 \\
 0 \\
 T
 \end{bmatrix}
-$$
-
-$$
+\end{equation}
+\begin{equation} \label{eq:torque}
 \tau_{B} = 
 \begin{bmatrix}
 \tau_{\phi} \\
@@ -366,8 +406,7 @@ lk(-w_{2}^{2}+w_{4}^{2}) \\
 lk(-w_{1}^{2}+w_{3}^{2}) \\
 \sum_{i=1}^{4}\tau_{M_{i}}
 \end{bmatrix}
-$$
-\end{center}
+\end{equation}
 
 %[[put some description explaining these equations here]]
 

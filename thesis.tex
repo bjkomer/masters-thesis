@@ -169,6 +169,8 @@
 % Allow chapter references to be capitalized
 \newcommand{\Chapref}[1]{Chapter~\ref{#1}} 
 
+\newcommand{\Tabref}[1]{Table~\ref{#1}} 
+
 %======================================================================
 %   L O G I C A L    D O C U M E N T -- the content of your thesis
 %======================================================================
@@ -219,7 +221,8 @@ Robots started out mainly performing simple and repetitive tasks in stable envir
 Now they are being used increasingly in more complex situations requiring a diverse amount of control, such as search and rescue missions, performing medical procedures, and assisting the elderly [[put references here]]. 
 When the precise environment that the robot will operate in is not fully known, it is useful for any control system that the robot uses to be adaptable to those environments.
 
-Another advantage the brain has when it comes to control, is that it uses very little power, about XXX Watts on average [[quote power amount here]]. 
+Another advantage the brain has when it comes to control, is that it uses very little power, about 20 Watts on average \cite{hart1975brain}.
+% the motor is the majority of the power on a quadcopter, so neuromorphic hardware might not help much here
 Hardware inspired by the brain is being designed to take advantage of this low power paradigm. 
 This style of hardware, known as neuromorphic hardware, is typically massively parallel and runs in an analog rather than digital domain.
 
@@ -284,8 +287,11 @@ By varying the relative speeds of each rotor, the quadcopter is able to create a
 
 A quadcopter performs four common ‘actions’ to move around in its environment, with a distinct pattern of rotor actuation for each one. 
 These actions are: tilt forward/backward, tilt left/right, rotate, and move up/down. 
-A quadcopter can perform any combination of these actions, and with different magnitudes of each. The relative rotor speeds required for each are shown in Figure XXX below [[put in diagram from wikipedia, or make your own]]
+A quadcopter can perform any combination of these actions, and with different magnitudes of each. The relative rotor speeds required for each are shown in \autoref{fig:actions} below [[put in diagram from wikipedia, or make your own]]
 
+\begin{figure} \label{fig:actions}
+
+\end{figure}
 
 
 \section{Dynamics}
@@ -508,6 +514,10 @@ Gaussian basis functions are commonly used in adaptive control [[reference]], bu
 \section{Neural Simulation}
 
 %[brief description of the NEF and Nengo and how it can be used, mostly just put references here]
+%put a reference to Travis' thesis as an example of how Nengo's learning can be used for motor control
+\cite{bekolay2013nengo}
+
+
 
 \section{Adaptive Control in Nengo}
 
@@ -517,7 +527,7 @@ Gaussian basis functions are commonly used in adaptive control [[reference]], bu
 
 The adaptive control methods described above can be applied to a network built using the Neural Engineering Framework. 
 An ensemble of simulated neurons is used as the set of basis functions for the physical model, and the decoders of these neurons are used as the vector of unknown constant parameters. 
-A learning rule known as the Prescribed Error Sensitivity or PES rule is used to update the decoder values [[reference here?]]. 
+A learning rule known as the Prescribed Error Sensitivity or PES rule is used to update the decoder values \cite{bekolay2013simultaneous}. 
 
 This works by first creating a connection from an ensemble of spiking neurons representing the state of the system to a node representing the output of the controller. 
 This is known as the learned connection and can be initially set to perform any transformation, but is typically initialized for the output to be random or zero. 
@@ -659,14 +669,18 @@ This is done by generating a separate gain matrix to use on the modulatory conne
 The new network diagram of the model is shown below in Figure XXX.
 
 %[[show network diagram with adaptive transform]]
+\subsection{Gain Tuning}
 
 This controller is now able to adapt to external horizontal forces, but normal flight is much less stable and prone to overshooting targets. 
 One possible reason for this is that the gains might need to be re-tuned to work with this new controller setup. 
 There are 15 different gains in this controller, which makes tuning them manually a difficult and laborious task.
 This is a task well suited for automated parameter optimization. 
-The tool that I chose to use for this is Hyperopt. 
+The tool that I chose to use for this is Hyperopt \cite{hyperopt}. 
 Hyperopt is a python package designed to perform parameter optimization over a search space for a given function. 
 As long as you can set your problem up in a way that it becomes a function that takes any number of parameters and returns a single error metric to be minimized, it can be used with Hyperopt. [[blather on about how hyperopt builds a surrogate model based on the problem, and how it has the option for smarter than random methods for picking points, as well as interesting ways to set up the search space]]
+
+%TODO better title here??
+\subsection{Using Hyperopt}
 
 In order to use Hyperopt, the controller model must be encapsulated in some function that returns a useful metric of how well the controller works. This was done by creating a set of target points for the quadcopter to move through over a period of time and an additional population computing a scalar measure of the error of the quadcopter from the target. This error metric was taken to be a weighted Euclidean norm of each of the dimensions of the state. States that were deemed more important (such as x,y, and z position) were given higher weights in this calculation. States that were less important (such as roll and pitch) were given lower weights. 
 Paired with this error was a status signal of whether or not the quadcopter should be at the target by now, or if it is okay that it is still in flight. 
@@ -697,6 +711,9 @@ This way the controller will no longer be actively trying to bring the quadcopte
 The performance of this controller is shown in Figure XXX below.
 
 %[[show plots of angle adapt controller]]
+
+%TODO figure out a better title for this section
+\subsection{Shortcomings of the Error Signal}
 
 There is still a problem with the implementation of this controller. 
 Since the adaptive component is driven by state error, as soon as the target is moved to a new location, a large error will be produced. 
@@ -741,7 +758,7 @@ This ensures that the timing of each simulation is always synchronized.
 There is some processing overhead in ensuring the synchronization of these two systems, but it is worth it for the improved accuracy of the overall simulation. 
 
 %======================================================================
-\chapter{Analysis} \label{chap:analysis}
+\chapter{Simulations and Results} \label{chap:analysis}
 %======================================================================
 
 \section{Experiments}
@@ -769,11 +786,14 @@ The adaptive controllers do not need this extra term as they are able to learn h
 
 A series of simple point to point control tasks are used to give an indication of performance. 
 These tasks are: movement in the vertical direction, movement in the horizontal direction, rotation about the yaw axis, movement into a wind tunnel, and a movement that requires a change in x, y, and z position as well as yaw angle. 
-These tasks are summarized in Table XXX below.
+These tasks are summarized in \autoref{table:tasks} below.
 
 %[[Show table with different movement types, along with brief descriptions (i.e. move 2 units in the y direction into wind tunnel with 1 Newton of force in the x direction)]]
 %[[maybe have multiple distances for each, and then average the RMS error, and report that for each model on the same graph? Should also have at least one plot from a single run, but its probably easiest to do massive comparisons with a single RMS number]]
 
+%TODO fix up this table
+\begin{table}
+\caption{Benchmark Tasks} \label{table:tasks}
 \begin{center}
 \begin{tabular}{| l | p{9cm} |}
 
@@ -788,6 +808,7 @@ Combination with External Force & \\ \hline
 
 \end{tabular}
 \end{center}
+\end{table}
 
 %[put some stuff in here with noise as well?]
 
@@ -812,6 +833,7 @@ For example, errors caused by overshooting the target are weighted more heavily.
 The third metric is the time taken for the quadcopter to reach its target within a particular tolerance. 
 This metric favours controllers that can reach the target quickly.
 This metric does not worry about overshoot and non-optimal trajectories as long as steady state is achieved at the target in the end.
+The particular tolerance chosen for these experiments is maintaining an RMS error of less than 0.001 for a duration of one second.
 
 % TODO: figure out a good name for this section
 \subsection{Benchmarks for Complex Environments}
@@ -821,9 +843,14 @@ Where the adaptive controller really excels is when there are external forces be
 The adaptive controller is designed to be able to account for both linear and nonlinear functions of the system state.
 
 To quantify the performance of the quadcopter controllers under the influence of these more interesting forces, a new set of benchmark tasks is used.
-These tasks are listed in Table XXX below.
+These tasks are listed in \autoref{table:forcingfunctions} below. %maybe just reference the forcing function table here? Have both places reference the same table
 
 %put table with strange forces here, include downward force proportional to horizontal velocity, sideways force proportional to position/velocity, etc.
+
+
+%Fill the rest of this subsection with the results of running models in these environments
+% could just put things in tables instead of having plots everywhere, or make the plots smaller so they don't take up an obnoxious amount of space
+
 
 % This subsection will talk about how pre-training for different amounts of time on particular force functions effects the performance 
 \subsection{Effects of Training Time}
@@ -832,14 +859,57 @@ Adaptive controllers learn over time.
 Longer operation contributes to a better internal representation of the environment which in turn increases the performance that the controller can achieve.
 As such, it useful to characterize by how much these controllers improve their performance as a function of time.
 
+Training is done by running the controller in a particular environment for a period of time and recording the values of the learned decoders. % maybe explain this more??
+These decoder values can then be loaded into the controller at the start of a new simulation, and the new controller will effectively start off with all of the information that the old controller had learned.
+By taking snapshots of the decoder values at particular intervals throughout the training run, the new simulations can be run with different levels of pre-training to compare performance.
+Each training run is completed with a different forcing function being applied to the quadcopter.
+The particular forcing functions used in these experiments are detailed in \autoref{table:forcingfunctions}.
+In order to explore the state space, the quadcopter is sent to a series of random target locations throughout the training run.
+In the experiments shown below, 15 random targets were chosen during training.
+These targets are sampled from a 6 by 6 area in the horizontal plane.
+Every three seconds the quadcopter is commanded to move to the next target in the sequence. Once the end of the sequence has been reached, the sequence will start over again until the end of the training session. %TODO this is out of date, future runs have everything random, with no repeating of the sequence
+Training sessions lasted 1000 seconds, with recordings taken every 100 seconds. %the recordings should really be on a more exponential scale, i.e. [0,5,10,50,100,500,1000]
+
+\begin{table}
+\caption{Forcing Functions} \label{table:forcingfunctions}
+\begin{center}
+\begin{tabular}{| l | p{9cm} |}
+\hline
+\textbf{Name} & \textbf{Description} \\ \hline
+None & No external forces applied \\ \hline
+Vertical Velocity & A downward force is applied proportional to the quadcopter's horizontal velocity \\ \hline
+Horizontal Position & A force is applied in the y-direction proportional to the quadcopter's x-position \\ \hline
+Horizontal Velocity & A force is applied in the y-direction proportional to the quadcopter's x-velocity \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+% could also add and try out forces dependent on the vertical direction, or even rotation
+
+These trained controllers ran on the benchmark tasks from Section XXX.
+The performance for different lengths of training time are shown in \autoref{fig:training_time} below.
+
+%put the figure with the different forcing functions and training time here
+\begin{figure} \label{fig:training_time}
+
+\end{figure}
+
+These results show a clear improvement in the controller performance after training.
+The amount of training needed to get good results is relatively small. 
+After about XXX seconds, the controller performance does not improve significantly.
+
+%maybe show another figure with training done on more than 15 points? Highlight how exploring a large portion of the space is important
+
+
+% does this even need to be a section? Results go hand in hand with experiments
 \section{Results}
 
 %[Talk about the results, give advantages and disadvantages of each]
 
-While the neural adaptive controller did not perform strictly the best in all tasks, it had the strongest overall performance. 
-
-\section{Discussion and Future Work}
-
+While the neural adaptive controller did not perform strictly the best in all tasks, it had the strongest overall performance.
+ 
+%======================================================================
+\chapter{Discussion and Future Work} \label{chap:discussion}
+%======================================================================
 
 
 % The \appendix statement indicates the beginning of the appendices.

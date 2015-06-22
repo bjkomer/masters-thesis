@@ -171,6 +171,16 @@
 
 \newcommand{\Tabref}[1]{Table~\ref{#1}} 
 
+% Find the figures stored in this folder
+\graphicspath{./figures/}
+
+% Uncomment these to remove all figures and tables for a print version for editing
+%\usepackage{comment}
+%\excludecomment{figure}
+%\excludecomment{table}
+%\let\endfigure\relax
+%\let\endtable\relax
+
 %======================================================================
 %   L O G I C A L    D O C U M E N T -- the content of your thesis
 %======================================================================
@@ -289,8 +299,11 @@ A quadcopter performs four common ‘actions’ to move around in its environmen
 These actions are: tilt forward/backward, tilt left/right, rotate, and move up/down. 
 A quadcopter can perform any combination of these actions, and with different magnitudes of each. The relative rotor speeds required for each are shown in \autoref{fig:actions} below [[put in diagram from wikipedia, or make your own]]
 
-\begin{figure} \label{fig:actions}
-
+\begin{figure}
+\centering
+\includegraphics[height=0.3\textheight]{./figures/QuadcopterMovements.JPG}
+\caption{Four Primary Quadcopter Movements. Taken from \cite{harsha}}
+\label{fig:actions}
 \end{figure}
 
 
@@ -298,11 +311,17 @@ A quadcopter can perform any combination of these actions, and with different ma
 
 %[go through all of the equations for dynamics]
 
-The structure of a quadcopter is shown in Figure XXX, along with the coordinate frame and relevant forces and torques created by the rotors.
+The structure of a quadcopter is shown in \autoref{fig:FBD}, along with the coordinate frame and relevant forces and torques created by the rotors.
 [fix this phrase a ton] There are two important frames of reference when studying quadcopters. The inertial frame is used to represent the state of the quadcopter relative to the outside world, and the body frame is fixed around the center of mass of the quadcopter and used to represent local effects on the quadcopter.
 Typically you are interested in the state of the quadcopter in the inertial frame, but the control of the quadcopter is easier to represent in the body frame. 
 
 %[put diagram around here]
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{./figures/QuadcopterFBD.png}
+\caption{The Inertial and Body Frames of a Quadcopter. Taken from \cite{luukkonen} } %TODO get a better caption
+\label{fig:FBD}
+\end{figure}
 
 The rotation matrix shown in \eqref{eq:rotation_matrix} can be used to convert coordinates from the body frame to the inertial frame. 
 To convert the other way, from inertial frame to body frame, the inverse of the matrix is used. 
@@ -527,7 +546,7 @@ Gaussian basis functions are commonly used in adaptive control [[reference]], bu
 
 The adaptive control methods described above can be applied to a network built using the Neural Engineering Framework. 
 An ensemble of simulated neurons is used as the set of basis functions for the physical model, and the decoders of these neurons are used as the vector of unknown constant parameters. 
-A learning rule known as the Prescribed Error Sensitivity or PES rule is used to update the decoder values \cite{bekolay2013simultaneous}. 
+A learning rule known as the Prescribed Error Sensitivity (PES) rule is used to update the decoder values \cite{bekolay2013simultaneous}. 
 
 This works by first creating a connection from an ensemble of spiking neurons representing the state of the system to a node representing the output of the controller. 
 This is known as the learned connection and can be initially set to perform any transformation, but is typically initialized for the output to be random or zero. 
@@ -617,12 +636,18 @@ The transformation done through this projection will be by the 12x4 PD gain matr
 This 4 dimensional ensemble is then projected to another 4 dimensional ensemble which represents the 4 desired angular velocities of the quadcopter’s rotors. 
 This is done through a transformation by the 4x4 rotor matrix. 
 This rotor velocity ensemble is connected to a node representing the physical quadcopter, which in turn feeds back into the state error ensemble. 
-The network diagram is shown in Figure XXX below. 
+The network diagram is shown in \autoref{fig:NetBasic} below. 
 This network can be simplified further by multiplying the gain matrix with the rotor matrix to give a single transformation matrix from state error to rotor velocity. 
 This simplified and functionally equivalent network is shown in Figure XXX. The larger network is used in the remainder of this thesis because it is more explicit with how each signal is used and allows greater flexibility in design improvements and debugging of the system. [make this last line sound better]
 
 %[Figure of simple control model without adaptation]
 %[Also figure of simplified model without task space representation]
+\begin{figure}
+\centering
+\includegraphics[height=0.3\textheight]{./figures/NetBasic.png} %TODO get better quality figure
+\caption{Basic Quadcopter Controller Network}
+\label{fig:NetBasic}
+\end{figure}
 
 \section{Iterations}
 
@@ -666,16 +691,24 @@ This information is still important to allow the quadcopter to fly properly, and
 
 One solution is to omit the roll and pitch information only from the adaptive population, while still using it for the baseline controller. 
 This is done by generating a separate gain matrix to use on the modulatory connection to the learned transformation. 
-The new network diagram of the model is shown below in Figure XXX.
+The new network diagram of the model is shown below in \autoref{fig:NetAdaptiveTransform}.
 
 %[[show network diagram with adaptive transform]]
+\begin{figure}
+\centering
+\includegraphics[height=0.3\textheight]{./figures/NetAdaptiveTransform.png} %TODO get better quality figure
+\caption{Quadcopter Controller Network with Adaptive Transformation}
+\label{fig:NetAdaptiveTransform}
+\end{figure}
+
+
 \subsection{Gain Tuning}
 
 This controller is now able to adapt to external horizontal forces, but normal flight is much less stable and prone to overshooting targets. 
 One possible reason for this is that the gains might need to be re-tuned to work with this new controller setup. 
 There are 15 different gains in this controller, which makes tuning them manually a difficult and laborious task.
 This is a task well suited for automated parameter optimization. 
-The tool that I chose to use for this is Hyperopt \cite{hyperopt}. 
+The tool that I chose to use for this is Hyperopt \cite{bergstra2013hyperopt}. 
 Hyperopt is a python package designed to perform parameter optimization over a search space for a given function. 
 As long as you can set your problem up in a way that it becomes a function that takes any number of parameters and returns a single error metric to be minimized, it can be used with Hyperopt. [[blather on about how hyperopt builds a surrogate model based on the problem, and how it has the option for smarter than random methods for picking points, as well as interesting ways to set up the search space]]
 
@@ -708,7 +741,14 @@ This is because the adaptive component of the controller is always fighting agai
 There is an implicit target roll and pitch angle of zero radians that the controller is trying to achieve even if that is not the correct angle to be at. 
 One approach to overcome this is to have a second adaptive population that tries to learn what roll and pitch angle will allow the quadcopter to be stationary, and then feed these angles to the basic controller. 
 This way the controller will no longer be actively trying to bring the quadcopter away from its setpoint, yet still has the angle information required for it to be able to fly. 
-The performance of this controller is shown in Figure XXX below.
+A network diagram of this controller is shown in \autoref{fig:NetAngleAdapt} and the performance of this controller is shown in Figure XXX below.
+
+\begin{figure}
+\centering
+\includegraphics[height=0.3\textheight]{./figures/NetAngleAdapt.png} %TODO get better quality figure
+\caption{Quadcopter Controller Network with Angle Correction}
+\label{fig:NetAngleAdapt}
+\end{figure}
 
 %[[show plots of angle adapt controller]]
 
@@ -868,7 +908,7 @@ In order to explore the state space, the quadcopter is sent to a series of rando
 In the experiments shown below, 15 random targets were chosen during training.
 These targets are sampled from a 6 by 6 area in the horizontal plane.
 Every three seconds the quadcopter is commanded to move to the next target in the sequence. Once the end of the sequence has been reached, the sequence will start over again until the end of the training session. %TODO this is out of date, future runs have everything random, with no repeating of the sequence
-Training sessions lasted 1000 seconds, with recordings taken every 100 seconds. %the recordings should really be on a more exponential scale, i.e. [0,5,10,50,100,500,1000]
+Training sessions lasted 1000 seconds, with recordings taken every 10 seconds. %the recordings should really be on a more exponential scale, i.e. [0,5,10,50,100,500,1000]
 
 \begin{table}
 \caption{Forcing Functions} \label{table:forcingfunctions}

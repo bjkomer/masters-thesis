@@ -763,15 +763,29 @@ This error will cause the adaptive transformation to change, even if it was alre
 This can cause problems in control, such as the overshoot seen in Figure XXX above. 
 The summation of the control signal of the underlying controller and the signal from the adaptation to the error creates a control signal that is too large for the desired performance. 
 To account for this, a time delayed filter is applied to a population representing the target location. 
-This filtered location is then subtracted from an unfiltered location and stored in a new population. The signal coming from this new population can be used to inhibit the angle learning population. 
+This filtered location is then subtracted from an unfiltered location and stored in a new population. The signal coming from this new population can be used to inhibit the adaptive populations. 
 If the target hasn’t moved for a while, the value being projected from this population [[give it some name to use!!]] will be close to zero, meaning there is no inhibition. 
 If the target is suddenly moved, this population will output the difference between the two target positions and inhibit the adaptation in any dimension that has a difference. 
 Over time the filtered target will start to match the unfiltered target, and the extent in which the angle adaptive population can adapt to any errors increases. 
-The network diagram for this model can be seen in Figure XXX. It’s performance on the target following task can be seen in Figure XXX.
+The network diagram for this model can be seen in \autoref{fig:NetTMC}. It’s performance on the target following task can be seen in Figure XXX.
 
 %[[put in network diagram, as well as one plot of performance]]
+\begin{figure}
+\centering
+\includegraphics[height=0.3\textheight]{./figures/NetTMC.png} %TODO get better quality figure
+\caption{Quadcopter Controller Network with Target Modulated Control}
+\label{fig:NetTMC}
+\end{figure}
 
 This controller performs extremely well in both operation under normal conditions and in the presence of unknown external forces.
+
+% This figure will be the same as the non-allocentric version, just with less dimensions in the state, so probably don't need a new figure for it
+%\begin{figure}
+%\centering
+%\includegraphics[height=0.3\textheight]{./figures/NetAlloTMC.png} %TODO get better quality figure
+%\caption{Quadcopter Controller Network with Allocentric Target Modulated Control}
+%\label{fig:NetAlloTMC}
+%\end{figure}
 
 \section{Implementation}
 
@@ -814,7 +828,8 @@ To get a sense of how well the neural adaptive controller performs, some referen
 Five different non-neural controllers were used, a standard PD controller, a standard PID controller, an improved PID controller, an improved PID controller with a faster integral gain, and an adaptive controller. [fix this sentence up, or just put them all in a table with a description].
 % doublecheck that these are the ones you actually want to use, maybe narrow it down to only recording data for a few of them
 A couple iterations of the neural adaptive controller are used in the benchmarking. 
-These are the standard adaptive controller, the modified error adaptive controller, the angle corrective controller, the target modulated angle corrective controller, the allocentric controller, and the context sensitive controller. [just stick these in a table with descriptions as well]
+These are the standard adaptive controller, the modified error adaptive controller, the angle corrective controller, the target modulated angle corrective controller, the allocentric controller, and the context sensitive controller. [just stick these in a table with descriptions as well] %TODO fix and re-work this sentence
+The controllers used in the benchmarking are listed in \autoref{table:controller_models}
 
 %[[show the math behind each of the controllers, mention the gravity compensation term used to account for the mass of the quadcopter, and how it is not needed in the adaptive models or PIDt. Have block diagrams or nengo diagrams of each]]
 
@@ -822,6 +837,28 @@ For each reference implementation, a gravity compensation term had to be calcula
 The magnitude of this term was determined empirically and is proportional to the mass of the quadcopter. 
 The rotor velocity signal is the sum of the gravity compensation term and the output of the controller.
 The adaptive controllers do not need this extra term as they are able to learn how to compensate for the effects of gravity very quickly.
+
+\begin{table}
+\caption{Controller Models} \label{table:controller_models}
+\begin{center}
+\begin{tabular}{| l | p{9cm} |}
+
+\hline
+\textbf{Task} & \textbf{Description} \\ \hline
+PD & Standard PD controller with gravity compensation term \\ \hline
+PID & Standard PID controller with gravity compensation term \\ \hline
+PIDt & PID controller where the error signal for the I term is in control space rather than state space \\ \hline
+PIDtf & PIDt controller with a greater integral gain \\ \hline
+Adaptive &  \\ \hline %TODO should this even be here? run some tests with it if you have time
+Neural Adaptive & Simple adaptive neural controller. The network diagram can be seen in \autoref{fig:NetAdaptiveTransform} \\ \hline
+Neural Adaptive Angle Correction & Adaptive neural controller with an additional adaptive neural population for determining stable roll and pitch. The network diagram can be see in \autoref{fig:NetAngleAdapt} \\ \hline
+Neural Adaptive TMC & The difference between the current target state and a time delayed target modulates the error signal that drives the learning. The network diagram can be seem in \autoref{fig:NetTMC} \\ \hline
+Neural Adaptive Allocentric TMC & The same as above, but absolute position and orientation information is projected into the adaptive populations along with the relative error to the target. The network diagram can be seem in \autoref{fig:NetTMC} \\ \hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
 
 % TODO: maybe get a better title for this
 \subsection{Benchmarks for Simple Environments}
@@ -877,6 +914,8 @@ This metric favours controllers that can reach the target quickly.
 This metric does not worry about overshoot and non-optimal trajectories as long as steady state is achieved at the target in the end.
 The particular tolerance chosen for these experiments is maintaining an RMS error of less than 0.001 for a duration of one second.
 
+
+
 % TODO: figure out a good name for this section
 \subsection{Benchmarks for Complex Environments}
 
@@ -892,6 +931,30 @@ These tasks are listed in \autoref{table:forcingfunctions} below. %maybe just re
 
 %Fill the rest of this subsection with the results of running models in these environments
 % could just put things in tables instead of having plots everywhere, or make the plots smaller so they don't take up an obnoxious amount of space
+
+% this is where the loop figures will be. Talk about the controller getting better over time by learning the space
+\subsection{Improvement over Time} %TODO better title for this section
+
+The previous experiments only track performance for a single short run. 
+The Neural Adaptive Controller is able to learn how to move throughout its environment better over time.
+An example of this ability is shown in \autoref{fig:loop_path}.
+The quadcopter is commanded to move back and forth between two points on the x-y plane ([0,0] and [3,0]) with a 5 second delay between each new command.
+An external force is being applied to the quadcopter along the y-direction proportional to its x-direction velocity.
+This causes the path of the quadcopter to become curved rather than a straight line.
+Over time, the Neural Adaptive Controller begins to compensate for this external force, and the path between the two points starts to converge towards a straight line.
+The non-adaptive controllers show no such improvement over time.
+
+\begin{figure}
+\centering
+%\includegraphics[height=0.15\textheight]{./figures/allo_both_tmc_loop.png}
+%\includegraphics[height=0.15\textheight]{./figures/pd_loop.png}
+%\includegraphics[height=0.15\textheight]{./figures/pidtf_loop.png}
+\includegraphics[width=0.32\textwidth]{./figures/allo_both_tmc_loop.png}
+\includegraphics[width=0.32\textwidth]{./figures/pd_loop.png}
+\includegraphics[width=0.32\textwidth]{./figures/pidtf_loop.png}
+\caption{Path of Quadcopter between Two Points with External Forces} %mention something about how the experiment was done here? it was 100 seconds total with 5 seconds before the point switches
+\label{fig:loop_path}
+\end{figure}
 
 
 % This subsection will talk about how pre-training for different amounts of time on particular force functions effects the performance 

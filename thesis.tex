@@ -297,7 +297,7 @@ By varying the relative speeds of each rotor, the quadcopter is able to create a
 
 A quadcopter performs four common ‘actions’ to move around in its environment, with a distinct pattern of rotor actuation for each one. 
 These actions are: tilt forward/backward, tilt left/right, rotate, and move up/down. 
-A quadcopter can perform any combination of these actions, and with different magnitudes of each. The relative rotor speeds required for each are shown in \autoref{fig:actions} below [[put in diagram from wikipedia, or make your own]]
+A quadcopter can perform any combination of these actions, and with different magnitudes of each. The relative rotor speeds required for each are shown in \autoref{fig:actions} below.
 
 \begin{figure}
 \centering
@@ -546,7 +546,7 @@ Gaussian basis functions are commonly used in adaptive control [[reference]], bu
 %[Talk about the PES rule, how it relates to the slotine stuff]
 %[talk about how there is no need to tune the KI term with the PES rule, this adaptive I term is easier to use]
 
-The adaptive control methods described above can be applied to a network built using the Neural Engineering Framework. 
+The adaptive control methods described above can be applied to a network built using Nengo. 
 An ensemble of simulated neurons is used as the set of basis functions for the physical model, and the decoders of these neurons are used as the vector of unknown constant parameters. 
 A learning rule known as the Prescribed Error Sensitivity (PES) rule is used to update the decoder values \cite{bekolay2013simultaneous}. 
 
@@ -693,7 +693,20 @@ This information is still important to allow the quadcopter to fly properly, and
 
 One solution is to omit the roll and pitch information only from the adaptive population, while still using it for the baseline controller. 
 This is done by generating a separate gain matrix to use on the modulatory connection to the learned transformation. 
-The new network diagram of the model is shown below in \autoref{fig:NetAdaptiveTransform}.
+The new network diagram of the model is shown below in \autoref{fig:NetAdaptiveTransform}. 
+The form of the gain matrix for the modulatory connection is shown in \autoref{eq:adaptive_gain_matrix}.
+
+\begin{equation} \label{eq:adaptive_gain_matrix}
+K_{a} =
+\setcounter{MaxMatrixCols}{12}
+\begin{bmatrix}
+0 & 0 & k_{a2} & 0 & 0 & -k_{a4} & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & k_{a1} & 0 & 0 & -k_{a3} & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+-k_{a1} & 0 & 0 & k_{a3} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -k_{6} & 0 & 0 & k_{8}
+\end{bmatrix}
+\end{equation}
+
 
 %[[show network diagram with adaptive transform]]
 \begin{figure}
@@ -708,7 +721,7 @@ The new network diagram of the model is shown below in \autoref{fig:NetAdaptiveT
 
 This controller is now able to adapt to external horizontal forces, but normal flight is much less stable and prone to overshooting targets. 
 One possible reason for this is that the gains might need to be re-tuned to work with this new controller setup. 
-There are 15 different gains in this controller, which makes tuning them manually a difficult and laborious task.
+There are 12 different gains in this controller, which makes tuning them manually a difficult and laborious task.
 This is a task well suited for automated parameter optimization. 
 The tool that I chose to use for this is Hyperopt \cite{bergstra2013hyperopt}. 
 Hyperopt is a python package designed to perform parameter optimization over a search space for a given function. 
@@ -811,6 +824,8 @@ The network diagram for this model can be seen in \autoref{fig:NetTMC}. It’s p
 
 This controller performs extremely well in both operation under normal conditions and in the presence of unknown external forces.
 
+%TODO talk about the allocentric version too
+
 % This figure will be the same as the non-allocentric version, just with less dimensions in the state, so probably don't need a new figure for it
 %\begin{figure}
 %\centering
@@ -891,40 +906,6 @@ Neural Adaptive Allocentric TMC & The same as above, but absolute position and o
 \end{center}
 \end{table}
 
-
-% TODO: maybe get a better title for this
-\subsection{Benchmarks for Simple Environments}
-
-A series of simple point to point control tasks are used to give an indication of performance. 
-These tasks are: movement in the vertical direction, movement in the horizontal direction, rotation about the yaw axis, movement into a wind tunnel, and a movement that requires a change in x, y, and z position as well as yaw angle. 
-These tasks are summarized in \autoref{table:tasks} below.
-
-%[[Show table with different movement types, along with brief descriptions (i.e. move 2 units in the y direction into wind tunnel with 1 Newton of force in the x direction)]]
-%[[maybe have multiple distances for each, and then average the RMS error, and report that for each model on the same graph? Should also have at least one plot from a single run, but its probably easiest to do massive comparisons with a single RMS number]]
-
-%TODO fix up this table
-\begin{table}
-\caption{Benchmark Tasks} \label{table:tasks}
-\begin{center}
-\begin{tabular}{| l | p{9cm} |}
-
-\hline
-Task & Description \\ \hline
-Vertical & Fly upwards (between one and five meters) \\ \hline
-Horizontal & Fly in the x direction (between one and five meters) \\ \hline
-Rotation & Rotate about the yaw axis (between 0 and 180 degrees) \\ \hline
-Combination & \\ \hline
-Wind & Fly in the y direction (between one and five meters). Enter a wind tunnel after 0.75 meters. This wind tunnel exerts a force of 0.6 N in the x direction \\ \hline
-Combination with External Force & \\ \hline
-
-\end{tabular}
-\end{center}
-\end{table}
-
-%[put some stuff in here with noise as well?]
-
-%[also do experiments moving throughout a weird force field, and seeing improvement the more times it does it. This will have to be the allocentric model]
-
 % TODO: this subsection should really come before the first experiments. May need to reword it so it makes sense to go there
 \subsection{Metrics}
 
@@ -948,6 +929,58 @@ The particular tolerance chosen for these experiments is maintaining an RMS erro
 
 
 
+% TODO: maybe get a better title for this
+\subsection{Benchmarks for Simple Environments}
+
+A series of simple point to point control tasks are used to give an indication of performance. 
+These tasks are: movement in the vertical direction, movement in the horizontal direction, rotation about the yaw axis, and horizontal movement into a wind tunnel. %, and a movement that requires a change in x, y, and z position as well as yaw angle. 
+These tasks are summarized in \autoref{table:tasks} below.
+Experimental results obtained from the reference controller and the neural adaptive controllers are shown in \autoref{fig:benchmark_simple_reference} and \autoref{fig:benchmark_simple_neural} respectively. %TODO possibly put these into one figure, and make it easier to read - also need to make the scaling clear to compare neural to benchmark. Possibly have another figure with just the best neural vs the best reference
+
+%[[Show table with different movement types, along with brief descriptions (i.e. move 2 units in the y direction into wind tunnel with 1 Newton of force in the x direction)]]
+%[[maybe have multiple distances for each, and then average the RMS error, and report that for each model on the same graph? Should also have at least one plot from a single run, but its probably easiest to do massive comparisons with a single RMS number]]
+
+%TODO fix up this table
+\begin{table}
+\caption{Benchmark Tasks} \label{table:tasks}
+\begin{center}
+\begin{tabular}{| l | p{9cm} |}
+
+\hline
+Task & Description \\ \hline
+Vertical & Fly upwards (between one and five meters) \\ \hline
+Horizontal & Fly in the x direction (between one and five meters) \\ \hline
+Rotation & Rotate about the yaw axis (between 45 and 135 degrees) \\ \hline
+Wind & Fly in the y direction (between one and five meters). Enter a wind tunnel after 0.75 meters. This wind tunnel exerts a force of 0.6 N in the x direction \\ \hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+
+\begin{figure}
+\centering
+\includegraphics[width=0.45\textwidth]{./figures/BenchmarkSimpleReferencePRMS.png} %TODO get better quality figure
+\includegraphics[width=0.45\textwidth]{./figures/BenchmarkSimpleReferenceTime.png} %TODO get better quality figure
+\caption{Performance on Benchmarks from Reference Controllers}
+\label{fig:benchmark_simple_reference}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.45\textwidth]{./figures/BenchmarkSimpleNeuralPRMS.png} %TODO get better quality figure
+\includegraphics[width=0.45\textwidth]{./figures/BenchmarkSimpleNeuralTime.png} %TODO get better quality figure
+\caption{Performance on Benchmarks from Neural Adaptive Controllers}
+\label{fig:benchmark_simple_neural}
+\end{figure}
+
+
+%[put some stuff in here with noise as well?]
+
+%[also do experiments moving throughout a weird force field, and seeing improvement the more times it does it. This will have to be the allocentric model]
+
+
+
 % TODO: figure out a good name for this section
 \subsection{Benchmarks for Complex Environments}
 
@@ -960,6 +993,26 @@ These tasks are listed in \autoref{table:forcingfunctions} below. %maybe just re
 
 %put table with strange forces here, include downward force proportional to horizontal velocity, sideways force proportional to position/velocity, etc.
 
+
+Performance of the Neural Adaptive controller is compared to the reference controller on these tasks.
+The results are displayed in \autoref{fig:benchmark_complex}. 
+
+%TODO organize the layout better and get better quality figures
+\begin{figure}
+\centering
+\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF0PRMS.png}
+\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF0Time.png}
+\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF1PRMS.png}
+\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF1Time.png}
+\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF3PRMS.png}
+\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF3Time.png}
+\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF5PRMS.png}
+\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF5Time.png}
+\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF6PRMS.png}
+\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF6Time.png}
+\caption{Performance on Benchmarks under different External Force Conditions}
+\label{fig:benchmark_complex}
+\end{figure}
 
 %Fill the rest of this subsection with the results of running models in these environments
 % could just put things in tables instead of having plots everywhere, or make the plots smaller so they don't take up an obnoxious amount of space
@@ -1047,7 +1100,22 @@ While the neural adaptive controller did not perform strictly the best in all ta
 %======================================================================
 \chapter{Discussion and Future Work} \label{chap:discussion}
 %======================================================================
+% maybe split the following sections into contributions and extensions?
 
+% talk about what this thesis provides to the community. What is new about it
+\section{Contributions}
+
+%mention adaptability to unknown environments with the potential to be run on low power neuromorphic hardware (maybe something about how Moore's law is ending, and neuromorphic hardware could be the future)
+%mention integrating Nengo with V-REP to allow more interesting biological models
+
+\section{Adaptive Prediction System}
+
+\section{Integrated Navigation and Planning System}
+
+% talk about using camera for odometry, or ultrasonic/infrared for distance, etc
+\section{Realistic Sensors}
+
+\section{Running on Real Hardware}
 
 % The \appendix statement indicates the beginning of the appendices.
 \appendix

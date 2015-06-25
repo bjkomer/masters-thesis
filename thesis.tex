@@ -295,7 +295,7 @@ For the quadcopter to be able to control its orientation, half of the rotors spi
 The pairs diagonally opposite each other across the body spin in the same direction, allowing the torques to balance one another out and the quadcopter to maintain a steady orientation. 
 By varying the relative speeds of each rotor, the quadcopter is able to create a net torque in a specific direction, causing a rotation about any axis.
 
-A quadcopter performs four common ‘actions’ to move around in its environment, with a distinct pattern of rotor actuation for each one. 
+A quadcopter performs four common actions to move around in its environment, with a distinct pattern of rotor actuation for each one. 
 These actions are: tilt forward/backward, tilt left/right, rotate, and move up/down. 
 A quadcopter can perform any combination of these actions, and with different magnitudes of each. The relative rotor speeds required for each are shown in \autoref{fig:actions} below.
 
@@ -465,7 +465,7 @@ Two other strong candidates for the physics simulator where MORSE [reference] an
 The simulation environment in V-REP was was set up to be a large open space with small obstacles and walls along the ground. 
 The quadcopter model is initialized to start in the center of the space, 0.5 meters above the ground. 
 This model is the one provided with the V-REP software courtesy of Eric Rohmer and Lyall Randell [[reference?]]. 
-The quadcopter’s target is a small semi-transparent green sphere. The goal of the control system is to make the quadcopter move to the target’s location with the target’s orientation. 
+The quadcopter's target is a small semi-transparent green sphere. The goal of the control system is to make the quadcopter move to the target's location with the target's orientation. 
 Throughout the environment there are various wind tunnels. 
 These wind tunnels are zones of space which will exert an external force on the quadcopter in a particular direction if the quadcopter is within the zone. 
 There are also zones which can exert various nonlinear forces on the quadcopter. 
@@ -520,8 +520,9 @@ This model is typically of the form shown in \eqref{eq:physical_equation}.
 M(q)\ddot{q} + C(q,\dot{q})\dot{q} + g(q) = \tau
 \end{equation}
 
-Where $q$ is the vector of state variables, $M(q)$ is a mass/inertia matrix, $C(q,\dot{q})$ is the coriolis term [???], $g(q)$ is the gravitational force, and $\tau$ is a vector representing the input to the system.
+Where $q$ is the vector of state variables, $M(q)$ is a mass/inertia matrix, $C(q,\dot{q})$ is the coriolis term [???], $g(q)$ is the gravitational force, and $\tau$ is a vector representing the input force/torque to the system.
 
+%TODO
 %[[[[[a lot more stuff to go here, need to understand it more first]]]]]
 
 It is difficult to come up with a mathematical model of a system with enough detail to account for everything. 
@@ -621,6 +622,32 @@ T_{R} =
 \end{bmatrix}
 \end{equation}
 
+\begin{equation} \label{eq:control_equation}
+U = 
+\begin{bmatrix}
+w_{1}^{2} \\
+w_{2}^{2} \\
+w_{3}^{2} \\
+w_{4}^{2}
+\end{bmatrix}
+= T_{R}K
+\begin{bmatrix}
+x \\
+y \\
+z \\
+\dot{x} \\
+\dot{y} \\
+\dot{z} \\
+\phi \\
+\theta \\
+\psi \\
+\dot{\phi} \\
+\dot{\theta} \\
+\dot{\psi} \\
+\end{bmatrix}
+\end{equation}
+%TODO make this equation look prettier on paper. There also might need to be tildes and things on the variables to show that they are state error.
+
 Translation in the x and y directions are dependent on the states of both x and y as well as roll and pitch. 
 This is because a roll in the quadcopter causes a component of thrust to be applied in the y direction, and a pitch causes a component of thrust to be applied in the x direction.
 A delicate balance needs to be found between each of the gains in order to create a stable, functioning controller. 
@@ -635,7 +662,7 @@ The state error is measured relative to the body frame. This is because most sen
 This controller model can be designed with a Nengo network. 
 A 12 dimensional ensemble representing the state error can be projected to a 4 dimensional ensemble representing the desired control command. 
 The transformation done through this projection will be by the 12x4 PD gain matrix of the controller. 
-This 4 dimensional ensemble is then projected to another 4 dimensional ensemble which represents the 4 desired angular velocities of the quadcopter’s rotors. 
+This 4 dimensional ensemble is then projected to another 4 dimensional ensemble which represents the 4 desired angular velocities of the quadcopter's rotors. 
 This is done through a transformation by the 4x4 rotor matrix. 
 This rotor velocity ensemble is connected to a node representing the physical quadcopter, which in turn feeds back into the state error ensemble. 
 The network diagram is shown in \autoref{fig:NetBasic} below. 
@@ -678,17 +705,33 @@ Since the quadcopter has a non-zero pitch, the control signal produced by this p
 In order to have zero error, the product of the x-position error and its gain must match this value. 
 This causes the quadcopter to move away from the target x-position in order to maintain zero control error. 
 This is an undesirable side-effect of this controller design. 
-In fact, there is a whole space of angle-position measurement pairs that produce zero error. 
+In fact, there is a whole space of angle-position measurement pairs that produce zero error.
+A visualization of this space is depicted in \autoref{fig:ZeroErrorSurface}. 
 The reason this controller works so well under normal operation despite this is that only one point in that space is ever stable at any particular time. 
 When the only force acting on the quadcopter is gravity, that point is at the target location with roll and pitch angles of zero radians. 
 As external forces are applied along the horizontal plane, this stable point shifts to new locations.
 
-%[[show diagram with parabola of 0 error states]]
+%[[show diagram with the cone of 0 error states]]
+\begin{figure}
+\centering
+\includegraphics[height=0.3\textheight]{./figures/ZeroErrorSurface.png} %TODO get better quality figure
+\caption{Zero Control Signal Region}
+\label{fig:ZeroErrorSurface}
+\medskip
+\small %TODO make the formatting of subtext nicer
+This surface indicates the region of the quadcopter state where the control output is zero.
+The target position is at [0,0] and the angle shown is a combination of the pitch and roll angles where $angle = \sqrt{\phi^{2} + \theta^{2}}$.
+The quadcopter is only ever stable at one point on this surface.
+The location of that point is dependent on the external forces acting on the quadcopter.
+Under only the influence of gravity, the stable point is at the center of [0,0], but when an external force is applied along the horizontal plane, the stable point shifts in the direction of that force by an amount proportional to the magnitude of that force.
+The slope of this surface is the ratio of the linear and angular P gains of the controller, $k_{1}/k_{5}$.
+\end{figure}
+
 
 One way to overcome this is to modify the error signal that the adaptive population uses. 
 The only important state variables that need to match the target are x,y,z position and yaw angle. 
 The state velocities should all be zero as well. 
-Since roll and pitch are not supposed to be controlled, they should really be left out of the error that the adaptive population uses since they don’t correspond to an actual error in the desired state. 
+Since roll and pitch are not supposed to be controlled, they should really be left out of the error that the adaptive population uses since they don't correspond to an actual error in the desired state. 
 This information is still important to allow the quadcopter to fly properly, and it needs to know roll and pitch information for stable flight. If this information is removed from the controller entirely it cannot fly.
 
 One solution is to omit the roll and pitch information only from the adaptive population, while still using it for the baseline controller. 
@@ -706,7 +749,7 @@ K_{a} =
 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & -k_{6} & 0 & 0 & k_{8}
 \end{bmatrix}
 \end{equation}
-
+%TODO maybe the roll/pitch velocities should still be kept here
 
 %[[show network diagram with adaptive transform]]
 \begin{figure}
@@ -809,10 +852,10 @@ This can cause problems in control, such as the overshoot seen in Figure XXX abo
 The summation of the control signal of the underlying controller and the signal from the adaptation to the error creates a control signal that is too large for the desired performance. 
 To account for this, a time delayed filter is applied to a population representing the target location. 
 This filtered location is then subtracted from an unfiltered location and stored in a new population. The signal coming from this new population can be used to inhibit the adaptive populations. 
-If the target hasn’t moved for a while, the value being projected from this population [[give it some name to use!!]] will be close to zero, meaning there is no inhibition. 
+If the target hasn't moved for a while, the value being projected from this population [[give it some name to use!!]] will be close to zero, meaning there is no inhibition. 
 If the target is suddenly moved, this population will output the difference between the two target positions and inhibit the adaptation in any dimension that has a difference. 
 Over time the filtered target will start to match the unfiltered target, and the extent in which the angle adaptive population can adapt to any errors increases. 
-The network diagram for this model can be seen in \autoref{fig:NetTMC}. It’s performance on the target following task can be seen in Figure XXX.
+The network diagram for this model can be seen in \autoref{fig:NetTMC}. It's performance on the target following task can be seen in Figure XXX.
 
 %[[put in network diagram, as well as one plot of performance]]
 \begin{figure}
@@ -842,7 +885,7 @@ This controller performs extremely well in both operation under normal condition
 
 Each of these controllers is implemented as a Nengo model in Python. 
 The main communication channel between V-REP and Nengo is the Quadcopter Node. 
-This Node contains a callable Python class that manages the communication between the two systems at every time step and from the Nengo network’s point of view represents the entirety of the physics simulation. 
+This Node contains a callable Python class that manages the communication between the two systems at every time step and from the Nengo network's point of view represents the entirety of the physics simulation. 
 Connections can be made to and from this node just like any other Node in a Nengo network. 
 A connection to the V-REP remote API server is established when this Node is created. 
 This node outputs the 6 dimensional state of the quadcopter, the 6 dimensional derivative of the state of the quadcopter, as well as the 6 dimensional state of the target. 
@@ -984,7 +1027,7 @@ Wind & Fly in the y direction (between one and five meters). Enter a wind tunnel
 % TODO: figure out a good name for this section
 \subsection{Benchmarks for Complex Environments}
 
-The performance of the adaptive controller is quite strong, but it’s performance is still relatively close to that of the modified PID controllers. 
+The performance of the adaptive controller is quite strong, but it's performance is still relatively close to that of the modified PID controllers. 
 Where the adaptive controller really excels is when there are external forces being applied that are functions of the system state. 
 The adaptive controller is designed to be able to account for both linear and nonlinear functions of the system state.
 
@@ -1116,6 +1159,8 @@ While the neural adaptive controller did not perform strictly the best in all ta
 \section{Realistic Sensors}
 
 \section{Running on Real Hardware}
+
+
 
 % The \appendix statement indicates the beginning of the appendices.
 \appendix

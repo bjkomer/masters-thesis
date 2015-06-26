@@ -583,6 +583,87 @@ A simple example of using the PES learning rule to control an inverted pendulum 
 \chapter{Implementation} \label{chap:implementation}
 %======================================================================
 
+%TODO should the pure math adaptive controller be talked about here? Maybe put this as a subsection in adaptive control?
+\section{Derivation of Non-Neural Adaptive Controller} %TODO pick a better title
+%this section will be heavy on math, and go through how the adaptive python model was formed (from the equations on all of those sheets of paper)
+
+\begin{equation} \label{eq:starting_equation}
+M(q)\ddot{q} + C(q,\dot{q})\dot{q} + g(q) = b(q)u
+\end{equation}
+
+\begin{equation} \label{eq:rearranged_starting_equation}
+\ddot{q} = M(q)^{-1}(-C(q,\dot{q})\dot{q} - g(q) + b(q)u)
+\end{equation}
+
+\begin{equation} \label{eq:internal_starting_equation}
+b(q)u = C(q,\dot{q})\dot{q} + g(q)
+\end{equation}
+
+\begin{equation} \label{eq:C}
+C(q,\dot{q}) = 
+\begin{bmatrix}
+A_{x}|\dot{x}| & 0 & 0 & 0 & 0 & 0 \\
+0 & A_{y}|\dot{y}| & 0 & 0 & 0 & 0 \\
+0 & 0 & A_{z}|\dot{z}| & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & \dot{\psi}(I_{zz} - I_{yy}) & 0 \\
+0 & 0 & 0 & 0 & 0 & \dot{\phi}(I_{xx} - I_{zz}) \\
+0 & 0 & 0 & \dot{\theta}(I_{yy} - I_{xx}) & 0 & 0 \\
+\end{bmatrix}
+\end{equation}
+
+\begin{equation} \label{eq:g}
+g(q) =
+\begin{bmatrix}
+0 \\
+0 \\
+mg \\
+0 \\
+0 \\
+0 \\
+\end{bmatrix}
+\end{equation}
+
+\begin{equation} \label{eq:b}
+b(q) =
+\begin{bmatrix}
+\cos{\phi}\sin{\theta}\cos{\psi} + \sin{\theta}\sin{\psi} & 0 & 0 & 0 \\
+\cos{\phi}\sin{\theta}\sin{\psi} - \sin{\theta}\cos{\psi} & 0 & 0 & 0 \\
+\cos{\phi}\cos{\theta} & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 1 \\
+\end{bmatrix}
+\end{equation}
+
+\begin{equation} \label{eq:u}
+u =
+\begin{bmatrix}
+u_{1} \\
+u_{2} \\
+u_{3} \\
+u_{4} \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+k & k & k & k \\
+0 & -lk & 0 & lk \\
+-lk & 0 & lk & 0 \\
+-b & b & -b & b \\
+\end{bmatrix}
+\begin{bmatrix}
+w_{1}^{2} \\
+w_{2}^{2} \\
+w_{3}^{2} \\
+w_{4}^{2} \\
+\end{bmatrix}
+\end{equation}
+
+%TODO find a good letter name for w->u
+\begin{equation} \label{eq:Y} 
+Y(q,\dot{q})\hat{\theta} = (w->u)^{-1}b(q)^{-1}[C(q,\dot{q}\dot{q} + g(q)]
+\end{equation}
+
+
 \section{Controller Model}
 
 %[show one model of the controller, the original one, talk about how it works]

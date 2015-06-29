@@ -588,15 +588,15 @@ A simple example of using the PES learning rule to control an inverted pendulum 
 %this section will be heavy on math, and go through how the adaptive python model was formed (from the equations on all of those sheets of paper)
 
 \begin{equation} \label{eq:starting_equation}
-M(q)\ddot{q} + C(q,\dot{q})\dot{q} + g(q) = b(q)u
+M(q)\ddot{q} + C(q,\dot{q})\dot{q} + g(q) = B(q)u
 \end{equation}
 
 \begin{equation} \label{eq:rearranged_starting_equation}
-\ddot{q} = M(q)^{-1}(-C(q,\dot{q})\dot{q} - g(q) + b(q)u)
+\ddot{q} = M(q)^{-1}(-C(q,\dot{q})\dot{q} - g(q) + B(q)u)
 \end{equation}
 
 \begin{equation} \label{eq:internal_starting_equation}
-b(q)u = C(q,\dot{q})\dot{q} + g(q)
+B(q)u = C(q,\dot{q})\dot{q} + g(q)
 \end{equation}
 
 \begin{equation} \label{eq:C}
@@ -624,7 +624,7 @@ mg \\
 \end{equation}
 
 \begin{equation} \label{eq:b}
-b(q) =
+B(q) =
 \begin{bmatrix}
 \cos{\phi}\sin{\theta}\cos{\psi} + \sin{\theta}\sin{\psi} & 0 & 0 & 0 \\
 \cos{\phi}\sin{\theta}\sin{\psi} - \sin{\theta}\cos{\psi} & 0 & 0 & 0 \\
@@ -644,6 +644,8 @@ u_{3} \\
 u_{4} \\
 \end{bmatrix}
 =
+A\omega
+=
 \begin{bmatrix}
 k & k & k & k \\
 0 & -lk & 0 & lk \\
@@ -651,16 +653,79 @@ k & k & k & k \\
 -b & b & -b & b \\
 \end{bmatrix}
 \begin{bmatrix}
-w_{1}^{2} \\
-w_{2}^{2} \\
-w_{3}^{2} \\
-w_{4}^{2} \\
+\omega_{1}^{2} \\
+\omega_{2}^{2} \\
+\omega_{3}^{2} \\
+\omega_{4}^{2} \\
 \end{bmatrix}
 \end{equation}
 
 %TODO find a good letter name for w->u
 \begin{equation} \label{eq:Y} 
-Y(q,\dot{q})\hat{\theta} = (w->u)^{-1}b(q)^{-1}[C(q,\dot{q}\dot{q} + g(q)]
+Y(q,\dot{q})\hat{\theta} = A^{-1}B(q)^{-1}[C(q,\dot{q})\dot{q} + g(q)]
+\end{equation}
+
+%TODO may need to rearrange this equation to reflect the rotor orientation
+\begin{equation} \label{eq:Y_expanded} 
+Y(q,\dot{q})\hat{\theta} =
+\begin{bmatrix}
+a|\dot{x}|\dot{x} & b|\dot{y}|\dot{y} & c|\dot{z}|\dot{z} & c & 0 & -\dot{\phi}\dot{\psi} & -\dot{\phi}\dot{\theta} \\
+a|\dot{x}|\dot{x} & b|\dot{y}|\dot{y} & c|\dot{z}|\dot{z} & c & -\dot{\theta}\dot{\psi} & 0 & \dot{\phi}\dot{\theta} \\
+a|\dot{x}|\dot{x} & b|\dot{y}|\dot{y} & c|\dot{z}|\dot{z} & c & 0 & \dot{\phi}\dot{\psi} & -\dot{\phi}\dot{\theta} \\
+a|\dot{x}|\dot{x} & b|\dot{y}|\dot{y} & c|\dot{z}|\dot{z} & c & \dot{\theta}\dot{\psi} & 0 & \dot{\phi}\dot{\theta} \\
+\end{bmatrix}
+\begin{bmatrix}
+\hat{\theta_{1}} \\
+\hat{\theta_{2}} \\
+\hat{\theta_{3}} \\
+\hat{\theta_{4}} \\
+\hat{\theta_{5}} \\
+\hat{\theta_{6}} \\
+\hat{\theta_{7}} \\
+\end{bmatrix}
+\end{equation}
+
+\begin{subequations} \label{eq:abc_definitions}
+\begin{equation}
+d = (\cos{\phi}\sin{\theta}\cos{\psi} + \sin{\theta}\sin{\psi})^{2} + (\cos{\phi}\sin{\theta}\sin{\psi} - \sin{\theta}\cos{\psi})^{2} + (\cos{\phi}\cos{\theta})^{2}
+\end{equation}
+\begin{equation}
+a = (\cos{\phi}\sin{\theta}\cos{\psi} + \sin{\theta}\sin{\psi}) / d
+\end{equation}
+\begin{equation}
+b = (\cos{\phi}\sin{\theta}\sin{\psi} - \sin{\theta}\cos{\psi}) / d
+\end{equation}
+\begin{equation}
+c = (\cos{\phi}\cos{\theta}) / d
+\end{equation}
+\end{subequations}
+
+%TODO may need to change this slightly to reflect the rotor orientation
+\begin{equation} \label{eq:parameters} 
+\theta =
+\begin{bmatrix}
+A_{x}/4k \\
+A_{y}/4k \\
+A_{z}/4k \\
+mg/4k \\
+(I_{zz}-I_{yy})/2kl \\
+(I_{xx}-I_{zz})/2kl \\
+(I_{yy}-I_{xx})/2kl \\
+\end{bmatrix}
+\end{equation}
+
+The controller and parameter update equations are shown in \autoref{eq:adaptive_control_equation} and \autoref{eq:adaptive_update_equation} respectively.
+$K$ is the control gain matrix, $e$ is the state error, and $L$ is the learning rate.
+
+%TODO need to mention and reference what K and e are in the text
+\begin{equation} \label{eq:adaptive_control_equation}
+\omega = Y(q,\dot{q})\hat{\theta} + Ke
+\end{equation}
+
+
+
+\begin{equation} \label{eq:adaptive_update_equation}
+\dot{\hat{\theta}} = LY^{T}Ke
 \end{equation}
 
 
@@ -1233,6 +1298,10 @@ While the neural adaptive controller did not perform strictly the best in all ta
 %mention integrating Nengo with V-REP to allow more interesting biological models
 
 \section{Adaptive Prediction System}
+
+% talk about modelling more complex things like blade flapping and vortex ring state
+%TODO maybe these weird states could be learned? That would be cool.
+\section{Detailed Modelling}
 
 \section{Integrated Navigation and Planning System}
 

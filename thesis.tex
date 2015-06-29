@@ -295,9 +295,9 @@ For the quadcopter to be able to control its orientation, half of the rotors spi
 The pairs diagonally opposite each other across the body spin in the same direction, allowing the torques to balance one another out and the quadcopter to maintain a steady orientation. 
 By varying the relative speeds of each rotor, the quadcopter is able to create a net torque in a specific direction, causing a rotation about any axis.
 
-A quadcopter performs four common actions to move around in its environment, with a distinct pattern of rotor actuation for each one. 
-These actions are: tilt forward/backward, tilt left/right, rotate, and move up/down. 
-A quadcopter can perform any combination of these actions, and with different magnitudes of each. The relative rotor speeds required for each are shown in \autoref{fig:actions} below.
+A quadcopter performs four common actions to move around in its environment, with a distinct pattern of rotor actuation for each one: 
+tilt forward/backward, tilt left/right, rotate, and move up/down. 
+A quadcopter can perform any combination of these actions, and with different magnitudes of each. The relative rotor speeds required for each are shown in \autoref{fig:actions}.
 
 \begin{figure}
 \centering
@@ -312,8 +312,10 @@ A quadcopter can perform any combination of these actions, and with different ma
 %[go through all of the equations for dynamics]
 
 The structure of a quadcopter is shown in \autoref{fig:FBD}, along with the coordinate frame and relevant forces and torques created by the rotors.
-[fix this phrase a ton] There are two important frames of reference when studying quadcopters. The inertial frame is used to represent the state of the quadcopter relative to the outside world, and the body frame is fixed around the center of mass of the quadcopter and used to represent local effects on the quadcopter.
-Typically you are interested in the state of the quadcopter in the inertial frame, but the control of the quadcopter is easier to represent in the body frame. 
+%TODO [fix this phrase a ton] 
+Two important frames of reference are involved when studying quadcopters: the inertial frame is used to represent the state of the quadcopter relative to the outside world, and the body frame is fixed around the center of mass of the quadcopter and used to represent local effects on the quadcopter.
+%Typically you are interested in the state of the quadcopter in the inertial frame, but the control of the quadcopter is easier to represent in the body frame.
+Typically, the inertial frame is the focus when researchers are interested in the state of the quadcopter, but the body frame is more useful when considering control of the quadcopter.
 
 %[put diagram around here]
 \begin{figure}
@@ -323,7 +325,7 @@ Typically you are interested in the state of the quadcopter in the inertial fram
 \label{fig:FBD}
 \end{figure}
 
-The rotation matrix shown in \eqref{eq:rotation_matrix} can be used to convert coordinates from the body frame to the inertial frame. 
+A rotation matrix \eqref{eq:rotation_matrix} can be used to convert coordinates from the body frame to the inertial frame. 
 To convert the other way, from inertial frame to body frame, the inverse of the matrix is used. 
 Since this matrix is orthogonal, its inverse is equal to its transpose.
 
@@ -337,7 +339,7 @@ S_{\psi}C_{\theta} & S_{\psi}S_{\theta}S_{\phi} + C_{\psi}C_{\phi} & S_{\psi}S_{
 \end{bmatrix}
 \end{equation}
 
-The transformation matrices for the angular velocities between the inertial and body frames are shown below in \eqref{eq:global_angular_velocity} and \eqref{eq:local_angular_velocity}.
+The transformation matrices for the angular velocities between the inertial and body frames are shown in \eqref{eq:global_angular_velocity} and \eqref{eq:local_angular_velocity}.
 
 %[matrices here]
 \begin{equation} \label{eq:global_angular_velocity}
@@ -381,7 +383,7 @@ r
 \end{equation}
 
 The quadcopter is assumed to be symmetrical with equal length arms for each rotor. 
-Aligning the arms along the body x and y axes gives the diagonal inertia matrix in \eqref{eq:inertia_matrix}. 
+Aligning the arms along the body's x and y axes gives the diagonal inertia matrix in \eqref{eq:inertia_matrix}. 
 Due to symmetry, $I_{xx} = I_{yy}$.
 
 %[put inertial matrix here]
@@ -394,8 +396,8 @@ I_{xx} & 0 & 0 \\
 \end{equation}
 
 The angular velocity of each rotor generates a thrust force perpendicular to the body frame, as well as a torque about the rotor axis. 
-This relationship is shown in \eqref{eq:rotor_force} and \eqref{eq:rotor_torque}. 
-Where $\omega$ is the angular velocity of the $i$th rotor, $k$ is the lift constant, $b$ is the drag constant, and $I_{M}$ is the moment of inertia of the rotor.
+This relationship is shown in \eqref{eq:rotor_force} and \eqref{eq:rotor_torque}, 
+where $\omega$ is the angular velocity of the $i$th rotor, $k$ is the lift constant, $b$ is the drag constant, and $I_{M}$ is the rotor's moment of inertia.
 
 %[equations here]
 \begin{equation} \label{eq:rotor_force}
@@ -405,11 +407,11 @@ f_{i} = kw_{i}^{2}
 \tau_{M_{i}} = b\omega_{i}^{2} + I_{M}\dot{\omega_{i}}
 \end{equation}
 
-Typically the effect of the angular acceleration is considered small and omitted in most analyses, so it will not be present in the remainder of the dynamics derivations.
+Typically the effect of the angular acceleration is considered small and is omitted in most analyses, so it will not be present in the remainder of the dynamics derivations.
 
-Note that the forces and torques generated are always proportional to the square of the rotor angular velocity, so it is simpler to work with this term instead of the angular velocity itself. [put this part under simulation instead]
+Note that the forces and torques generated are always proportional to the square of the rotor's angular velocity, thus working with this term instead of the angular velocity itself is simpler. %[put this part under simulation instead]?
 
-Combining the forces of all four rotors leads to \eqref{eq:thrust} below. Where $T$ is the thrust in the direction of the z-axis of the body. 
+Combining the forces of all four rotors leads to \eqref{eq:thrust}, where $T$ is the thrust in the direction of the z-axis of the body. 
 Combining the torques of all four rotors leads to \eqref{eq:torque}, where the vector tau represents the torques across each of the principal body axes ($\tau_{\phi}$ for roll, $\tau_{\theta}$ for pitch, and $\tau_{\psi}$ for yaw). 
 The distance between the rotor and the center of mass of the quadcopter is denoted by $l$. 
 
@@ -452,9 +454,9 @@ lk(-w_{1}^{2}+w_{3}^{2}) \\
 The quadcopter model was validated and tested using a computer simulation environment. 
 The advantage of starting with a simulation rather than going straight to physical hardware is that it is quicker and easier to prototype new control algorithms, and it is much less costly to do so. 
 For this project I decided to use the Virtual Robotics Experimentation Platform (V-REP)\cite{vrep} as the physical simulation environment.
-This is an open-source software package that is free to use for educational purposes. 
-It contains models of various robotic platforms, including a model of a quadcopter. 
-It allows the construction of intricate 3D virtual environments for the quadcopter to interact with, as well as many virtual sensors that can be equipped to the quadcopter, such as cameras.
+This open-source software package is free to use for educational purposes; 
+contains models of various robotic platforms, including a model of a quadcopter; 
+and allows the construction of intricate 3D virtual environments for the quadcopter to interact with, as well as many virtual sensors with which to equip the quadcopter, such as cameras.
 
 %[possible bit about choosing the simulator]
 Two other strong candidates for the physics simulator where MORSE [reference] and Gazebo [reference]. 
@@ -462,16 +464,17 @@ Two other strong candidates for the physics simulator where MORSE [reference] an
 
 %[possible table comparing V-REP/MORSE/Gazebo with pros and cons of each]
 
-The simulation environment in V-REP was was set up to be a large open space with small obstacles and walls along the ground. 
-The quadcopter model is initialized to start in the center of the space, 0.5 meters above the ground. 
-This model is the one provided with the V-REP software courtesy of Eric Rohmer and Lyall Randell [[reference?]]. 
+The simulation environment in V-REP was set up to be a large open space with small obstacles and walls along the ground. 
+The quadcopter model was initialized to start in the center of the space, 0.5 meters above the ground. 
+This model is the one provided with the V-REP software courtesy of Eric Rohmer and Lyall Randell. 
 The quadcopter's target is a small semi-transparent green sphere. The goal of the control system is to make the quadcopter move to the target's location with the target's orientation. 
-Throughout the environment there are various wind tunnels. 
-These wind tunnels are zones of space which will exert an external force on the quadcopter in a particular direction if the quadcopter is within the zone. 
-There are also zones which can exert various nonlinear forces on the quadcopter. 
+Throughout the environment there are various wind tunnels, which are zones of space which will exert an external force on the quadcopter in a particular direction if the quadcopter is within the zone. 
+There are also zones that can exert various nonlinear forces on the quadcopter. 
 For example, one zone could push the quadcopter in the z direction with a force proportional to the square of its horizontal velocity. 
 In addition to these zones, the quadcopter can also pick up and drop off boxes of various mass. 
-These are used to test how well the controller can adapt to changes in its dynamics.
+These wind zones and boxes are used to test how well the controller can adapt to changes in its dynamics.
+
+%TODO put in a screenshot here?
 
 \chapter{Control} \label{chap:control}
 
@@ -484,22 +487,19 @@ These are used to test how well the controller can adapt to changes in its dynam
 
 The canonical method for building a control system is to use a PID controller. 
 This is a closed loop controller that works by applying gains to an error signal and feeding the result as input to the plant (system being controlled). 
-PID stands for Proportional, Integral, and Derivative, which refers to the three types of gains that are used. 
-One gain is applied directly to the error (proportional), a second gain is applied to the derivative of the error, and the third gain is applied to the integral of the error. 
-Each of these gains serves a unique purpose and the careful tuning of all three is required to get the desired performance of the controller. 
-The proportional gain is the main one that drives the system. 
-It responds directly to the error and brings the system towards its target point. 
-The larger the gain, the faster this will be done. 
-The problem with only using this gain, is that it does not account for any inertia in the system and will often cause the entity being controlled to overshoot its target, especially when the gain is large. 
-In some cases the overshoot can be so large that the system will be unstable and oscillate out of control. This is where the derivative gain comes in. 
-It is sensitive to the rate of change of the error, and attempts to bring this rate towards zero. 
-The faster the system is moving towards its target state, the more this gain acts to slow it down. 
-It effectively provides a form of damping to the system to reduce the amount of overshoot.
+PID stands for Proportional, Integral, and Derivative, referring to the three types of gains used. 
+One gain is applied directly to the error (proportional); a second gain is applied to the derivative of the error, and the third gain is applied to the integral of the error. 
+Each of these gains serves a unique purpose, and the careful tuning of all three is required to get the desired performance of the controller. 
+The proportional gain is the main driver of the system and responds directly to the error to bring the system towards its target point. 
+The larger the gain, the faster this response will be.
+However, using only this gain will not account for any inertia in the system and will often cause the entity being controlled to overshoot its target, especially when the gain is large. 
+In some cases, the overshoot can be so large that the system becomes unstable and oscillates out of control.
+Thus, the derivative gain is usually used in addition, because it is sensitive to the rate of change of the error, and attempts to bring this rate towards zero. 
+The faster the system is moving towards its target state, the more this gain acts to slow it down, by effectively providing a form of damping and so reducing the amount of overshoot.
 Depending on how this parameter is tuned, and the properties of the system at hand, it can remove overshooting entirely. 
-Due to unmodelled disturbances or changing external inputs, there may be a steady state error in the system. 
-This is where the controller has reached a stable state, yet there is still an error being measured. 
-The integral term is designed to account for this by keeping a running sum of the error over time. 
-Eventually this integral error should be large enough that it will drive the system to close the steady state error gap.
+Due to unmodelled disturbances or changing external inputs, there may be a steady state error in the system, wherein the controller has reached a stable state, yet there is still an error being measured. 
+The integral term is designed to account for this steady state error by keeping a running sum of the error over time. 
+Eventually, this integral error should be large enough that it will drive the system to close the steady state error gap.
 
 \section{Adaptive Control}
 
@@ -511,25 +511,25 @@ Eventually this integral error should be large enough that it will drive the sys
 
 Sometimes the kinematics and dynamics of the system being controlled are unknown, or change over time in an unknown fashion. 
 A controller that works well for the system initially may not be well suited when the system undergoes changes. 
-In this situation it is useful to have a controller that can adapt to these changes.
+In this situation, it is useful to have a controller that can adapt to these changes.
 
 The foundation of adaptive control is based on parameter estimation. 
 First, a mathematical model of the system to be controlled is generated based on physical laws. 
-This model is typically of the form shown in \eqref{eq:physical_equation}.
+This model is typically of the form shown in \eqref{eq:physical_equation}, where $q$ is the vector of state variables, $M(q)$ is a mass/inertia matrix, $C(q,\dot{q})$ is the coriolis term [???], $g(q)$ is the gravitational force, and $\tau$ is a vector representing the input force/torque to the system.
+
 \begin{equation} \label{eq:physical_equation}
 M(q)\ddot{q} + C(q,\dot{q})\dot{q} + g(q) = \tau
 \end{equation}
 
-Where $q$ is the vector of state variables, $M(q)$ is a mass/inertia matrix, $C(q,\dot{q})$ is the coriolis term [???], $g(q)$ is the gravitational force, and $\tau$ is a vector representing the input force/torque to the system.
-
 %TODO
 %[[[[[a lot more stuff to go here, need to understand it more first]]]]]
 
-It is difficult to come up with a mathematical model of a system with enough detail to account for everything. 
-There are always assumptions and approximations that are made for the model to be manageable. In addition to this, external forces from the environment may influence the model and it is not always possible to know the form of these forces as the environment can be largely unknown. 
-One way to get around this is to use a set of basis functions as the model, and the weights applied to each element of the basis are the constant parameters. 
+Creating a mathematical model of a system with enough detail to account for everything is difficult. 
+Assumptions and approximations must be made if the model is to be manageable. 
+Moreover, external forces from the environment may influence the model, and their form may be unknown as the environment can be largely unknown. 
+One way to overcome this problem is to use a set of basis functions as the model, and the weights applied to each element of the basis as the constant parameters. 
 If the basis is designed such that it can represent any computable function to a reasonable degree of accuracy, it will be effective in the adaptive control problem. 
-Gaussian basis functions are commonly used in adaptive control [[reference]], but it is possible to use neural networks as well [[reference]].
+Gaussian basis functions are commonly used in adaptive control [[reference]], but neural networks may be used as well [[reference]].
 
 \section{Neural Simulation}
 

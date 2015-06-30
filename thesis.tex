@@ -307,7 +307,7 @@ A quadcopter can perform any combination of these actions, and with different ma
 \end{figure}
 
 
-\section{Dynamics}
+\section{Dynamics} \label{sec:dynamics}
 
 %[go through all of the equations for dynamics]
 
@@ -441,6 +441,8 @@ lk(-w_{1}^{2}+w_{3}^{2}) \\
 
 %[[put some description explaining these equations here]]
 
+%TODO have some equations which have the drag force in them, as this will be referenced later
+
 \section{Simulation}
 
 %[maybe move this section later in the thesis, possibly put pure python sim here and v-rep sim elsewhere (with implementation?)]
@@ -501,7 +503,7 @@ Due to unmodelled disturbances or changing external inputs, there may be a stead
 The integral term is designed to account for this steady state error by keeping a running sum of the error over time. 
 Eventually, this integral error should be large enough that it will drive the system to close the steady state error gap.
 
-\section{Adaptive Control}
+\section{Adaptive Control} \label{sec:adaptive_control}
 
 %[name a few other adaptive control methods and give references]
 %[go over the slotine adaptive control stuff, throw in a bunch of references]
@@ -523,6 +525,22 @@ M(q)\ddot{q} + C(q,\dot{q})\dot{q} + g(q) = \tau
 
 %TODO
 %[[[[[a lot more stuff to go here, need to understand it more first]]]]]
+The goal of the controller is to bring the system to a particular target state.
+Typically the state as well as its derivative is desired to be controlled.
+Thus, the second derivative of the state will be zero when the system has arrived at the target state.
+Setting $\ddot{q}$ to be zero gives the relationship of the inputs to the rest of the state shown in \eqref{eq:input_equation}.
+
+\begin{equation} \label{eq:input_equation}
+\tau = C(q,\dot{q})\dot{q} + g(q)
+\end{equation}
+
+An estimate of $q$ and $\dot{q}$ can typically be measured, leaving the only potentially unknown quantities in the right-hand side of the equation to be the physical parameters of the system.
+If these physical parameters are constant and linear with respect to the system state, the equation can be reorganized as in \eqref{eq:Y_equation}.
+Here $\hat{\theta}$ is a an estimate of the vector of unknown constant parameters of the system and $Y(q,\dot{q})$ is a known matrix dependent on the system state.
+
+\begin{equation} \label{eq:input_equation}
+\tau = C(q,\dot{q})\dot{q} + g(q) = Y(q,\dot{q})\hat{\theta}
+\end{equation}
 
 Creating a mathematical model of a system with enough detail to account for everything is difficult. 
 Assumptions and approximations must be made if the model is to be manageable. 
@@ -583,9 +601,13 @@ A simple example of using the PES learning rule to control an inverted pendulum 
 \chapter{Implementation} \label{chap:implementation}
 %======================================================================
 
-%TODO should the pure math adaptive controller be talked about here? Maybe put this as a subsection in adaptive control?
+%TODO should the pure math adaptive controller be talked about here? Maybe put this as a subsection in adaptive control? This might make more sense to be after the basic controller model is introduced, but before all of the iterations
 \section{Derivation of Non-Neural Adaptive Controller} %TODO pick a better title
 %this section will be heavy on math, and go through how the adaptive python model was formed (from the equations on all of those sheets of paper)
+
+Based on the dynamics equations in \autoref{sec:dynamics} and the adaptive control theory presented in \autoref{sec:adaptive_control}, an adaptive controller for a quadcopter can be generated.
+The first step is to set up the governing equation for the system \eqref{eq:starting_equation}, and rearrange it so that the right side is in terms of the second derivative of the state \eqref{eq:rearranged_starting_equation}.
+
 
 \begin{equation} \label{eq:starting_equation}
 M(q)\ddot{q} + C(q,\dot{q})\dot{q} + g(q) = B(q)u
@@ -594,6 +616,8 @@ M(q)\ddot{q} + C(q,\dot{q})\dot{q} + g(q) = B(q)u
 \begin{equation} \label{eq:rearranged_starting_equation}
 \ddot{q} = M(q)^{-1}(-C(q,\dot{q})\dot{q} - g(q) + B(q)u)
 \end{equation}
+
+The relationship in \eqref{eq:internal_starting_equation} allows $\ddot{q}$ to be zero.
 
 \begin{equation} \label{eq:internal_starting_equation}
 B(q)u = C(q,\dot{q})\dot{q} + g(q)
@@ -623,17 +647,7 @@ mg \\
 \end{bmatrix}
 \end{equation}
 
-\begin{equation} \label{eq:b}
-B(q) =
-\begin{bmatrix}
-\cos{\phi}\sin{\theta}\cos{\psi} + \sin{\theta}\sin{\psi} & 0 & 0 & 0 \\
-\cos{\phi}\sin{\theta}\sin{\psi} - \sin{\theta}\cos{\psi} & 0 & 0 & 0 \\
-\cos{\phi}\cos{\theta} & 0 & 0 & 0 \\
-0 & 1 & 0 & 0 \\
-0 & 0 & 1 & 0 \\
-0 & 0 & 0 & 1 \\
-\end{bmatrix}
-\end{equation}
+$u$ is a vector containing the thrust force and the rotational torque in the body frame. $B(q)$ is the transformation matrix of the force and torque from the body frame to the inertial frame. $\omega$ is a vector containing the squared angular velocities of each rotor.
 
 \begin{equation} \label{eq:u}
 u =
@@ -660,10 +674,26 @@ k & k & k & k \\
 \end{bmatrix}
 \end{equation}
 
+\begin{equation} \label{eq:b}
+B(q) =
+\begin{bmatrix}
+\cos{\phi}\sin{\theta}\cos{\psi} + \sin{\theta}\sin{\psi} & 0 & 0 & 0 \\
+\cos{\phi}\sin{\theta}\sin{\psi} - \sin{\theta}\cos{\psi} & 0 & 0 & 0 \\
+\cos{\phi}\cos{\theta} & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 1 \\
+\end{bmatrix}
+\end{equation}
+
+Expanding \eqref{eq:internal_starting_equation} and rearranging the equation in terms of $\omega$ results in \eqref{eq:Y}.
+
 %TODO find a good letter name for w->u
 \begin{equation} \label{eq:Y} 
-Y(q,\dot{q})\hat{\theta} = A^{-1}B(q)^{-1}[C(q,\dot{q})\dot{q} + g(q)]
+\omega = Y(q,\dot{q})\hat{\theta} = A^{-1}B(q)^{-1}[C(q,\dot{q})\dot{q} + g(q)]
 \end{equation}
+
+The form of $Y(q,\dot{q})$ can be determined in \eqref{eq:Y_expanded} by pulling out a vector of the unknown constant parameters. The true values of these parameters is shown in \eqref{eq:parameters}.
 
 %TODO may need to rearrange this equation to reflect the rotor orientation
 \begin{equation} \label{eq:Y_expanded} 
@@ -714,18 +744,18 @@ mg/4k \\
 \end{bmatrix}
 \end{equation}
 
-The controller and parameter update equations are shown in \autoref{eq:adaptive_control_equation} and \autoref{eq:adaptive_update_equation} respectively.
-$K$ is the control gain matrix, $e$ is the state error, and $L$ is the learning rate.
+The adaptive controller and parameter update equations are shown in \eqref{eq:adaptive_control_equation} and \eqref{eq:adaptive_update_equation} respectively.
+$K$ is the control gain matrix \eqref{eq:gain_matrix}, $T_{R}$ is the transformation from task space to rotor space \eqref{eq:rotor_transform}, $e$ is the state error, and $L$ is the learning rate.
+The value of $L$ can either be a constant or a 4x4 matrix.
+For simplicity a constant value of one is used.
 
 %TODO need to mention and reference what K and e are in the text
 \begin{equation} \label{eq:adaptive_control_equation}
-\omega = Y(q,\dot{q})\hat{\theta} + Ke
+\omega = Y(q,\dot{q})\hat{\theta} + T_{R}Ke
 \end{equation}
 
-
-
 \begin{equation} \label{eq:adaptive_update_equation}
-\dot{\hat{\theta}} = LY^{T}Ke
+\dot{\hat{\theta}} = LY^{T}T_{R}Ke
 \end{equation}
 
 
@@ -769,7 +799,7 @@ T_{R} =
 \end{equation}
 
 \begin{equation} \label{eq:control_equation}
-U = 
+u = 
 \begin{bmatrix}
 w_{1}^{2} \\
 w_{2}^{2} \\
@@ -1297,20 +1327,41 @@ While the neural adaptive controller did not perform strictly the best in all ta
 %mention adaptability to unknown environments with the potential to be run on low power neuromorphic hardware (maybe something about how Moore's law is ending, and neuromorphic hardware could be the future)
 %mention integrating Nengo with V-REP to allow more interesting biological models
 
+The main contribution of this thesis is an adaptive control system for a quadcopter using simulated biological neurons.
+
+A second contribution is the integration of the Nengo neural simulation software with the robotics and physics simulation capacity of V-REP.
+This union allows complex neural models to be embodied in a physical environment in a straightforward manner. 
+
 \section{Adaptive Prediction System}
+
+In addition to control, the inverse problem of predicting future states is important. 
 
 % talk about modelling more complex things like blade flapping and vortex ring state
 %TODO maybe these weird states could be learned? That would be cool.
 \section{Detailed Modelling}
 
+
+
 \section{Integrated Navigation and Planning System}
+
+A useful extension of the adaptive controller would be to embed it within a larger navigation and planning system.
+Currently the quadcopter will only fly in a direct path towards a specified point, but it would be useful for it to be able to detect obstacles in its path and calculate a new route to avoid those obstacles.
+The adaptive population of neurons in the controller could be set up to be able to recognize certain obstacles and learn to avoid them in an effective manner.
+An internal representation of the environment along with a memory for changes in the environment could be used to allow dynamic planning of optimal trajectories to a target.
 
 % talk about using camera for odometry, or ultrasonic/infrared for distance, etc
 \section{Realistic Sensors}
 
-\section{Running on Real Hardware}
+The current implementation of the simulation is able to directly read the exact state information of the quadcopter.
+A more realistic scenario would be to use a set of sensors that provide measurements that can be used to estimate the state.
+Each of these sensors can have different noise properties and accuracy that can change depending on the situation.
+The robustness of the adaptive control algorithm to changes in the sensor properties and estimation algorithm can be important to characterize when looking into purchasing components to implement the controller on physical hardware.
 
 
+\section{Running on Physical Hardware}
+
+The most practical extension to this work would be to move beyond simulation and run the control system on physical hardware.
+%Many challenges will arise in this undertaking, including selection of the particular hardware platform, sensors to use, timing issues in the control algorithm.
 
 % The \appendix statement indicates the beginning of the appendices.
 \appendix
@@ -1319,10 +1370,14 @@ While the neural adaptive controller did not perform strictly the best in all ta
 \chapter*{APPENDICES}
 \addcontentsline{toc}{chapter}{APPENDICES}
 %======================================================================
-\chapter[Name in Contents]{Longer name found in the body}
+\chapter[Link to the Source Code]{Source Code for Thesis Work}
 \label{AppendixA}
 % Tip 4: Example of how to get a shorter chapter title for the Table of Contents 
 %======================================================================
+
+All of the source code used to create the quadcopter controllers presented in this thesis is available for download at: https://github.com/bjkomer/masters-thesis
+
+Instructions for downloading and installing the necessary software to run the simulations and benchmarks are also provided at this link.
 
 %----------------------------------------------------------------------
 % END MATERIAL

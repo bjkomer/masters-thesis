@@ -569,24 +569,23 @@ The adaptive control methods described above can be applied to a network built u
 An ensemble of simulated neurons is used as the set of basis functions for the physical model, and the decoders of these neurons are used as the vector of unknown constant parameters. 
 A learning rule known as the Prescribed Error Sensitivity (PES) rule is used to update the decoder values \cite{bekolay2013simultaneous}. 
 
-This works by first creating a connection from an ensemble of spiking neurons representing the state of the system to a node representing the output of the controller. 
-This is known as the learned connection and can be initially set to perform any transformation, but is typically initialized for the output to be random or zero. 
-If the designer has an approximation of what the final learned transformation should look like, they can set this to be the initial transformation. 
-This will allow the system to converge to the final transformation quicker.
+This learning method works by first creating a connection from an ensemble of spiking neurons representing the state of the system to a node representing the output of the controller. 
+This is known as the "learned connection" and can be initially set to perform any transformation, but is typically initialized for the output to be random or zero. 
+If the designer has an approximation of what the final learned transformation should look like, they can set this as the initial transformation. 
+Doing so will allow the system to converge to the final transformation more quickly.
 
-This connection will be modulated by an error signal. 
-This error signal can come from anywhere in the network. 
+The learned connection will be modulated by an error signal, which can come from anywhere in the network. 
 The PES learning rule will attempt to reduce the error signal by changing the value of the decoders on the learned connection. 
 The direction in which the decoder values change is dependent on the sign of the error. 
-The magnitude of the change in decoder values at each time step is dependant on both the magnitude of the error as well as a learning rate parameter. 
+The magnitude of the change in decoder values at each time step is dependant on both the magnitude of the error and a learning-rate parameter. 
 The learning rate is a dimensionless parameter that needs to be tuned for the specific application. 
 It is dependant on the simulation time step, the number of neurons in the state population, as well as how responsive the model needs to be to changes. [[check to make sure this is true!!]] 
 A larger learning rate will cause larger reactions to error, effectively making the system trust its current measurements more than historical ones. 
 A smaller timestep means that these changes will occur more frequently, so the net change over time will be greater. 
-A larger number of neurons means that the changes will be greater, as there will be more decoders changing and the overall transformation is a sum of these decoders [[check to make sure this is true!!]].
+A larger number of neurons means that the changes will be greater, as there will be more decoders changing. The overall transformation is a sum of these decoders. [[check to make sure this is true!!]].
 %[[talk about differing dimensions in these populations?]]
 
-A simple example of using the PES learning rule to control an inverted pendulum is shown in Figure XXX. [[describe how the model works in the figure description, talk about the different dimensionalities of each population]]
+A simple example of using the PES learning rule to control an inverted pendulum is shown in Figure XXX for clarification before employing the rule the more high dimensional case of a quadcopter controller. [[describe how the model works in the figure description, talk about the different dimensionalities of each population]]
 
 %[put in a simple network diagram showing the PES rule, and possibly an equation with its math]
 
@@ -770,10 +769,9 @@ This position is specified as a set of x, y, and z coordinates and a particular 
 The controller is given the state error of the quadcopter and its target, as well as the current linear and angular velocities of the quadcopter. 
 It needs to use this information to generate a suitable control signal.
 
-This is done by using a PD controller which generates a four dimensional output signal in the space of possible quadcopter motions. 
+First, a PD controller generates a four-dimensional output signal in the space of possible quadcopter motions. 
 The gain matrix that performs this operation can be seen in \eqref{eq:gain_matrix}. 
-This signal is then transformed into the four dimensional rotor velocity space to provide the actuation associated with the desired movement commands. 
-This is done by multiplying by the matrix in \eqref{eq:rotor_transform}. 
+This signal multiplied by the matrix in \eqref{eq:rotor_transform}, is transformed into the four dimensional rotor velocity space to provide the actuation associated with the desired movement commands.
 The design of this matrix depends upon the orientation of the rotor blades to the x and y axes. 
 This transformation matrix assumes that the rotor axes are offset from the x-y axes by 45 degrees.
 
@@ -824,26 +822,25 @@ z \\
 \end{equation}
 %TODO make this equation look prettier on paper. There also might need to be tildes and things on the variables to show that they are state error.
 
-Translation in the x and y directions are dependent on the states of both x and y as well as roll and pitch. 
-This is because a roll in the quadcopter causes a component of thrust to be applied in the y direction, and a pitch causes a component of thrust to be applied in the x direction.
+Translation in the x and y directions is dependent on the states of both x and y as well as roll and pitch, because a roll in the quadcopter causes a component of thrust to be applied in the y direction, and a pitch causes a component of thrust to be applied in the x direction.
 A delicate balance needs to be found between each of the gains in order to create a stable, functioning controller. 
-The setpoints for each of the velocities as well as roll and pitch is zero.
+The setpoint for each of the velocities as well as for roll and pitch is zero.
 
 %[gain matrix figures]
 
 %[talk about egocentric state as the error]
-The state error is measured relative to the body frame. This is because most sensors on a real quadcopter would return measurements relative to the sensor device itself, which is located on the quadcopter. Absolute measurements could still be obtained with a GPS device, but this would typically have much less accuracy and is harder to use for finer tuned control. In this manner, the state of the quadcopter can be defined relative to its target, making the state the same as the error.
+The state error is measured relative to the body frame because most sensors on a real quadcopter would return measurements relative to the sensor device itself, which is located on the quadcopter. Absolute measurements could still be obtained with a GPS device, but would typically be much less accurate and such devices are harder to use for fine tuned control. With the preferred manner, localized sensors, the state of the quadcopter can be defined relative to its target, making the state the same as the error.
 
 %[talk about building the model in Nengo]
-This controller model can be designed with a Nengo network. 
-A 12 dimensional ensemble representing the state error can be projected to a 4 dimensional ensemble representing the desired control command. 
+This controller model can be designed with a Nengo network, in which a 12-dimensional ensemble representing the state error can be projected to a 4-dimensional ensemble representing the desired control command. 
 The transformation done through this projection will be by the 12x4 PD gain matrix of the controller. 
-This 4 dimensional ensemble is then projected to another 4 dimensional ensemble which represents the 4 desired angular velocities of the quadcopter's rotors. 
-This is done through a transformation by the 4x4 rotor matrix. 
+This 4-dimensional ensemble is then projected to another 4-dimensional ensemble which represents the four desired angular velocities of the quadcopter's rotors. 
+This projection is done through a transformation by the 4x4 rotor matrix. 
 This rotor velocity ensemble is connected to a node representing the physical quadcopter, which in turn feeds back into the state error ensemble. 
-The network diagram is shown in \autoref{fig:NetBasic} below. 
-This network can be simplified further by multiplying the gain matrix with the rotor matrix to give a single transformation matrix from state error to rotor velocity. 
-This simplified and functionally equivalent network is shown in Figure XXX. The larger network is used in the remainder of this thesis because it is more explicit with how each signal is used and allows greater flexibility in design improvements and debugging of the system. [make this last line sound better]
+The network diagram is shown in \autoref{fig:NetBasic}. 
+The network can be simplified further by multiplying the gain matrix with the rotor matrix to give a single transformation matrix from state error to rotor velocity. 
+This simplified and functionally equivalent network is shown in Figure XXX.
+The larger network is used in the remainder of this thesis because it is more explicit with how each signal is used and allows greater flexibility for design improvements and system debugging.
 
 %[Figure of simple control model without adaptation]
 %[Also figure of simplified model without task space representation]
@@ -866,24 +863,24 @@ The PES learning rule is applied to this connection, which seeks to build a tran
 The effect is similar to that of the I term in a PID controller, except that it uses all state information to come up with the integral gain, and can perform nonlinear transforms to accomplish this. Without this adaptive component, the quadcopter will have a large steady state error in the z direction, and will fall to the ground as soon as the simulation starts.
 
 This model is very effective at learning the weight of the quadcopter and adapting to any external forces in the z direction. 
-Gains were initially chosen manually by surveying other quadcopter models and trying a couple gains until decent results were found [reference v-rep quadcopter, and a few other places?]
+Gains were initially chosen manually by surveying other quadcopter models and trying a couple gains until reasonable results were found [reference v-rep quadcopter, and a few other places?]
 %[[put in some plots showing adaptation speed at simulation start, talk about parameters that change this speed -> maybe show all gains used with the plot?]]
 
-When an external force is applied in the horizontal plane, this model does a very bad job of correcting itself from it. 
-It will settle to a stable point in space with a constant offset from the target location. This is due to how the error is specified. 
-Since both position and angle gains are being combined into the same dimension to produce the task space error, there are multiple pairs of measurements that will produce the same error. 
-What is happening is that the adaptive population is being given an effective error reading of zero even though the quadcopter is not at the desired position. 
+When an external force is applied in the horizontal plane, this controller does a very bad job of correcting from it. 
+The quadcopter will settle to a stable point in space with a constant offset from the target location. 
+This behaviour results from how the error is specified:
+since both position and angle gains are being combined into the same dimension to produce the task space error, multiple pairs of measurements will produce the same error. 
+That is, the adaptive population is being given an effective error reading of zero even though the quadcopter is not at the desired position. 
 For example, if wind is producing a force in the x-direction, in order for the quadcopter to remain stationary, it must have a pitch angle that allows its thrust to compensate for both the gravitational force and the translational force.
 
 %[[show FBD of quadcopter with pitch angle and forces balancing]]
 
 Since the quadcopter has a non-zero pitch, the control signal produced by this pitch multiplied by its gain will be non-zero. 
 In order to have zero error, the product of the x-position error and its gain must match this value. 
-This causes the quadcopter to move away from the target x-position in order to maintain zero control error. 
-This is an undesirable side-effect of this controller design. 
+The quadcopter will consequently move away from the target x-position in order to maintain zero control error, an undesirable side-effect of this controller design. 
 In fact, there is a whole space of angle-position measurement pairs that produce zero error.
 A visualization of this space is depicted in \autoref{fig:ZeroErrorSurface}. 
-The reason this controller works so well under normal operation despite this is that only one point in that space is ever stable at any particular time. 
+The reason this controller works so well under normal operation despite this flaw is that only one point in that space is ever stable at any particular time. 
 When the only force acting on the quadcopter is gravity, that point is at the target location with roll and pitch angles of zero radians. 
 As external forces are applied along the horizontal plane, this stable point shifts to new locations.
 

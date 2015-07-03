@@ -167,9 +167,12 @@
 \let\cleardoublepage\clearemptydoublepage
 
 % Allow chapter references to be capitalized
-\newcommand{\Chapref}[1]{Chapter~\ref{#1}} 
+\newcommand{\Chapref}[1]{Chapter~\ref{#1}}
 
-\newcommand{\Tabref}[1]{Table~\ref{#1}} 
+\newcommand{\Tabref}[1]{Table~\ref{#1}}
+
+% Allow subfigures
+\usepackage{subcaption}
 
 % Find the figures stored in this folder
 \graphicspath{./figures/}
@@ -547,17 +550,17 @@ Assumptions and approximations must be made if the model is to be manageable.
 Moreover, external forces from the environment may influence the model, and their form may be unknown as the environment can be largely unknown. 
 One way to overcome this problem is to use a set of basis functions as the model, and the weights applied to each element of the basis as the constant parameters. 
 If the basis is designed such that it can represent any computable function to a reasonable degree of accuracy, it will be effective in the adaptive control problem. 
-Gaussian basis functions are commonly used in adaptive control [[reference]], but neural networks may be used as well [[reference]].
+Gaussian basis functions are commonly used in adaptive control \cite{sanner1992gaussian}, but neural networks may be used as well \cite{barto1983neuronlike}.
 
 \section{Neural Simulation}
 
 %[brief description of the NEF and Nengo and how it can be used, mostly just put references here]
 %put a reference to Travis' thesis as an example of how Nengo's learning can be used for motor control
-\cite{bekolay2013nengo}
 
 % Maybe this section shouldn't be here at all, and just have a brief description at the start of the next section?
 
-
+Simulation of biological neurons is carried out by the software package Nengo \cite{bekolay2013nengo}.
+This software implements the algorithms in the Neural Engineering Framework (NEF) [[reference]]
 
 \section{Adaptive Control in Nengo}
 
@@ -901,7 +904,7 @@ The slope of this surface is the ratio of the linear and angular P gains of the 
 \end{figure}
 
 
-One way to overcome this is to modify the error signal that the adaptive population uses. 
+One way to overcome this flaw is to modify the error signal that the adaptive population uses. 
 The only important state variables that need to match the target are x,y,z position and yaw angle. 
 The state velocities should all be zero as well. 
 Since roll and pitch are not supposed to be controlled, they should really be left out of the error that the adaptive population uses since they don't correspond to an actual error in the desired state. 
@@ -999,12 +1002,26 @@ $k_{a4}$ & 8.25 & 34.9626 & 21.45 \\ \hline
 \subsection{Improving Adaptation to Horizontal Forces}
 
 There is still much room for improvement on this controller. 
-While it can adapt to horizontal forces, it does so quite slowly. 
+While it can adapt to horizontal forces, it does so quite slowly, as can be seen in \autoref{fig:PlotStandard}. 
 This is because the adaptive component of the controller is always fighting against the command given by the standard component. 
 There is an implicit target roll and pitch angle of zero radians that the controller is trying to achieve even if that is not the correct angle to be at. 
 One approach to overcome this is to have a second adaptive population that tries to learn what roll and pitch angle will allow the quadcopter to be stationary, and then feed these angles to the basic controller. 
 This way the controller will no longer be actively trying to bring the quadcopter away from its setpoint, yet still has the angle information required for it to be able to fly. 
-A network diagram of this controller is shown in \autoref{fig:NetAngleAdapt} and the performance of this controller is shown in Figure XXX below.
+A network diagram of this controller is shown in \autoref{fig:NetAngleAdapt} and the performance of this controller is shown in \autoref{fig:PlotAngleAdapt}.
+
+\begin{figure}
+\centering
+\begin{subfigure}[t]{0.4\textwidth}
+\includegraphics[height=0.3\textheight]{./figures/StandardWindX.png} %TODO get better quality figure
+\caption{Displacement by Wind}
+\end{subfigure}
+\begin{subfigure}[t]{0.4\textwidth}
+\includegraphics[height=0.3\textheight]{./figures/StandardWindY.png}
+\caption{Trajectory to Target}
+\end{subfigure}
+\caption{Performance of Basic Adaptive Controller}
+\label{fig:PlotStandard}
+\end{figure}
 
 \begin{figure}
 \centering
@@ -1014,6 +1031,21 @@ A network diagram of this controller is shown in \autoref{fig:NetAngleAdapt} and
 \end{figure}
 
 %[[show plots of angle adapt controller]]
+\begin{figure}
+\centering
+\begin{subfigure}[t]{0.4\textwidth}
+\includegraphics[height=0.3\textheight]{./figures/AngleCorrectionWindX.png} %TODO get better quality figure
+\caption{Displacement by Wind}
+\label{fig:PlotAngleAdaptA}
+\end{subfigure}
+\begin{subfigure}[t]{0.4\textwidth}
+\includegraphics[height=0.3\textheight]{./figures/AngleCorrectionWindY.png}
+\caption{Trajectory to Target}
+\label{fig:PlotAngleAdaptB}
+\end{subfigure}
+\caption{Performance of Angle Correction Controller}
+\label{fig:PlotAngleAdapt}
+\end{figure}
 
 %TODO figure out a better title for this section
 \subsection{Shortcomings of the Error Signal}
@@ -1021,14 +1053,17 @@ A network diagram of this controller is shown in \autoref{fig:NetAngleAdapt} and
 There is still a problem with the implementation of this controller. 
 Since the adaptive component is driven by state error, as soon as the target is moved to a new location, a large error will be produced. 
 This error will cause the adaptive transformation to change, even if it was already at its optimal configuration. 
-This can cause problems in control, such as the overshoot seen in Figure XXX above. 
+This can cause problems in control, such as the overshoot and oscillations seen in \autoref{fig:PlotAngleAdaptB}. 
 The summation of the control signal of the underlying controller and the signal from the adaptation to the error creates a control signal that is too large for the desired performance. 
 To account for this, a time delayed filter is applied to a population representing the target location. 
 This filtered location is then subtracted from an unfiltered location and stored in a new population. The signal coming from this new population can be used to inhibit the adaptive populations. 
 If the target hasn't moved for a while, the value being projected from this population [[give it some name to use!!]] will be close to zero, meaning there is no inhibition. 
 If the target is suddenly moved, this population will output the difference between the two target positions and inhibit the adaptation in any dimension that has a difference. 
 Over time the filtered target will start to match the unfiltered target, and the extent in which the angle adaptive population can adapt to any errors increases. 
-The network diagram for this model can be seen in \autoref{fig:NetTMC}. It's performance on the target following task can be seen in Figure XXX.
+The network diagram for this model can be seen in \autoref{fig:NetTMC} and the performance of this controller is shown in \autoref{fig:PlotTMC}.
+
+%TODO should target following go anywhere?
+%It's performance on the target following task can be seen in Figure XXX.
 
 %[[put in network diagram, as well as one plot of performance]]
 \begin{figure}
@@ -1036,6 +1071,20 @@ The network diagram for this model can be seen in \autoref{fig:NetTMC}. It's per
 \includegraphics[height=0.3\textheight]{./figures/NetTMC.png} %TODO get better quality figure
 \caption{Quadcopter Controller Network with Target Modulated Control}
 \label{fig:NetTMC}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{subfigure}[t]{0.4\textwidth}
+\includegraphics[height=0.3\textheight]{./figures/AlloBothTMCWindX.png} %TODO get better quality figure
+\caption{Displacement by Wind}
+\end{subfigure}
+\begin{subfigure}[t]{0.4\textwidth}
+\includegraphics[height=0.3\textheight]{./figures/AlloBothTMCWindY.png}
+\caption{Trajectory to Target}
+\end{subfigure}
+\caption{Performance of Filtered Angle Correction Controller}
+\label{fig:PlotTMC}
 \end{figure}
 
 This controller performs extremely well in both operation under normal conditions and in the presence of unknown external forces.
@@ -1050,6 +1099,7 @@ This controller performs extremely well in both operation under normal condition
 %\label{fig:NetAlloTMC}
 %\end{figure}
 
+%TODO this section may need a new name
 \section{Implementation}
 
 %[talk about how Nengo is connected to V-REP?]
@@ -1151,7 +1201,7 @@ The particular tolerance chosen for these experiments is maintaining an RMS erro
 A series of simple point to point control tasks are used to give an indication of performance. 
 These tasks are: movement in the vertical direction, movement in the horizontal direction, rotation about the yaw axis, and horizontal movement into a wind tunnel. %, and a movement that requires a change in x, y, and z position as well as yaw angle. 
 These tasks are summarized in \autoref{table:tasks} below.
-Experimental results obtained from the reference controller and the neural adaptive controllers are shown in \autoref{fig:benchmark_simple_reference} and \autoref{fig:benchmark_simple_neural} respectively. %TODO possibly put these into one figure, and make it easier to read - also need to make the scaling clear to compare neural to benchmark. Possibly have another figure with just the best neural vs the best reference
+Experimental results obtained from the reference controllers and the neural adaptive controllers are shown in \autoref{fig:benchmark_simple_reference} and \autoref{fig:benchmark_simple_neural} respectively. %TODO possibly put these into one figure, and make it easier to read - also need to make the scaling clear to compare neural to benchmark. Possibly have another figure with just the best neural vs the best reference
 
 %[[Show table with different movement types, along with brief descriptions (i.e. move 2 units in the y direction into wind tunnel with 1 Newton of force in the x direction)]]
 %[[maybe have multiple distances for each, and then average the RMS error, and report that for each model on the same graph? Should also have at least one plot from a single run, but its probably easiest to do massive comparisons with a single RMS number]]
@@ -1245,6 +1295,7 @@ This causes the path of the quadcopter to become curved rather than a straight l
 Over time, the Neural Adaptive Controller begins to compensate for this external force, and the path between the two points starts to converge towards a straight line.
 The non-adaptive controllers show no such improvement over time.
 
+%TODO include numeric RMS values to accompany the plots
 \begin{figure}
 \centering
 %\includegraphics[height=0.15\textheight]{./figures/allo_both_tmc_loop.png}
@@ -1329,25 +1380,37 @@ The main contribution of this thesis is an adaptive control system for a quadcop
 A second contribution is the integration of the Nengo neural simulation software with the robotics and physics simulation capacity of V-REP.
 This union allows complex neural models to be embodied in a physical environment in a straightforward manner. 
 
-\section{Adaptive Prediction System}
+%TODO talk about noise here? Throw in one simulation with noise to say that it works
+%TODO can also throw in one simulation of target following and mention how it works too
+\section{Discussion}
 
-In addition to control, the inverse problem of predicting future states is important. 
+\section{Future Work}
 
-% talk about modelling more complex things like blade flapping and vortex ring state
-%TODO maybe these weird states could be learned? That would be cool.
-\section{Detailed Modelling}
+Further research could usefully explore improvements to this model in terms of both physical accuracy and additional capabilities.
+The closer the model behaves to a real physical system, the more useful it will be in guiding the design of real world applications.
+The more capabilities the model displays, the more variety in the applications it can be applied to.
+%TODO fix this last sentence up a bit
 
+\subsection{Adaptive Prediction System}
 
+In addition to control, the inverse problem of predicting future states is important.
+Integrating adaptive control with an adaptive method for system identification could lead to major improvements in overall system performance.
 
-\section{Integrated Navigation and Planning System}
+\subsection{Integrated Navigation and Planning System}
 
 A useful extension of the adaptive controller would be to embed it within a larger navigation and planning system.
 Currently the quadcopter will only fly in a direct path towards a specified point, but it would be useful for it to be able to detect obstacles in its path and calculate a new route to avoid those obstacles.
 The adaptive population of neurons in the controller could be set up to be able to recognize certain obstacles and learn to avoid them in an effective manner.
 An internal representation of the environment along with a memory for changes in the environment could be used to allow dynamic planning of optimal trajectories to a target.
 
+% talk about modelling more complex things like blade flapping and vortex ring state
+%TODO maybe these weird states could be learned? That would be cool.
+\subsection{Detailed Modelling}
+
+
+
 % talk about using camera for odometry, or ultrasonic/infrared for distance, etc
-\section{Realistic Sensors}
+\subsection{Realistic Sensors}
 
 The current implementation of the simulation is able to directly read the exact state information of the quadcopter.
 A more realistic scenario would be to use a set of sensors that provide measurements that can be used to estimate the state.
@@ -1355,7 +1418,7 @@ Each of these sensors can have different noise properties and accuracy that can 
 The robustness of the adaptive control algorithm to changes in the sensor properties and estimation algorithm can be important to characterize when looking into purchasing components to implement the controller on physical hardware.
 
 
-\section{Running on Physical Hardware}
+\subsection{Running on Physical Hardware}
 
 The most practical extension to this work would be to move beyond simulation and run the control system on physical hardware.
 %Many challenges will arise in this undertaking, including selection of the particular hardware platform, sensors to use, timing issues in the control algorithm.

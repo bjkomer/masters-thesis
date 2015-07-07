@@ -84,7 +84,7 @@
 % CHANGE THIS VALUE TO "true" as necessary, to improve printed results for hard copies
 % by overriding some options of the hyperref package below.
 
-%\usepackage{nomencl} % For a nomenclature (optional; available from ctan.org)
+\usepackage{nomencl} % For a nomenclature (optional; available from ctan.org)
 \usepackage{amsmath,amssymb,amstext} % Lots of math symbols and environments
 \usepackage[pdftex]{graphicx} % For including graphics N.B. pdftex graphics driver 
 
@@ -174,6 +174,14 @@
 % Allow subfigures
 \usepackage{subcaption}
 
+% Include a Glossary
+%\usepackage[acronym]{glossaries}
+
+%\makeglossaries
+
+%\newglossaryentry{Nengo}{name=Nengo,description={blabla}}
+%\newglossaryentry{decoder}{name=Decoders,description={blablazzzz}}
+
 % Find the figures stored in this folder
 \graphicspath{./figures/}
 
@@ -183,6 +191,10 @@
 %\excludecomment{table}
 %\let\endfigure\relax
 %\let\endtable\relax
+
+
+
+
 
 %======================================================================
 %   L O G I C A L    D O C U M E N T -- the content of your thesis
@@ -230,8 +242,8 @@ This ability can be largely attributed to the plasticity of neural connections i
 This ability for quick and easy adaptation to new dynamic properties of a system would be extremely useful in robotics. 
 Applying similar methods of control that have been developed over millions of years of evolution in the brain to a robotic control system could result in major improvements. 
 This is especially useful now that the demands of many robotic systems are now more general purpose than they were in the past. 
-Robots started out mainly performing simple and repetitive tasks in stable environments, such as automation in manufacturing [[throw in some references]]. 
-Now they are being used increasingly in more complex situations requiring a diverse amount of control, such as search and rescue missions, performing medical procedures, and assisting the elderly [[put references here]]. 
+Robots started out mainly performing simple and repetitive tasks in stable environments, such as automation in manufacturing \cite{garcia2007evolution}. 
+Now they are being used increasingly in more complex situations requiring a diverse amount of control, such as search and rescue missions, performing medical procedures, and assisting the elderly \cite{garcia2007evolution, hockstein2007history, nourbakhsh2005human, lacey1998application}. 
 When the precise environment that the robot will operate in is not fully known, it is useful for any control system that the robot uses to be adaptable to those environments.
 
 Another advantage the brain has when it comes to control, is that it uses very little power, about 20 Watts on average \cite{hart1975brain}.
@@ -253,13 +265,16 @@ They can also change directions fairly easily mid flight, and have the ability t
 
 %[battery heaviest part, low power controller means it can last longer and/or be lighter, good candidate for neural control]
 Despite all of these positive qualities, one of the main weaknesses of quadcopters is their short battery life. 
-Small and simple quadcopters used by hobbyists typically last only 10 to 20 minutes before they run out of power [[put in source]]. 
-The more expensive industrial grade quadcopters can last 1 to 2 hours before they need to be recharged [[check this]] [[put in source]], but this duration is still not long enough for some applications. 
+Small and simple quadcopters used by hobbyists typically last only 5 to 10 minutes before they run out of power [[put in source]]. 
+The more expensive industrial grade quadcopters typically last up to 30 minutes before they need to be recharged [[check this]] [[put in source]], but this duration is still not long enough for some applications. 
 For example, if a quadcopter is being used in a search and rescue mission it may need to remain flying for a long time without recharging, especially if it is operating in a remote area. 
 Battery weight is one of the main issues hindering the maximum flight time of quadcopters. 
 If a larger battery is used in attempts to increase the maximum flight time, the quadcopter will be heavier and therefore require more power to fly, which in turn will drain the battery faster. 
 Two possible solutions to this problem are lighter batteries and more energy-efficient operation.
 The latter can be achieved by the use of neuromorphic hardware to run the flight control system.
+While the majority of the power consumed by a quadcopter goes towards the rotors, some is still used by the on-board control system.
+Reducing the power required for the control system can allow more of the power from the batteries to be used for the rotors.
+%TODO this seems like a really weak claim, and isn't the main focus of the thesis, should it still be included here as a possibility?
 
 %[something about how adaptive control is awesome]
 In addition to the low power consumption of neuromorphic hardware, they also have the advantage of using various types of neural algorithms that can be extremely useful for control.
@@ -560,18 +575,35 @@ Gaussian basis functions are commonly used in adaptive control \cite{sanner1992g
 % Maybe this section shouldn't be here at all, and just have a brief description at the start of the next section?
 
 %TODO go through and edit this section later for those common grammar things
-Simulation of biological neurons is carried out by the software package Nengo \cite{bekolay2013nengo}.
-This software implements the algorithms in the Neural Engineering Framework (NEF) [[reference]].
-The NEF provides a means of representing arbitrary vectors using the properties of neurons as a basis.
+
+The Neural Engineering Framework (NEF)\cite{eliasmith2004neural} provides a means of representing arbitrary vectors using the properties of neurons as a basis.
 This is done through a nonlinear encoding mechanism carried out by the tuning curves of the neurons, and a weighted linear decoding of the neurons responses to retrieve an approximation of the vector being encoded.
 A transformation can be applied to the underlying representation by specifying different weights on the linear decoding.
 Any computable function can be approximated through a transform, and the degree of accuracy of the decoding is dependent on the number of neurons used and the complexity of the function.
 %TODO put some simple example here about x and x**2?
+%TODO talk about dynamics here, might need to fix wording, and talk about recurrent connections?
+The neurons themselves are a part of a dynamical system where timing effects and filters across connections play a role in the behaviour of the system. 
 %It also specifies a means of performing transformation
-For detail on the NEF, see [[references]] % put this line in if you think the reader might want more details.
-The core components Nengo are Networks, Nodes, Ensembles, and Connections.
-Ensembles are groups of neurons representing a similar concept.
- 
+For more detail on the NEF, see \cite{eliasmith2007build, stewart2011neural, eliasmith2013build} % put this line in if you think the reader might want more details.
+
+Simulation of biological neurons is carried out by the software package Nengo \cite{bekolay2013nengo}.
+This software implements the algorithms in the NEF and provides an easy to use Python interface for building complex models under this framework.
+The core components of Nengo are networks, nodes, ensembles, and connections.
+A network is a container for all of the components, it can contain any number of nodes, ensembles, connections, and even other networks.
+There is always one base network from which the rest of the model is built.
+Ensembles are groups of neurons representing a single vector. 
+The dimensionality of this vector can be any positive integer.
+Nodes are used when a particular part of the network is doing a computation without using neurons as the underlying representation.
+Typically nodes are used as the inputs and outputs to a neural system.
+Connections specify transformations between representational components (ensembles and nodes) through one-way links where the information flows from the output of the first representational component (origin) to the input of the second representational component (termination).
+Connections may have a synapse model applied to them, where the information from one end of the connection is delayed by a time-step before reaching the other end and a filter with a particular time constant may be applied.
+If no synapse is applied, the value from the origin of the connection is sent directly to the termination of the connection during the same time step.
+
+Once the network structure has been specified, Nengo can build and run a simulation of this network for either a specified duration of time, or until a stop signal is generated. 
+All timing is measured as 'simulated time' with a specific time-step. 
+If the time-step is short, the simulation can capture minute timing details more accurately, but the system as a whole will run slower with respect to real-time. A default time step of 1ms is typically used in Nengo models, which provides a reasonable trade-off between accuracy and run-time.
+%TODO is there any justification for this?
+
 \section{Adaptive Control in Nengo}
 
 %[Brief overview of Nengo (can be made longer with subsections if need be)]

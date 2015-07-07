@@ -1449,7 +1449,23 @@ An internal representation of the environment along with a memory for changes in
 %TODO maybe these weird states could be learned? That would be cool.
 \subsection{Detailed Modelling}
 
+Under special conditions, the dynamics of a quadcopter can change dramatically from the ideal model presented in this thesis.
+One such condition is known as vortex ring state, which can arise when the quadcopter descends too quickly. [[reference]]
+The quadcopter's rotor blades may enter the turbulent downwash of the air beneath the craft, causing a severe loss of lift.
+A vortex forms in a circular ring around the rotors' path of rotation, bringing turbulent air from beneath the rotors to above them.
+Increasing the throttle at this point only makes the vortex stronger, eventually causing a total loss of lift.
+This is a dangerous situation to encounter, so it could be highly beneficial to include some properties of this state as well as signs of entering this state (typically wobbling of the craft during descent) in the model.
+With this extra information, the adaptive controller should have an easier time learning how to recover from this state and avoid entering it entirely.
+%TODO put in reference for vortex ring state
 
+Another condition that was not modelled in simulation is blade flapping.
+This condition occurs when the rotor blades undergo translational motion;
+the advancing blade experiences a higher tip velocity while the retreating blade experiences a lower tip velocity \cite{bangura2012nonlinear}.
+This differential results in an increase in lift in the advancing blade and a decrease in lift in the retreating blade, applying a torque to the rotor disk.
+The rotor tip path flaps up as the blade advances, and down as the blade retreats to balance the aerodynamic forces.
+The adaptive controller is designed to be able to account for external non-linear effects, so this would be a good condition to test the controller with in the future.
+
+%TODO add ground effects as well? Maybe just test them in one experiment because it is quick and easy to do, and mention how more work can be done on it here
 
 % talk about using camera for odometry, or ultrasonic/infrared for distance, etc
 \subsection{Realistic Sensors}

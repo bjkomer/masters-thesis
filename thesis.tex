@@ -559,9 +559,19 @@ Gaussian basis functions are commonly used in adaptive control \cite{sanner1992g
 
 % Maybe this section shouldn't be here at all, and just have a brief description at the start of the next section?
 
+%TODO go through and edit this section later for those common grammar things
 Simulation of biological neurons is carried out by the software package Nengo \cite{bekolay2013nengo}.
-This software implements the algorithms in the Neural Engineering Framework (NEF) [[reference]]
-
+This software implements the algorithms in the Neural Engineering Framework (NEF) [[reference]].
+The NEF provides a means of representing arbitrary vectors using the properties of neurons as a basis.
+This is done through a nonlinear encoding mechanism carried out by the tuning curves of the neurons, and a weighted linear decoding of the neurons responses to retrieve an approximation of the vector being encoded.
+A transformation can be applied to the underlying representation by specifying different weights on the linear decoding.
+Any computable function can be approximated through a transform, and the degree of accuracy of the decoding is dependent on the number of neurons used and the complexity of the function.
+%TODO put some simple example here about x and x**2?
+%It also specifies a means of performing transformation
+For detail on the NEF, see [[references]] % put this line in if you think the reader might want more details.
+The core components Nengo are Networks, Nodes, Ensembles, and Connections.
+Ensembles are groups of neurons representing a similar concept.
+ 
 \section{Adaptive Control in Nengo}
 
 %[Brief overview of Nengo (can be made longer with subsections if need be)]

@@ -251,7 +251,7 @@ Another advantage the brain has when it comes to control, is that it uses very l
 Hardware inspired by the brain is being designed to take advantage of this low power paradigm. 
 This style of hardware, known as neuromorphic hardware, is typically massively parallel and runs in an analog rather than digital domain.
 
-\section{Introduction}
+\section{Quadcopters}
 
 %[basic characteristics, four rotors, rotating different ways]
 %[something about vertical take off and landing]
@@ -479,8 +479,8 @@ contains models of various robotic platforms, including a model of a quadcopter;
 and allows the construction of intricate 3D virtual environments for the quadcopter to interact with, as well as many virtual sensors with which to equip the quadcopter, such as cameras.
 
 %[possible bit about choosing the simulator]
-Two other strong candidates for the physics simulator where MORSE [reference] and Gazebo [reference]. 
-%[continue with a little blurb about them and why they were not chosen, and reference the comparison table]
+Two other strong candidates for the physics simulator where MORSE \cite{echeverria2011modular} and Gazebo \cite{koenig2004design}. 
+%TODO [continue with a little blurb about them and why they were not chosen, and reference the comparison table]
 
 %[possible table comparing V-REP/MORSE/Gazebo with pros and cons of each]
 
@@ -646,7 +646,7 @@ A simple example of using the PES learning rule to control an inverted pendulum 
 %======================================================================
 
 %TODO should the pure math adaptive controller be talked about here? Maybe put this as a subsection in adaptive control? This might make more sense to be after the basic controller model is introduced, but before all of the iterations
-\section{Derivation of Non-Neural Adaptive Controller} %TODO pick a better title
+\section{Derivation of Non-Neural Adaptive Controller} \label{chap:nonneuraladaptive} %TODO pick a better title
 %this section will be heavy on math, and go through how the adaptive python model was formed (from the equations on all of those sheets of paper)
 
 Based on the dynamics equations in \autoref{sec:dynamics} and the adaptive control theory presented in \autoref{sec:adaptive_control}, an adaptive controller for a quadcopter can be generated.
@@ -955,7 +955,7 @@ This information is still important to allow the quadcopter to fly properly, and
 One solution is to omit the roll and pitch information only from the adaptive population, while still using it for the baseline controller. 
 This is done by generating a separate gain matrix to use on the modulatory connection to the learned transformation. 
 The new network diagram of the model is shown below in \autoref{fig:NetAdaptiveTransform}. 
-The form of the gain matrix for the modulatory connection is shown in \autoref{eq:adaptive_gain_matrix}.
+The form of the gain matrix for the modulatory connection is shown in \eqref{eq:adaptive_gain_matrix}.
 
 \begin{equation} \label{eq:adaptive_gain_matrix}
 K_{a} =
@@ -1204,7 +1204,7 @@ PD & Standard PD controller with gravity compensation term \\ \hline
 PID & Standard PID controller with gravity compensation term \\ \hline
 PIDt & PID controller where the error signal for the I term is in control space rather than state space \\ \hline
 PIDtf & PIDt controller with a greater integral gain \\ \hline
-Adaptive &  \\ \hline %TODO should this even be here? run some tests with it if you have time
+Adaptive &  Adaptive controller without using neurons. Derivation shown in \autoref{chap:nonneuraladaptive} \\ \hline %TODO should this even be here? run some tests with it if you have time
 Neural Adaptive & Simple adaptive neural controller. The network diagram can be seen in \autoref{fig:NetAdaptiveTransform} \\ \hline
 Neural Adaptive Angle Correction & Adaptive neural controller with an additional adaptive neural population for determining stable roll and pitch. The network diagram can be see in \autoref{fig:NetAngleAdapt} \\ \hline
 Neural Adaptive TMC & The difference between the current target state and a time delayed target modulates the error signal that drives the learning. The network diagram can be seem in \autoref{fig:NetTMC} \\ \hline
@@ -1306,6 +1306,7 @@ Performance of the Neural Adaptive controller is compared to the reference contr
 The results are displayed in \autoref{fig:benchmark_complex}. 
 
 %TODO organize the layout better and get better quality figures
+%TODO possibly put all of this in an appendix, and put data for only a few controllers here
 \begin{figure}
 \centering
 \includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF0PRMS.png}
@@ -1352,6 +1353,7 @@ The non-adaptive controllers show no such improvement over time.
 
 
 % This subsection will talk about how pre-training for different amounts of time on particular force functions effects the performance 
+%TODO need to fix this up a bunch or remove it
 \subsection{Effects of Training Time}
 
 Adaptive controllers learn over time.
@@ -1450,7 +1452,7 @@ An internal representation of the environment along with a memory for changes in
 \subsection{Detailed Modelling}
 
 Under special conditions, the dynamics of a quadcopter can change dramatically from the ideal model presented in this thesis.
-One such condition is known as vortex ring state, which can arise when the quadcopter descends too quickly. [[reference]]
+One such condition is known as vortex ring state, which can arise when the quadcopter descends too quickly \cite{vortexring}.
 The quadcopter's rotor blades may enter the turbulent downwash of the air beneath the craft, causing a severe loss of lift.
 A vortex forms in a circular ring around the rotors' path of rotation, bringing turbulent air from beneath the rotors to above them.
 Increasing the throttle at this point only makes the vortex stronger, eventually causing a total loss of lift.
@@ -1479,7 +1481,8 @@ The robustness of the adaptive control algorithm to changes in the sensor proper
 \subsection{Running on Physical Hardware}
 
 The most practical extension to this work would be to move beyond simulation and run the control system on physical hardware.
-%Many challenges will arise in this undertaking, including selection of the particular hardware platform, sensors to use, timing issues in the control algorithm.
+Many challenges will arise in this undertaking, including selection of the particular hardware platform, sensors to use, and real-time requirements of the control algorithm.
+Overcoming these challenges to produce an adaptive neural quadcopter that can interact with the real world will be highly beneficial for exploring both practical applications of this work as well as guiding future research direction.
 
 % The \appendix statement indicates the beginning of the appendices.
 \appendix

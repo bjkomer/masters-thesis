@@ -1056,7 +1056,11 @@ The tool that I chose to use for this optimization is Hyperopt \cite{bergstra201
 Hyperopt is a python package designed to perform parameter optimization over a search space for a given function. 
 As long as a problem can be set as a function that takes any number of parameters and returns a single error metric to be minimized, that problem can be used with Hyperopt. 
 %TODO
-[[blather on about how hyperopt builds a surrogate model based on the problem, and how it has the option for smarter than random methods for picking points, as well as interesting ways to set up the search space]]
+Hyperopt uses a technique known as Sequential Model-Based Optimization (SMBO) for function optimization.
+SMBO methods are typically used when the goal is to optimize a function that is costly to evaluate as they invest more time between function evaluations than other methods, such as conjugate gradient descent, in order to reduce the overall number of evaluations \cite{mockus1978application, bergstra2013hyperopt}.
+Since each set of gains to evaluate requires a controller model to be generated and physics simulation to be run for a fixed amount of time (on the order of seconds), the evaluations are costly to compute time-wise, leading to SMBO as the preferred choice of optimization method.
+%Hyperopt works by constructing a surrogate model 
+%[[blather on about how hyperopt builds a surrogate model based on the problem, and how it has the option for smarter than random methods for picking points, as well as interesting ways to set up the search space]]
 
 %TODO better title here??
 \subsection{Using Hyperopt}
@@ -1074,7 +1078,8 @@ A longer delay means the optimization will find parameters that allow the quadco
 A shorter delay will prefer controllers that get to the target quickly, but may overshoot, have a steady state error, or jitter once they reach the target.
 
 Model creation, running the physics simulator, sending the target commands, stopping the physics simulator, and returning the error metric were all encapsulated in a single Python function. 
-This function was then given to Hyperopt, which ran it many times and kept track of the parameters used for the best result. There were about 3000 [[check this!!]] evaluations of different parameter sets, and each run took about 26 seconds [[check this!!]]. 
+This function was then given to Hyperopt, which ran it many times and kept track of the parameters used for the best result. 
+There were 3000 evaluations of different parameter sets, and each run took about 30 seconds to complete. 
 Hyperopt is able to go through a set number of evaluation points in one run, and then pick up where it left off in a separate run.
 This capability allowed these runs to be completed overnight over the course of multiple nights to get the final results, shown in the Hyperopt column of \autoref{table:hyperopt_gains}. 
 These are by no means the optimal gain parameters, as the function being optimized does not represent the full operational space of the controller, and the method for generating the error metric was very simplistic. 
@@ -1172,7 +1177,6 @@ Since the adaptive component is driven by state error, as soon as the target is 
 This error will cause the adaptive transformation to change, even if it was already at its optimal configuration. 
 This change can cause problems in control, such as the overshoot and oscillations seen in \autoref{fig:PlotAngleAdaptB}. 
 The summation of the control signal of the underlying controller and the signal from the adaptation to the error creates a control signal that is too large for the desired performance.
-%TODO clean up the ordering of the next few sentences to make the point clear
 To correct this behaviour, a time-delayed filter is first applied to an ensemble representing the target location. 
 This filtered location is then subtracted from an unfiltered location and stored in a new ensemble. The signal coming from this new ensemble can be used to inhibit the adaptive ensembles. 
 If the target has not moved recently, the value being projected from this filtered-difference ensemble will be close to zero, meaning there is no inhibition. 

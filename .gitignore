@@ -12,6 +12,17 @@
 *.bbl
 *.blg
 
+*.acn
+*.acr
+*.alg
+*.glg
+*.glo
+*.gls
+*.ilg
+*.ist
+*.nlo
+*.nls
+
 # Swap files
 
 *.swp

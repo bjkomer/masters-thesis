@@ -339,11 +339,12 @@ Typically, the inertial frame is the focus when researchers are interested in th
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{./figures/QuadcopterFBD.png}
-\caption{The Inertial and Body Frames of a Quadcopter. Taken from \cite{luukkonen} } %TODO get a better caption
+\caption{The Inertial and Body Frames of a Quadcopter. Taken from \cite{luukkonen2011modelling} } %TODO get a better caption
 \label{fig:FBD}
 \end{figure}
 
-A rotation matrix \eqref{eq:rotation_matrix} can be used to convert coordinates from the body frame to the inertial frame. 
+A rotation matrix \eqref{eq:rotation_matrix} can be used to convert coordinates from the body frame to the inertial frame.
+Here, $C_{x}$ represents $\cos{x}$ and $S_{x}$ represents $\sin{x}$.
 To convert the other way, from inertial frame to body frame, the inverse of the matrix is used. 
 Since this matrix is orthogonal, its inverse is equal to its transpose.
 
@@ -357,48 +358,49 @@ S_{\psi}C_{\theta} & S_{\psi}S_{\theta}S_{\phi} + C_{\psi}C_{\phi} & S_{\psi}S_{
 \end{bmatrix}
 \end{equation}
 
-The transformation matrices for the angular velocities between the inertial and body frames are shown in \eqref{eq:global_angular_velocity} and \eqref{eq:local_angular_velocity}.
+% %TODO I don't use these matrices anywhere, so there probably isn't a need to include them
+%The transformation matrices for the angular velocities between the inertial and body frames are shown in \eqref{eq:global_angular_velocity} and \eqref{eq:local_angular_velocity}.
 
-%[matrices here]
-\begin{equation} \label{eq:global_angular_velocity}
-\dot{\eta} = W_{\eta}^{-1}\nu, 
-\begin{bmatrix}
-\dot{\phi} \\
-\dot{\theta} \\
-\dot{\psi}
-\end{bmatrix}
-=
-\begin{bmatrix}
-1 & S_{\phi}T_{\theta} & C_{\phi}T_{\theta} \\
-0 & C_{\phi} & -S_{\phi} \\
-0 & S_{\phi}/C_{\theta} & C_{\phi}/C_{\theta}
-\end{bmatrix}
-\begin{bmatrix}
-p \\
-q \\
-r
-\end{bmatrix}
-\end{equation}
+%%[matrices here]
+%\begin{equation} \label{eq:global_angular_velocity}
+%\dot{\eta} = W_{\eta}^{-1}\nu, 
+%\begin{bmatrix}
+%\dot{\phi} \\
+%\dot{\theta} \\
+%\dot{\psi}
+%\end{bmatrix}
+%=
+%\begin{bmatrix}
+%1 & S_{\phi}T_{\theta} & C_{\phi}T_{\theta} \\
+%0 & C_{\phi} & -S_{\phi} \\
+%0 & S_{\phi}/C_{\theta} & C_{\phi}/C_{\theta}
+%\end{bmatrix}
+%\begin{bmatrix}
+%p \\
+%q \\
+%r
+%\end{bmatrix}
+%\end{equation}
 
-\begin{equation} \label{eq:local_angular_velocity}
-\nu = W_{\eta}\dot{\eta},
-\begin{bmatrix}
-p \\
-q \\
-r
-\end{bmatrix}
-=
-\begin{bmatrix}
-1 & 0 & -S_{\theta} \\
-0 & C_{\phi} & C_{\theta}S_{\phi} \\
-0 & -S_{\phi} & C_{\theta}C_{\phi}
-\end{bmatrix}
-\begin{bmatrix}
-\dot{\phi} \\
-\dot{\theta} \\
-\dot{\psi}
-\end{bmatrix}
-\end{equation}
+%\begin{equation} \label{eq:local_angular_velocity}
+%\nu = W_{\eta}\dot{\eta},
+%\begin{bmatrix}
+%p \\
+%q \\
+%r
+%\end{bmatrix}
+%=
+%\begin{bmatrix}
+%1 & 0 & -S_{\theta} \\
+%0 & C_{\phi} & C_{\theta}S_{\phi} \\
+%0 & -S_{\phi} & C_{\theta}C_{\phi}
+%\end{bmatrix}
+%\begin{bmatrix}
+%\dot{\phi} \\
+%\dot{\theta} \\
+%\dot{\psi}
+%\end{bmatrix}
+%\end{equation}
 
 The quadcopter is assumed to be symmetrical with equal length arms for each rotor. 
 Aligning the arms along the body's x and y axes gives the diagonal inertia matrix in \eqref{eq:inertia_matrix}. 
@@ -457,9 +459,75 @@ lk(-w_{1}^{2}+w_{3}^{2}) \\
 \end{bmatrix}
 \end{equation}
 
-%[[put some description explaining these equations here]]
+The governing equation for translational motion is \eqref{eq:translation}; where $\xi$ is the linear position vector, $T_{B}$ is the thrust from \eqref{eq:thrust}, $R$ is the rotation matrix from \eqref{eq:rotation_matrix}, and $A(\dot{\xi})$ is a matrix containing the drag force coefficients.
 
-%TODO have some equations which have the drag force in them, as this will be referenced later
+\begin{equation} \label{eq:translation}
+m\ddot{\xi} = T_{B}R - A(\dot{\xi})\dot{\xi} - G
+\end{equation}
+
+Expanding \eqref{eq:translation} and setting the equation in terms of translational acceleration leads to \eqref{eq:translation_expanded}.
+
+\begin{equation} \label{eq:translation_expanded}
+\begin{bmatrix}
+\ddot{x} \\
+\ddot{y} \\
+\ddot{z}
+\end{bmatrix} 
+=
+\dfrac{T}{m}
+\begin{bmatrix}
+C_{\psi}S_{\theta}C_{\phi} + S_{\psi}S_{\phi} \\
+S_{\psi}S_{\theta}C_{\phi} - S_{\psi}S_{\phi} \\
+C_{\theta}C_{\phi}
+\end{bmatrix}
+-
+\dfrac{1}{m}
+\begin{bmatrix}
+A_{x}|\dot{x}| & 0 & 0 \\
+0 & A_{y}|\dot{y}| & 0 \\
+0 & 0 & A_{z}|\dot{z}|
+\end{bmatrix}
+\begin{bmatrix}
+\dot{x} \\
+\dot{y} \\
+\dot{z}
+\end{bmatrix}
+-
+\begin{bmatrix}
+0 \\
+0 \\
+g
+\end{bmatrix}
+\end{equation}
+
+The governing equation for rotational motion is \eqref{eq:rotation_expanded}; where $\eta$ is the Euler angle vector, $I$ is the inertia matrix from \eqref{eq:inertia_matrix}, $\tau_{B}$ is the applied torque from \eqref{eq:torque}, and $C(\dot{\eta})\dot{\eta}$ is the centripetal force. 
+
+\begin{equation} \label{eq:rotation}
+I\ddot{\eta} = C(\dot{\eta})\dot{\eta} + \tau_{B}
+\end{equation}
+
+Expanding \eqref{eq:rotation} and setting the equation in terms of angular acceleration leads to \eqref{eq:rotation_expanded}.
+
+\begin{equation} \label{eq:rotation_expanded}
+\begin{bmatrix}
+\ddot{\phi} \\
+\ddot{\theta} \\
+\ddot{\psi}
+\end{bmatrix}
+=
+\begin{bmatrix}
+(I_{yy} - I_{zz})\dot{\theta}\dot{\psi}/I_{xx} \\
+(I_{zz} - I_{xx})\dot{\phi}\dot{\psi}/I_{yy} \\
+(I_{xx} - I_{yy})\dot{\phi}\dot{\theta}/I_{zz}
+\end{bmatrix}
++
+\begin{bmatrix}
+\tau_{\phi}/I_{xx} \\
+\tau_{\theta}/I_{yy} \\
+\tau_{\psi}/I_{zz}
+\end{bmatrix}
+\end{equation}
+
 
 \section{Simulation}
 
@@ -535,7 +603,7 @@ In this situation, it is useful to have a controller that can adapt to these cha
 
 The foundation of adaptive control is based on parameter estimation. 
 First, a mathematical model of the system to be controlled is generated based on physical laws. 
-This model is typically of the form shown in \eqref{eq:physical_equation}, where $q$ is the vector of state variables, $M(q)$ is a mass/inertia matrix, $C(q,\dot{q})$ is the coriolis term [???], $g(q)$ is the gravitational force, and $\tau$ is a vector representing the input force/torque to the system.
+This model is typically of the form shown in \eqref{eq:physical_equation}, where $q$ is the vector of state variables, $M(q)$ is a mass/inertia matrix, $C(q,\dot{q})$ is the coriolis-drag term, $g(q)$ is the gravitational force, and $\tau$ is a vector representing the input force/torque to the system.
 
 \begin{equation} \label{eq:physical_equation}
 M(q)\ddot{q} + C(q,\dot{q})\dot{q} + g(q) = \tau
@@ -556,7 +624,7 @@ An estimate of $q$ and $\dot{q}$ can typically be measured, leaving the only pot
 If these physical parameters are constant and linear with respect to the system state, the equation can be reorganized as in \eqref{eq:Y_equation}.
 Here $\hat{\theta}$ is a an estimate of the vector of unknown constant parameters of the system and $Y(q,\dot{q})$ is a known matrix dependent on the system state.
 
-\begin{equation} \label{eq:input_equation}
+\begin{equation} \label{eq:Y_equation}
 \tau = C(q,\dot{q})\dot{q} + g(q) = Y(q,\dot{q})\hat{\theta}
 \end{equation}
 
@@ -673,9 +741,9 @@ C(q,\dot{q}) =
 A_{x}|\dot{x}| & 0 & 0 & 0 & 0 & 0 \\
 0 & A_{y}|\dot{y}| & 0 & 0 & 0 & 0 \\
 0 & 0 & A_{z}|\dot{z}| & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & \dot{\psi}(I_{zz} - I_{yy}) & 0 \\
-0 & 0 & 0 & 0 & 0 & \dot{\phi}(I_{xx} - I_{zz}) \\
-0 & 0 & 0 & \dot{\theta}(I_{yy} - I_{xx}) & 0 & 0 \\
+0 & 0 & 0 & 0 & I_{zz}\dot{\psi} & -I_{yy}\dot{\theta} \\
+0 & 0 & 0 & -I_{zz}\dot{\psi} & 0 & I_{xx}\dot{\phi} \\
+0 & 0 & 0 & I_{yy}\dot{\theta} & -I_{xx}\dot{\phi} & 0 \\
 \end{bmatrix}
 \end{equation}
 

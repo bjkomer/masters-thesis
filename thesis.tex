@@ -1014,15 +1014,15 @@ The slope of this surface is the ratio of the linear and angular P gains of the 
 \end{figure}
 
 
-One way to overcome this flaw is to modify the error signal that the adaptive population uses. 
-The only important state variables that need to match the target are x,y,z position and yaw angle. 
+One way to overcome the above problem is to modify the error signal that the adaptive ensemble uses. 
+The only important state variables that need to match the target are the x, y, z position and yaw angle. 
 The state velocities should all be zero as well. 
-Since roll and pitch are not supposed to be controlled, they should really be left out of the error that the adaptive population uses since they don't correspond to an actual error in the desired state. 
-This information is still important to allow the quadcopter to fly properly, and it needs to know roll and pitch information for stable flight. If this information is removed from the controller entirely it cannot fly.
+Since roll and pitch are not supposed to be controlled, they should really be left out of the error that the adaptive ensemble uses since they do not correspond to an actual error in the desired state. 
+This information is still important in allowing the quadcopter to fly properly, as the controller needs to know roll and pitch information for stable flight. If this information is removed from the controller entirely, it cannot fly.
 
-One solution is to omit the roll and pitch information only from the adaptive population, while still using it for the baseline controller. 
-This is done by generating a separate gain matrix to use on the modulatory connection to the learned transformation. 
-The new network diagram of the model is shown below in \autoref{fig:NetAdaptiveTransform}. 
+One implementation is to omit the roll and pitch information only from the adaptive ensemble, while still using it for the baseline controller. 
+This approach involves generating a separate gain matrix to use on the modulatory connection to the learned transformation. 
+The new network diagram of the controller is shown below in \autoref{fig:NetAdaptiveTransform}. 
 The form of the gain matrix for the modulatory connection is shown in \eqref{eq:adaptive_gain_matrix}.
 
 \begin{equation} \label{eq:adaptive_gain_matrix}
@@ -1049,27 +1049,34 @@ K_{a} =
 \subsection{Gain Tuning}
 
 This controller is now able to adapt to external horizontal forces, but normal flight is much less stable and prone to overshooting targets. 
-One possible reason for this is that the gains might need to be re-tuned to work with this new controller setup. 
-There are 12 different gains in this controller, which makes tuning them manually a difficult and laborious task.
-This is a task well suited for automated parameter optimization. 
-The tool that I chose to use for this is Hyperopt \cite{bergstra2013hyperopt}. 
+Possibly because the gains need to be re-tuned to work with this new controller setup. 
+However, as there are 12 different gains in this controller, tuning them manually is a difficult and laborious task, one well suited for automated parameter optimization, as described next.
+
+The tool that I chose to use for this optimization is Hyperopt \cite{bergstra2013hyperopt}. 
 Hyperopt is a python package designed to perform parameter optimization over a search space for a given function. 
-As long as you can set your problem up in a way that it becomes a function that takes any number of parameters and returns a single error metric to be minimized, it can be used with Hyperopt. [[blather on about how hyperopt builds a surrogate model based on the problem, and how it has the option for smarter than random methods for picking points, as well as interesting ways to set up the search space]]
+As long as a problem can be set as a function that takes any number of parameters and returns a single error metric to be minimized, that problem can be used with Hyperopt. 
+%TODO
+[[blather on about how hyperopt builds a surrogate model based on the problem, and how it has the option for smarter than random methods for picking points, as well as interesting ways to set up the search space]]
 
 %TODO better title here??
 \subsection{Using Hyperopt}
 
-In order to use Hyperopt, the controller model must be encapsulated in some function that returns a useful metric of how well the controller works. This was done by creating a set of target points for the quadcopter to move through over a period of time and an additional population computing a scalar measure of the error of the quadcopter from the target. This error metric was taken to be a weighted Euclidean norm of each of the dimensions of the state. States that were deemed more important (such as x,y, and z position) were given higher weights in this calculation. States that were less important (such as roll and pitch) were given lower weights. 
-Paired with this error was a status signal of whether or not the quadcopter should be at the target by now, or if it is okay that it is still in flight. 
-As the quadcopter cannot be expected to move instantaneously between targets, it should not be penalized for having an error when it was just told to move to a different location. 
-This status signal is set to 0 right after a new target is required, and then set to 1 again around the time when the quadcopter is expected to have reached the new target. The error at each time step is multiplied by this status signal before being recorded. 
-The delay in switching back on the status signal can be used to give an indication of how important it is that the quadcopter reaches the target quickly. 
-A longer delay means the optimization will find parameters that allow the quadcopter to reach the target very precisely with little oscillations, but could take a long time. 
+In order to use Hyperopt, the controller model must be encapsulated in some function that returns a useful metric of how well the controller works.
+This was done by creating a set of target points for the quadcopter to move through over a period of time and an additional population computing a scalar measure of the error of the quadcopter from the target. 
+This error metric was taken to be a weighted Euclidean norm of each of the dimensions of the state.
+States that were deemed more important (such as the x, y, and z position) were given higher weights in this calculation.
+States that were less important (such as roll and pitch) were given lower weights. 
+Paired with this error was a status signal of whether the quadcopter should be at the target at a given time or en route.
+As the quadcopter cannot be expected to move instantaneously between targets, it should not be penalized for having an error when it has just been told to move to a different location. 
+This status signal is set to 0 right after a new target is introduced, and then set to 1 again about the time when the quadcopter is expected to have reached the new target. The error at each time step is multiplied by this status signal before being recorded. 
+The delay in switching back on the status signal can be used to indicate how important it is for the quadcopter to reach the target quickly. 
+A longer delay means the optimization will find parameters that allow the quadcopter to reach the target very precisely with little oscillation, but reaching the target could take a long time. 
 A shorter delay will prefer controllers that get to the target quickly, but may overshoot, have a steady state error, or jitter once they reach the target.
 
-Model creation, running the physics simulator, sending the target commands, stopping the physics simulator, and returning the error metric are all encapsulated in a single Python function. 
+Model creation, running the physics simulator, sending the target commands, stopping the physics simulator, and returning the error metric were all encapsulated in a single Python function. 
 This function was then given to Hyperopt, which ran it many times and kept track of the parameters used for the best result. There were about 3000 [[check this!!]] evaluations of different parameter sets, and each run took about 26 seconds [[check this!!]]. 
-Hyperopt is able to go through a set number of evaluation points in one run, and then pick up where it left off in a separate run. This allowed these runs to be completed overnight over the course of multiple nights to get the final results, shown in the Hyperopt column of \autoref{table:hyperopt_gains}. 
+Hyperopt is able to go through a set number of evaluation points in one run, and then pick up where it left off in a separate run.
+This capability allowed these runs to be completed overnight over the course of multiple nights to get the final results, shown in the Hyperopt column of \autoref{table:hyperopt_gains}. 
 These are by no means the optimal gain parameters, as the function being optimized does not represent the full operational space of the controller, and the method for generating the error metric was very simplistic. 
 The more complex the set of targets in the objective function, the longer each run will take to complete, meaning less of the parameter space can be explored in the same amount of time. 
 A tradeoff had to be made between the amount of data to evaluate and the quality of each data point. 
@@ -1111,12 +1118,12 @@ $k_{a4}$ & 8.25 & 34.9626 & 21.45 \\ \hline
 
 \subsection{Improving Adaptation to Horizontal Forces}
 
-There is still much room for improvement on this controller. 
+There is still much room for improvement of this controller. 
 While it can adapt to horizontal forces, it does so quite slowly, as can be seen in \autoref{fig:PlotStandard}. 
 This is because the adaptive component of the controller is always fighting against the command given by the standard component. 
 There is an implicit target roll and pitch angle of zero radians that the controller is trying to achieve even if that is not the correct angle to be at. 
-One approach to overcome this is to have a second adaptive population that tries to learn what roll and pitch angle will allow the quadcopter to be stationary, and then feed these angles to the basic controller. 
-This way the controller will no longer be actively trying to bring the quadcopter away from its setpoint, yet still has the angle information required for it to be able to fly. 
+One approach to overcoming this problem is to have a second adaptive population that tries to learn what roll and pitch angle will allow the quadcopter to be stationary, and then feed these angles to the basic controller. 
+Thus, the controller will no longer be actively trying to bring the quadcopter away from its setpoint, yet still has the angle information required for it to be able to fly. 
 A network diagram of this controller is shown in \autoref{fig:NetAngleAdapt} and the performance of this controller is shown in \autoref{fig:PlotAngleAdapt}.
 
 \begin{figure}
@@ -1160,20 +1167,21 @@ A network diagram of this controller is shown in \autoref{fig:NetAngleAdapt} and
 %TODO figure out a better title for this section
 \subsection{Shortcomings of the Error Signal}
 
-There is still a problem with the implementation of this controller. 
+Even with the above adaptation, a problem remains with the implementation of this controller. 
 Since the adaptive component is driven by state error, as soon as the target is moved to a new location, a large error will be produced. 
 This error will cause the adaptive transformation to change, even if it was already at its optimal configuration. 
-This can cause problems in control, such as the overshoot and oscillations seen in \autoref{fig:PlotAngleAdaptB}. 
-The summation of the control signal of the underlying controller and the signal from the adaptation to the error creates a control signal that is too large for the desired performance. 
-To account for this, a time delayed filter is applied to a population representing the target location. 
-This filtered location is then subtracted from an unfiltered location and stored in a new population. The signal coming from this new population can be used to inhibit the adaptive populations. 
-If the target hasn't moved for a while, the value being projected from this population [[give it some name to use!!]] will be close to zero, meaning there is no inhibition. 
-If the target is suddenly moved, this population will output the difference between the two target positions and inhibit the adaptation in any dimension that has a difference. 
+This change can cause problems in control, such as the overshoot and oscillations seen in \autoref{fig:PlotAngleAdaptB}. 
+The summation of the control signal of the underlying controller and the signal from the adaptation to the error creates a control signal that is too large for the desired performance.
+%TODO clean up the ordering of the next few sentences to make the point clear
+To account for this, a time-delayed filter is applied to an ensemble representing the target location. 
+This filtered location is then subtracted from an unfiltered location and stored in a new ensemble. The signal coming from this new ensemble can be used to inhibit the adaptive ensembles. 
+If the target has not moved recently, the value being projected from this ensemble [[give it some name to use!!]] will be close to zero, meaning there is no inhibition. 
+If the target is suddenly moved, this ensemble will output the difference between the two target positions and inhibit the adaptation in any dimension that has a difference. 
 Over time the filtered target will start to match the unfiltered target, and the extent in which the angle adaptive population can adapt to any errors increases. 
 The network diagram for this model can be seen in \autoref{fig:NetTMC} and the performance of this controller is shown in \autoref{fig:PlotTMC}.
 
 %TODO should target following go anywhere?
-%It's performance on the target following task can be seen in Figure XXX.
+%Its performance on the target following task can be seen in Figure XXX.
 
 %[[put in network diagram, as well as one plot of performance]]
 \begin{figure}
@@ -1218,7 +1226,7 @@ This controller performs extremely well in both operation under normal condition
 
 Each of these controllers is implemented as a Nengo model in Python. 
 The main communication channel between V-REP and Nengo is the Quadcopter Node. 
-This Node contains a callable Python class that manages the communication between the two systems at every time step and from the Nengo network's point of view represents the entirety of the physics simulation. 
+This Node contains a callable Python class that manages the communication between the two systems at every time step and, from the Nengo network's point of view, represents the entirety of the physics simulation. 
 Connections can be made to and from this node just like any other Node in a Nengo network. 
 A connection to the V-REP remote API server is established when this Node is created. 
 This node outputs the 6 dimensional state of the quadcopter, the 6 dimensional derivative of the state of the quadcopter, as well as the 6 dimensional state of the target. 
@@ -1232,9 +1240,11 @@ Nengo is run with a time step of 1ms, as this is the standard time step for most
 The V-REP simulation on the other hand is run at a 10ms time step. 
 Ideally it would also be run at 1ms, but the simulator has trouble rendering and making calculations that quickly. 
 To account for this, Nengo only communicates with V-REP every 10 of its time steps. 
-A synchronization trigger command is also issued every 10 time steps from Nengo. The V-REP simulation will only move forward one time step each time this trigger is issued, and Nengo will pause simulation until V-REP has completed this time step. 
-This ensures that the timing of each simulation is always synchronized. 
-There is some processing overhead in ensuring the synchronization of these two systems, but it is worth it for the improved accuracy of the overall simulation. 
+A synchronization trigger command is also issued every 10 time steps from Nengo. 
+The V-REP simulation can move forward only after a trigger is issued, and only by one time step. 
+Nengo pauses simulation until V-REP has completed this time step. 
+This sequence ensures that the timing of each simulation is always synchronized. 
+Some processing overhead is incurred in ensuring the synchronization of these two systems, but the improved accuracy of the overall simulation justifies this expense. 
 
 %======================================================================
 \chapter{Simulations and Results} \label{chap:analysis}
@@ -1248,10 +1258,9 @@ There is some processing overhead in ensuring the synchronization of these two s
 %[lots of graphs and pretty pictures, maybe even a screenshot or two]
 
 To get a sense of how well the neural adaptive controller performs, some reference implementations were created to use as benchmarks. 
-Five different non-neural controllers were used, a standard PD controller, a standard PID controller, an improved PID controller, an improved PID controller with a faster integral gain, and an adaptive controller. [fix this sentence up, or just put them all in a table with a description].
+Five different non-neural controllers were used: a standard PD controller, a standard PID controller, an improved PID controller, an improved PID controller with a faster integral gain, and an adaptive controller. [fix this sentence up, or just put them all in a table with a description].
 % doublecheck that these are the ones you actually want to use, maybe narrow it down to only recording data for a few of them
-A couple iterations of the neural adaptive controller are used in the benchmarking. 
-These are the standard adaptive controller, the modified error adaptive controller, the angle corrective controller, the target modulated angle corrective controller, the allocentric controller, and the context sensitive controller. [just stick these in a table with descriptions as well] %TODO fix and re-work this sentence
+Several iterations of the neural adaptive controller are used in the benchmarking: the standard adaptive controller, the modified error adaptive controller, the angle corrective controller, the target modulated angle corrective controller, the allocentric controller, and the context sensitive controller. [just stick these in a table with descriptions as well] %TODO fix and re-work this sentence
 The controllers used in the benchmarking are listed in \autoref{table:controller_models}
 
 %[[show the math behind each of the controllers, mention the gravity compensation term used to account for the mass of the quadcopter, and how it is not needed in the adaptive models or PIDt. Have block diagrams or nengo diagrams of each]]
@@ -1308,8 +1317,7 @@ The particular tolerance chosen for these experiments is maintaining an RMS erro
 % TODO: maybe get a better title for this
 \subsection{Benchmarks for Simple Environments}
 
-A series of simple point to point control tasks are used to give an indication of performance. 
-These tasks are: movement in the vertical direction, movement in the horizontal direction, rotation about the yaw axis, and horizontal movement into a wind tunnel. %, and a movement that requires a change in x, y, and z position as well as yaw angle. 
+A series of simple point-to-point control tasks were used to give an indication of performance:  movement in the vertical direction, movement in the horizontal direction, rotation about the yaw axis, and horizontal movement into a wind tunnel. %, and a movement that requires a change in x, y, and z position as well as yaw angle. 
 These tasks are summarized in \autoref{table:tasks} below.
 Experimental results obtained from the reference controllers and the neural adaptive controllers are shown in \autoref{fig:benchmark_simple_reference} and \autoref{fig:benchmark_simple_neural} respectively. %TODO possibly put these into one figure, and make it easier to read - also need to make the scaling clear to compare neural to benchmark. Possibly have another figure with just the best neural vs the best reference
 

@@ -692,7 +692,7 @@ The PES learning rule will attempt to reduce the error signal by changing the va
 The direction in which the decoder values change is dependent on the sign of the error. 
 The magnitude of the change in decoder values at each time step is dependant on both the magnitude of the error and a learning-rate parameter. 
 The learning rate is a dimensionless parameter that needs to be tuned for the specific application. 
-It is dependant on the simulation time step, the number of neurons in the state population, as well as how responsive the model needs to be to changes. [[check to make sure this is true!!]] 
+It is dependant on the simulation time step, the number of neurons in the state ensemble, as well as how responsive the model needs to be to changes. [[check to make sure this is true!!]] 
 A larger learning rate will cause larger reactions to error, effectively making the system trust its current measurements more than historical ones. 
 A smaller timestep means that these changes will occur more frequently, so the net change over time will be greater. 
 A larger number of neurons means that the changes will be greater, as there will be more decoders changing. The overall transformation is a sum of these decoders. [[check to make sure this is true!!]].
@@ -970,8 +970,8 @@ The larger network is used in the remainder of this thesis because it is more ex
 %[have diagrams of each, similar to the powerpoint presentation]
 %[talk about Hyperopt parameter tuning]
 
-The first iteration of the controller uses an adaptive population to influence the task space command. 
-A projection from the adaptive population to the task population is modulated by the state error undergoing the control transform. 
+The first iteration of the controller uses an adaptive ensemble to influence the task space command. 
+A projection from the adaptive ensemble to the task ensemble is modulated by the state error undergoing the control transform. 
 The PES learning rule is applied to this connection, which seeks to build a transformation that minimizes the error coming in from this modulatory connection. 
 The effect is similar to that of the I term in a PID controller, except that it uses all state information to come up with the integral gain, and can perform nonlinear transforms to accomplish this. Without this adaptive component, the quadcopter will have a large steady state error in the z direction, and will fall to the ground as soon as the simulation starts.
 
@@ -983,7 +983,7 @@ When an external force is applied in the horizontal plane, this controller does 
 The quadcopter will settle to a stable point in space with a constant offset from the target location. 
 This behaviour results from how the error is specified:
 since both position and angle gains are being combined into the same dimension to produce the task space error, multiple pairs of measurements will produce the same error. 
-That is, the adaptive population is being given an effective error reading of zero even though the quadcopter is not at the desired position. 
+That is, the adaptive ensemble is being given an effective error reading of zero even though the quadcopter is not at the desired position. 
 For example, if wind is producing a force in the x-direction, in order for the quadcopter to remain stationary, it must have a pitch angle that allows its thrust to compensate for both the gravitational force and the translational force.
 
 %[[show FBD of quadcopter with pitch angle and forces balancing]]
@@ -1062,7 +1062,7 @@ As long as a problem can be set as a function that takes any number of parameter
 \subsection{Using Hyperopt}
 
 In order to use Hyperopt, the controller model must be encapsulated in some function that returns a useful metric of how well the controller works.
-This was done by creating a set of target points for the quadcopter to move through over a period of time and an additional population computing a scalar measure of the error of the quadcopter from the target. 
+This was done by creating a set of target points for the quadcopter to move through over a period of time and an additional ensemble computing a scalar measure of the error of the quadcopter from the target. 
 This error metric was taken to be a weighted Euclidean norm of each of the dimensions of the state.
 States that were deemed more important (such as the x, y, and z position) were given higher weights in this calculation.
 States that were less important (such as roll and pitch) were given lower weights. 
@@ -1122,7 +1122,7 @@ There is still much room for improvement of this controller.
 While it can adapt to horizontal forces, it does so quite slowly, as can be seen in \autoref{fig:PlotStandard}. 
 This is because the adaptive component of the controller is always fighting against the command given by the standard component. 
 There is an implicit target roll and pitch angle of zero radians that the controller is trying to achieve even if that is not the correct angle to be at. 
-One approach to overcoming this problem is to have a second adaptive population that tries to learn what roll and pitch angle will allow the quadcopter to be stationary, and then feed these angles to the basic controller. 
+One approach to overcoming this problem is to have a second adaptive ensemble that tries to learn what roll and pitch angle will allow the quadcopter to be stationary, and then feed these angles to the basic controller. 
 Thus, the controller will no longer be actively trying to bring the quadcopter away from its setpoint, yet still has the angle information required for it to be able to fly. 
 A network diagram of this controller is shown in \autoref{fig:NetAngleAdapt} and the performance of this controller is shown in \autoref{fig:PlotAngleAdapt}.
 
@@ -1173,11 +1173,11 @@ This error will cause the adaptive transformation to change, even if it was alre
 This change can cause problems in control, such as the overshoot and oscillations seen in \autoref{fig:PlotAngleAdaptB}. 
 The summation of the control signal of the underlying controller and the signal from the adaptation to the error creates a control signal that is too large for the desired performance.
 %TODO clean up the ordering of the next few sentences to make the point clear
-To account for this, a time-delayed filter is applied to an ensemble representing the target location. 
+To correct this behaviour, a time-delayed filter is first applied to an ensemble representing the target location. 
 This filtered location is then subtracted from an unfiltered location and stored in a new ensemble. The signal coming from this new ensemble can be used to inhibit the adaptive ensembles. 
-If the target has not moved recently, the value being projected from this ensemble [[give it some name to use!!]] will be close to zero, meaning there is no inhibition. 
-If the target is suddenly moved, this ensemble will output the difference between the two target positions and inhibit the adaptation in any dimension that has a difference. 
-Over time the filtered target will start to match the unfiltered target, and the extent in which the angle adaptive population can adapt to any errors increases. 
+If the target has not moved recently, the value being projected from this filtered-difference ensemble will be close to zero, meaning there is no inhibition. 
+If the target is suddenly moved, this filtered-difference ensemble will begin to output the difference between the two target positions, thereby inhibiting the adaptation in any dimension that has a difference. 
+Over time the filtered target will start to match the unfiltered target, and the extent in which the adaptive ensembles can adapt to any errors increases. 
 The network diagram for this model can be seen in \autoref{fig:NetTMC} and the performance of this controller is shown in \autoref{fig:PlotTMC}.
 
 %TODO should target following go anywhere?
@@ -1236,7 +1236,7 @@ A Lua script is run within V-REP each time step, and this script unpacks these v
 It then issues them to the physical quadcopter model. The physics engine calculates the appropriate forces and torques that will be applied to the quadcopter as well as the resulting changes in state (position, velocity, orientation, and angular velocity) after one time step. 
 This new state will now be read by the Nengo script in its next time step.
 
-Nengo is run with a time step of 1ms, as this is the standard time step for most models and is sufficient for modelling spike timing effects in populations of LIF neurons while still running at a reasonable speed on most computer processors. 
+Nengo is run with a time step of 1ms, as this is the standard time step for most models and is sufficient for modelling spike timing effects in ensembles of LIF neurons while still running at a reasonable speed on most computer processors. 
 The V-REP simulation on the other hand is run at a 10ms time step. 
 Ideally it would also be run at 1ms, but the simulator has trouble rendering and making calculations that quickly. 
 To account for this, Nengo only communicates with V-REP every 10 of its time steps. 
@@ -1258,7 +1258,9 @@ Some processing overhead is incurred in ensuring the synchronization of these tw
 %[lots of graphs and pretty pictures, maybe even a screenshot or two]
 
 To get a sense of how well the neural adaptive controller performs, some reference implementations were created to use as benchmarks. 
-Five different non-neural controllers were used: a standard PD controller, a standard PID controller, an improved PID controller, an improved PID controller with a faster integral gain, and an adaptive controller. [fix this sentence up, or just put them all in a table with a description].
+Five different non-neural controllers were used: a standard PD controller, a standard PID controller, an improved PID controller, an improved PID controller with a faster integral gain, and an adaptive controller. 
+%TODO
+[fix this sentence up, or just put them all in a table with a description].
 % doublecheck that these are the ones you actually want to use, maybe narrow it down to only recording data for a few of them
 Several iterations of the neural adaptive controller are used in the benchmarking: the standard adaptive controller, the modified error adaptive controller, the angle corrective controller, the target modulated angle corrective controller, the allocentric controller, and the context sensitive controller. [just stick these in a table with descriptions as well] %TODO fix and re-work this sentence
 The controllers used in the benchmarking are listed in \autoref{table:controller_models}
@@ -1283,9 +1285,9 @@ PIDt & PID controller where the error signal for the I term is in control space 
 PIDtf & PIDt controller with a greater integral gain \\ \hline
 Adaptive &  Adaptive controller without using neurons. Derivation shown in \autoref{chap:nonneuraladaptive} \\ \hline %TODO should this even be here? run some tests with it if you have time
 Neural Adaptive & Simple adaptive neural controller. The network diagram can be seen in \autoref{fig:NetAdaptiveTransform} \\ \hline
-Neural Adaptive Angle Correction & Adaptive neural controller with an additional adaptive neural population for determining stable roll and pitch. The network diagram can be see in \autoref{fig:NetAngleAdapt} \\ \hline
+Neural Adaptive Angle Correction & Adaptive neural controller with an additional adaptive neural ensemble for determining stable roll and pitch. The network diagram can be see in \autoref{fig:NetAngleAdapt} \\ \hline
 Neural Adaptive TMC & The difference between the current target state and a time delayed target modulates the error signal that drives the learning. The network diagram can be seem in \autoref{fig:NetTMC} \\ \hline
-Neural Adaptive Allocentric TMC & The same as above, but absolute position and orientation information is projected into the adaptive populations along with the relative error to the target. The network diagram can be seem in \autoref{fig:NetTMC} \\ \hline
+Neural Adaptive Allocentric TMC & The same as above, but absolute position and orientation information is projected into the adaptive ensembles along with the relative error to the target. The network diagram can be seem in \autoref{fig:NetTMC} \\ \hline
 
 \end{tabular}
 \end{center}
@@ -1524,7 +1526,7 @@ Integrating adaptive control with an adaptive method for system identification c
 
 A useful extension of the adaptive controller would be to embed it within a larger navigation and planning system.
 Currently the quadcopter will only fly in a direct path towards a specified point, but it would be useful for it to be able to detect obstacles in its path and calculate a new route to avoid those obstacles.
-The adaptive population of neurons in the controller could be set up to be able to recognize certain obstacles and learn to avoid them in an effective manner.
+The adaptive ensemble of neurons in the controller could be set up to be able to recognize certain obstacles and learn to avoid them in an effective manner.
 An internal representation of the environment along with a memory for changes in the environment could be used to allow dynamic planning of optimal trajectories to a target.
 
 % talk about modelling more complex things like blade flapping and vortex ring state

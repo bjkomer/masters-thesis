@@ -1422,7 +1422,10 @@ While the neural adaptive controller did not perform strictly the best in all ta
 The main contribution of this thesis is an adaptive control system for a quadcopter using simulated biological neurons.
 
 A second contribution is the integration of the Nengo neural simulation software with the robotics and physics simulation capacity of V-REP.
-This union allows complex neural models to be embodied in a physical environment in a straightforward manner. 
+This union allows complex neural models to be embodied in a physical environment in a straightforward manner.
+The various tools developed over the course of this thesis work to support the integration of the simulated quadcopter with Nengo are general purpose enough to be applied to other simulated robotic models.
+These tools include a standard method for opening and closing the communication channel for the simulators, synchronization of simulation time between the two simulators, an interface for using sensors and actuators from Nengo, and method for displaying data from a Nengo network using V-REP's plotting interface.
+
 
 %TODO talk about noise here? Throw in one simulation with noise to say that it works
 %TODO can also throw in one simulation of target following and mention how it works too

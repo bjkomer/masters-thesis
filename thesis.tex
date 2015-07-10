@@ -174,6 +174,9 @@
 % Allow subfigures
 \usepackage{subcaption}
 
+% Allow multi-references
+\usepackage{cleveref}
+
 % Include a Glossary
 %\usepackage[acronym]{glossaries}
 
@@ -1318,14 +1321,20 @@ This metric favours controllers that can reach the target quickly.
 This metric does not worry about overshoot and non-optimal trajectories as long as steady state is achieved at the target in the end.
 The particular tolerance chosen for these experiments is maintaining an RMS error of less than 0.001 for a duration of one second.
 
-
+The majority of the benchmarks performed in this thesis will report results using the trajectory RMS error and the time-to-target metric.
 
 % TODO: maybe get a better title for this
 \subsection{Benchmarks for Simple Environments}
 
 A series of simple point-to-point control tasks were used to give an indication of performance:  movement in the vertical direction, movement in the horizontal direction, rotation about the yaw axis, and horizontal movement into a wind tunnel. %, and a movement that requires a change in x, y, and z position as well as yaw angle. 
 These tasks are summarized in \autoref{table:tasks} below.
-Experimental results obtained from the reference controllers and the neural adaptive controllers are shown in \autoref{fig:benchmark_simple_reference} and \autoref{fig:benchmark_simple_neural} respectively. %TODO possibly put these into one figure, and make it easier to read - also need to make the scaling clear to compare neural to benchmark. Possibly have another figure with just the best neural vs the best reference
+Experimental results obtained from the reference controllers and the neural adaptive controllers are shown for each of these tasks in \Cref{fig:bar_horizontal,fig:bar_vertical,fig:bar_rotational,fig:bar_wind}.
+%TODO find a way to colour the table with the description instead
+The legend for all of the bar plots in the remainder of this thesis is shown in \autoref{fig:bar_legend}.
+%\autoref{fig:bar_horizontal}, \autoref{fig:bar_vertical},\autoref{fig:bar_rotational}, \autoref{fig:bar_wind}.
+ 
+%Experimental results obtained from the reference controllers and the neural adaptive controllers are shown in \autoref{fig:benchmark_simple_reference} and \autoref{fig:benchmark_simple_neural} respectively. %TODO possibly put these into one figure, and make it easier to read - also need to make the scaling clear to compare neural to benchmark. Possibly have another figure with just the best neural vs the best reference
+%TODO try using a bar chart instead, which will include all of them in one chart for the task
 
 %[[Show table with different movement types, along with brief descriptions (i.e. move 2 units in the y direction into wind tunnel with 1 Newton of force in the x direction)]]
 %[[maybe have multiple distances for each, and then average the RMS error, and report that for each model on the same graph? Should also have at least one plot from a single run, but its probably easiest to do massive comparisons with a single RMS number]]
@@ -1347,22 +1356,55 @@ Wind & Fly in the y direction (between one and five meters). Enter a wind tunnel
 \end{center}
 \end{table}
 
-
 \begin{figure}
 \centering
-\includegraphics[width=0.45\textwidth]{./figures/BenchmarkSimpleReferencePRMS.png} %TODO get better quality figure
-\includegraphics[width=0.45\textwidth]{./figures/BenchmarkSimpleReferenceTime.png} %TODO get better quality figure
-\caption{Performance on Benchmarks from Reference Controllers}
-\label{fig:benchmark_simple_reference}
+\includegraphics[width=0.45\textwidth]{./figures/ControllerLegend.png}
+\caption{Controllers used in Benchmarking}\label{fig:bar_legend}
 \end{figure}
 
 \begin{figure}
 \centering
-\includegraphics[width=0.45\textwidth]{./figures/BenchmarkSimpleNeuralPRMS.png} %TODO get better quality figure
-\includegraphics[width=0.45\textwidth]{./figures/BenchmarkSimpleNeuralTime.png} %TODO get better quality figure
-\caption{Performance on Benchmarks from Neural Adaptive Controllers}
-\label{fig:benchmark_simple_neural}
+\includegraphics[width=0.45\textwidth]{./figures/BarHorizontalPRMS.png}
+\includegraphics[width=0.45\textwidth]{./figures/BarHorizontalTime.png}
+\caption{Performance on Horizontal Movement Tasks}\label{fig:bar_horizontal}
 \end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.45\textwidth]{./figures/BarVerticalPRMS.png}
+\includegraphics[width=0.45\textwidth]{./figures/BarVerticalTime.png}
+\caption{Performance on Vertical Movement Tasks}\label{fig:bar_vertical}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.45\textwidth]{./figures/BarRotationalPRMS.png}
+\includegraphics[width=0.45\textwidth]{./figures/BarRotationalTime.png}
+\caption{Performance on Rotational Movement Tasks}\label{fig:bar_rotational}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.45\textwidth]{./figures/BarWindPRMS.png}
+\includegraphics[width=0.45\textwidth]{./figures/BarWindTime.png}
+\caption{Performance on Horizontal Movement Through Wind Tasks}\label{fig:bar_wind}
+\end{figure}
+
+%\begin{figure}
+%\centering
+%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkSimpleReferencePRMS.png} %TODO get better quality figure
+%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkSimpleReferenceTime.png} %TODO get better quality figure
+%\caption{Performance on Benchmarks from Reference Controllers}
+%\label{fig:benchmark_simple_reference}
+%\end{figure}
+%
+%\begin{figure}
+%\centering
+%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkSimpleNeuralPRMS.png} %TODO get better quality figure
+%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkSimpleNeuralTime.png} %TODO get better quality figure
+%\caption{Performance on Benchmarks from Neural Adaptive Controllers}
+%\label{fig:benchmark_simple_neural}
+%\end{figure}
 
 
 %[put some stuff in here with noise as well?]
@@ -1387,23 +1429,33 @@ These tasks are listed in \autoref{table:forcingfunctions} below. %maybe just re
 Performance of the Neural Adaptive controller is compared to the reference controller on these tasks.
 The results are displayed in \autoref{fig:benchmark_complex}. 
 
-%TODO organize the layout better and get better quality figures
-%TODO possibly put all of this in an appendix, and put data for only a few controllers here
 \begin{figure}
 \centering
-\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF0PRMS.png}
-\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF0TIME.png}
-\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF1PRMS.png}
-\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF1TIME.png}
-\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF3PRMS.png}
-\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF3TIME.png}
-\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF5PRMS.png}
-\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF5TIME.png}
-\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF6PRMS.png}
-\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF6TIME.png}
+%TODO change the ordering of tasks on the figures
+\includegraphics[width=1\textwidth]{./figures/BarForcesPRMS.png}
+\includegraphics[width=1\textwidth]{./figures/BarForcesTime.png}
+
 \caption{Performance on Benchmarks under different External Force Conditions}
 \label{fig:benchmark_complex}
 \end{figure}
+
+%%TODO organize the layout better and get better quality figures
+%TODO possibly put all of this in an appendix, and put data for only a few controllers here
+%\begin{figure}
+%\centering
+%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF0PRMS.png}
+%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF0TIME.png}
+%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF1PRMS.png}
+%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF1TIME.png}
+%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF3PRMS.png}
+%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF3TIME.png}
+%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF5PRMS.png}
+%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF5TIME.png}
+%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF6PRMS.png}
+%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF6TIME.png}
+%\caption{Performance on Benchmarks under different External Force Conditions}
+%\label{fig:benchmark_complex}
+%\end{figure}
 
 %Fill the rest of this subsection with the results of running models in these environments
 % could just put things in tables instead of having plots everywhere, or make the plots smaller so they don't take up an obnoxious amount of space
@@ -1428,6 +1480,9 @@ The non-adaptive controllers show no such improvement over time.
 \includegraphics[width=0.32\textwidth]{./figures/pidtf_loop.png}
 \caption{Path of Quadcopter between Two Points with External Forces} %mention something about how the experiment was done here? it was 100 seconds total with 5 seconds before the point switches
 \label{fig:loop_path}
+\medskip
+\small
+RMS values for the Neural Adaptive, PD, and PIDtf controllers are 0.6729, 1.2827, and 1.7662 respectively. These values were calculated using the deviation from the line formed by the two target points as the error.
 \end{figure}
 
 

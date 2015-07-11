@@ -177,6 +177,9 @@
 % Allow multi-references
 \usepackage{cleveref}
 
+% Allow descriptions under tables
+\usepackage[flushleft]{threeparttable}
+
 % Include a Glossary
 %\usepackage[acronym]{glossaries}
 
@@ -268,8 +271,8 @@ They can also change directions fairly easily mid flight, and have the ability t
 
 %[battery heaviest part, low power controller means it can last longer and/or be lighter, good candidate for neural control]
 Despite all of these positive qualities, one of the main weaknesses of quadcopters is their short battery life. 
-Small and simple quadcopters used by hobbyists typically last only 5 to 10 minutes before they run out of power [[put in source]]. 
-The more expensive industrial grade quadcopters typically last up to 30 minutes before they need to be recharged [[check this]] [[put in source]], but this duration is still not long enough for some applications. 
+Small and simple quadcopters used by hobbyists typically last only 5 to 10 minutes before they run out of power \cite{batterylife}. 
+The more expensive industrial grade quadcopters typically last up to 30 minutes before they need to be recharged, but this duration is still not long enough for some applications. 
 For example, if a quadcopter is being used in a search and rescue mission it may need to remain flying for a long time without recharging, especially if it is operating in a remote area. 
 Battery weight is one of the main issues hindering the maximum flight time of quadcopters. 
 If a larger battery is used in attempts to increase the maximum flight time, the quadcopter will be heavier and therefore require more power to fly, which in turn will drain the battery faster. 
@@ -544,18 +547,49 @@ Expanding \eqref{eq:rotation} and setting the equation in terms of angular accel
 
 The quadcopter model was validated and tested using a computer simulation environment. 
 The advantage of starting with a simulation rather than going straight to physical hardware is that it is quicker and easier to prototype new control algorithms, and it is much less costly to do so. 
-For this project I decided to use the Virtual Robotics Experimentation Platform (V-REP)\cite{vrep} as the physical simulation environment.
+
+There are three robot simulators that were considered: Virtual Robotics Experimentation Platform (V-REP)\cite{vrep}, Modular Open Robotics Simulator Engine (MORSE)\cite{echeverria2011modular}, and Gazebo\cite{koenig2004design}. All three simulators were experimented with during the beginning of this work and a qualitative summary of the relative strengths of each approach is shown in \autoref{table:robot_simulators}.
+
+%TODO fix up alignment of this table, and possibly put the description text into the actual body
+\begin{table}
+\begin{threeparttable}
+\caption{Robotic Simulator Candidates} \label{table:robot_simulators}
+%\begin{center}
+\begin{tabular}{| l | l | l | l |}
+\hline
+\textbf{Feature} & \textbf{V-REP} & \textbf{MORSE} & \textbf{Gazebo} \\ \hline
+Python Support & **** & *** & * \\ \hline
+Ease of Model Creation & *** & **** & ** \\ \hline
+Quality of Available Quadcopter Models & *** & ** & **** \\ \hline
+Timing Control & **** & * & ** \\ \hline
+Interactivity with Simulation & **** & ** & ** \\ \hline
+Community Support & **** & **** & **** \\ \hline
+\end{tabular}
+\begin{tablenotes}
+\footnotesize
+\item The number of stars indicate the extent to which the simulator demonstrates a particular feature.
+Descriptions for each feature are given below.
+\textit{Python Support}: the extent in which the simulator supports control from an external Python script.
+\textit{Ease of Model Creation}: how easy it is to build a virtual environment and add sensors and actuators to robots in this environment.
+\textit{Quality of Available Quadcopter Models}: how realistic the publicly available quadcopter models are.
+\textit{Timing Control}: how much control the programmer has on the physics simulation steps and synchronization with Nengo.
+\textit{Interactivity with Simulation}: degree in which the simulation can be interacted with once it is built and running.
+\textit{Community Support}: available online resources to get help with using the simulator.
+\end{tablenotes}
+%\end{center}
+\end{threeparttable}
+\end{table}
+
+For this project the Virtual Robotics Experimentation Platform (V-REP) was chosen as the physical simulation environment.
 This open-source software package is free to use for educational purposes; 
 contains models of various robotic platforms, including a model of a quadcopter; 
 and allows the construction of intricate 3D virtual environments for the quadcopter to interact with, as well as many virtual sensors with which to equip the quadcopter, such as cameras.
 
-%[possible bit about choosing the simulator]
-Two other strong candidates for the physics simulator where MORSE \cite{echeverria2011modular} and Gazebo \cite{koenig2004design}. 
-%TODO [continue with a little blurb about them and why they were not chosen, and reference the comparison table]
+
 
 %[possible table comparing V-REP/MORSE/Gazebo with pros and cons of each]
 
-The simulation environment in V-REP was set up to be a large open space with small obstacles and walls along the ground. 
+The simulation environment in V-REP is set up to be a large open space with small obstacles and walls along the ground. 
 The quadcopter model was initialized to start in the center of the space, 0.5 meters above the ground. 
 This model is the one provided with the V-REP software courtesy of Eric Rohmer and Lyall Randell. 
 The quadcopter's target is a small semi-transparent green sphere. The goal of the control system is to make the quadcopter move to the target's location with the target's orientation. 
@@ -625,11 +659,29 @@ Setting $\ddot{q}$ to be zero gives the relationship of the inputs to the rest o
 
 An estimate of $q$ and $\dot{q}$ can typically be measured, leaving the only potentially unknown quantities in the right-hand side of the equation to be the physical parameters of the system.
 If these physical parameters are constant and linear with respect to the system state, the equation can be reorganized as in \eqref{eq:Y_equation}.
-Here $\hat{\theta}$ is a an estimate of the vector of unknown constant parameters of the system and $Y(q,\dot{q})$ is a known matrix dependent on the system state.
+Here $\theta$ is a vector of constant system parameters and $Y(q,\dot{q})$ is a known matrix dependent on the system state. 
+$\tau$ is the input required to keep the system in a steady state.
 
 \begin{equation} \label{eq:Y_equation}
-\tau = C(q,\dot{q})\dot{q} + g(q) = Y(q,\dot{q})\hat{\theta}
+\tau = C(q,\dot{q})\dot{q} + g(q) = Y(q,\dot{q})\theta
 \end{equation}
+
+Often the system parameters are not fully known and an estimate needs to be used instead.
+Many control applications also require the system to be able to transition to different states, rather than remain at a particular state.
+The adaptive control law in \eqref{eq:Y_and_control_law} uses an estimate of the parameter vector, $\hat{\theta}$, along with a standard control law to compute the desired input to the system. Here $e$ is the state error and $K$ is a gain matrix.
+
+\begin{equation} \label{eq:Y_and_control_law}
+\tau = Y(q,\dot{q})\hat{\theta} + Ke
+\end{equation}
+
+The parameter estimates can be initialized to any stable value and are updated according to the relationship in \eqref{eq:Y_update_equation}.
+$L$ is a learning rate parameter that determines how quickly the parameter estimates change over time in proportion to the measured error.
+The parameter estimates will eventually converge on values that allow the system to be controlled with minimal error.
+
+\begin{equation} \label{eq:Y_update_equation}
+\dot{\hat{\theta}} = LY(q,\dot{q})^{T}Ke
+\end{equation}
+
 
 Creating a mathematical model of a system with enough detail to account for everything is difficult. 
 Assumptions and approximations must be made if the model is to be manageable. 

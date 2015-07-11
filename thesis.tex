@@ -1596,7 +1596,10 @@ RMS values for the Neural Adaptive, PD, and PIDtf controllers are 0.6729, 1.2827
 
 %[Talk about the results, give advantages and disadvantages of each]
 
-While the neural adaptive controller did not perform strictly the best in all tasks, it had the strongest overall performance.
+While the final iteration of the neural adaptive controller did not perform strictly the best in all tasks, it had the strongest overall performance.
+For the benchmarks that covered simple environments with no external forces, the neural controller performed on par with the reference controllers.
+For the benchmarks involving external forces, the neural controller achieved the lowest RMS error and the fastest time to reach the target for the majority of the tasks.
+
  
 %======================================================================
 \chapter{Discussion and Future Work} \label{chap:discussion}
@@ -1620,7 +1623,9 @@ These tools include a standard method for opening and closing the communication 
 
 %TODO talk about noise here? Throw in one simulation with noise to say that it works
 %TODO can also throw in one simulation of target following and mention how it works too
+%TODO possibly move this section to the previous chapter and combine with results
 \section{Discussion}
+
 
 \section{Future Work}
 

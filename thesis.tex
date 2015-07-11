@@ -310,7 +310,8 @@ The system state of a quadcopter is six dimensional: three for position (x, y, a
 There are four control inputs, which are typically taken to be the rotational velocity of each of the four rotors. 
 For a physical quadcopter, these inputs are the voltages applied to each of these rotors.
 A transformation in these voltages can be obtained using the physical rotor parameters to estimate the rotor velocity.
-For simplicity of the simulation, the velocity is used directly in this thesis. [continue...]
+For simplicity of the simulation, the velocity is used directly as the control input in this thesis. 
+%TODO [continue...]
 
 %[talk about perpendicular thrust, as well as torque on the body, and that is how each of the movements is done]
 The rotors will always generate a thrust that is perpendicular to the body of the aircraft. 
@@ -747,10 +748,12 @@ The PES learning rule will attempt to reduce the error signal by changing the va
 The direction in which the decoder values change is dependent on the sign of the error. 
 The magnitude of the change in decoder values at each time step is dependant on both the magnitude of the error and a learning-rate parameter. 
 The learning rate is a dimensionless parameter that needs to be tuned for the specific application. 
-It is dependant on the simulation time step, the number of neurons in the state ensemble, as well as how responsive the model needs to be to changes. [[check to make sure this is true!!]] 
+It is dependant on the simulation time step, the number of neurons in the state ensemble, as well as how responsive the model needs to be to changes. 
+%TODO [[check to make sure this is true!!]] 
 A larger learning rate will cause larger reactions to error, effectively making the system trust its current measurements more than historical ones. 
 A smaller timestep means that these changes will occur more frequently, so the net change over time will be greater. 
-A larger number of neurons means that the changes will be greater, as there will be more decoders changing. The overall transformation is a sum of these decoders. [[check to make sure this is true!!]].
+A larger number of neurons means that the changes will be greater, as there will be more decoders changing. The overall transformation is a sum of these decoders. 
+%TODO [[check to make sure this is true!!]].
 %[[talk about differing dimensions in these populations?]]
 
 A simple example of using the PES learning rule to control an inverted pendulum is shown in Figure XXX for clarification before employing the rule the more high dimensional case of a quadcopter controller. [[describe how the model works in the figure description, talk about the different dimensionalities of each population]]
@@ -1188,12 +1191,12 @@ A network diagram of this controller is shown in \autoref{fig:NetAngleAdapt} and
 
 \begin{figure}
 \centering
-\begin{subfigure}[t]{0.4\textwidth}
-\includegraphics[height=0.3\textheight]{./figures/StandardWindX.png} %TODO get better quality figure
+\begin{subfigure}[t]{0.48\textwidth}
+\includegraphics[height=0.40\textheight]{./figures/StandardWindX.png} %TODO get better quality figure
 \caption{Displacement by Wind}
 \end{subfigure}
-\begin{subfigure}[t]{0.4\textwidth}
-\includegraphics[height=0.3\textheight]{./figures/StandardWindY.png}
+\begin{subfigure}[t]{0.48\textwidth}
+\includegraphics[height=0.40\textheight]{./figures/StandardWindY.png}
 \caption{Trajectory to Target}
 \end{subfigure}
 \caption{Performance of Basic Adaptive Controller}
@@ -1210,13 +1213,13 @@ A network diagram of this controller is shown in \autoref{fig:NetAngleAdapt} and
 %[[show plots of angle adapt controller]]
 \begin{figure}
 \centering
-\begin{subfigure}[t]{0.4\textwidth}
-\includegraphics[height=0.3\textheight]{./figures/AngleCorrectionWindX.png} %TODO get better quality figure
+\begin{subfigure}[t]{0.48\textwidth}
+\includegraphics[height=0.40\textheight]{./figures/AngleCorrectionWindX.png} %TODO get better quality figure
 \caption{Displacement by Wind}
 \label{fig:PlotAngleAdaptA}
 \end{subfigure}
-\begin{subfigure}[t]{0.4\textwidth}
-\includegraphics[height=0.3\textheight]{./figures/AngleCorrectionWindY.png}
+\begin{subfigure}[t]{0.48\textwidth}
+\includegraphics[height=0.40\textheight]{./figures/AngleCorrectionWindY.png}
 \caption{Trajectory to Target}
 \label{fig:PlotAngleAdaptB}
 \end{subfigure}
@@ -1252,12 +1255,12 @@ The network diagram for this model can be seen in \autoref{fig:NetTMC} and the p
 
 \begin{figure}
 \centering
-\begin{subfigure}[t]{0.4\textwidth}
-\includegraphics[height=0.3\textheight]{./figures/AlloBothTMCWindX.png} %TODO get better quality figure
+\begin{subfigure}[t]{0.48\textwidth}
+\includegraphics[height=0.40\textheight]{./figures/AlloBothTMCWindX.png} %TODO get better quality figure
 \caption{Displacement by Wind}
 \end{subfigure}
-\begin{subfigure}[t]{0.4\textwidth}
-\includegraphics[height=0.3\textheight]{./figures/AlloBothTMCWindY.png}
+\begin{subfigure}[t]{0.48\textwidth}
+\includegraphics[height=0.40\textheight]{./figures/AlloBothTMCWindY.png}
 \caption{Trajectory to Target}
 \end{subfigure}
 \caption{Performance of Filtered Angle Correction Controller}
@@ -1476,7 +1479,20 @@ To quantify the performance of the quadcopter controllers under the influence of
 These tasks are listed in \autoref{table:forcingfunctions} below. %maybe just reference the forcing function table here? Have both places reference the same table
 
 %put table with strange forces here, include downward force proportional to horizontal velocity, sideways force proportional to position/velocity, etc.
-
+\begin{table}
+\caption{Forcing Functions} \label{table:forcingfunctions}
+\begin{center}
+\begin{tabular}{| l | p{9cm} |}
+\hline
+\textbf{Name} & \textbf{Description} \\ \hline
+None & No external forces applied \\ \hline
+Constant & A constant horizontal force is applied in a direction perpendicular to the quadcopter's desired trajectory\\ \hline
+Vertical Velocity & A downward force is applied proportional to the quadcopter's horizontal velocity \\ \hline
+Horizontal Position & A force is applied in the y-direction proportional to the quadcopter's x-position \\ \hline
+Horizontal Velocity & A force is applied in the y-direction proportional to the quadcopter's x-velocity \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
 
 Performance of the Neural Adaptive controller is compared to the reference controller on these tasks.
 The results are displayed in \autoref{fig:benchmark_complex}. 
@@ -1538,53 +1554,41 @@ RMS values for the Neural Adaptive, PD, and PIDtf controllers are 0.6729, 1.2827
 \end{figure}
 
 
-% This subsection will talk about how pre-training for different amounts of time on particular force functions effects the performance 
-%TODO need to fix this up a bunch or remove it
-\subsection{Effects of Training Time}
-
-Adaptive controllers learn over time.
-Longer operation contributes to a better internal representation of the environment which in turn increases the performance that the controller can achieve.
-As such, it useful to characterize by how much these controllers improve their performance as a function of time.
-
-Training is done by running the controller in a particular environment for a period of time and recording the values of the learned decoders. % maybe explain this more??
-These decoder values can then be loaded into the controller at the start of a new simulation, and the new controller will effectively start off with all of the information that the old controller had learned.
-By taking snapshots of the decoder values at particular intervals throughout the training run, the new simulations can be run with different levels of pre-training to compare performance.
-Each training run is completed with a different forcing function being applied to the quadcopter.
-The particular forcing functions used in these experiments are detailed in \autoref{table:forcingfunctions}.
-In order to explore the state space, the quadcopter is sent to a series of random target locations throughout the training run.
-In the experiments shown below, 15 random targets were chosen during training.
-These targets are sampled from a 6 by 6 area in the horizontal plane.
-Every three seconds the quadcopter is commanded to move to the next target in the sequence. Once the end of the sequence has been reached, the sequence will start over again until the end of the training session. %TODO this is out of date, future runs have everything random, with no repeating of the sequence
-Training sessions lasted 1000 seconds, with recordings taken every 10 seconds. %the recordings should really be on a more exponential scale, i.e. [0,5,10,50,100,500,1000]
-
-\begin{table}
-\caption{Forcing Functions} \label{table:forcingfunctions}
-\begin{center}
-\begin{tabular}{| l | p{9cm} |}
-\hline
-\textbf{Name} & \textbf{Description} \\ \hline
-None & No external forces applied \\ \hline
-Vertical Velocity & A downward force is applied proportional to the quadcopter's horizontal velocity \\ \hline
-Horizontal Position & A force is applied in the y-direction proportional to the quadcopter's x-position \\ \hline
-Horizontal Velocity & A force is applied in the y-direction proportional to the quadcopter's x-velocity \\ \hline
-\end{tabular}
-\end{center}
-\end{table}
-% could also add and try out forces dependent on the vertical direction, or even rotation
-
-These trained controllers ran on the benchmark tasks from Section XXX.
-The performance for different lengths of training time are shown in \autoref{fig:training_time} below.
-
-%put the figure with the different forcing functions and training time here
-\begin{figure} \label{fig:training_time}
-
-\end{figure}
-
-These results show a clear improvement in the controller performance after training.
-The amount of training needed to get good results is relatively small. 
-After about XXX seconds, the controller performance does not improve significantly.
-
-%maybe show another figure with training done on more than 15 points? Highlight how exploring a large portion of the space is important
+%% This subsection will talk about how pre-training for different amounts of time on particular force functions effects the performance 
+%%TODO need to fix this up a bunch or remove it
+%\subsection{Effects of Training Time}
+%
+%Adaptive controllers learn over time.
+%Longer operation contributes to a better internal representation of the environment which in turn increases the performance that the controller can achieve.
+%As such, it useful to characterize by how much these controllers improve their performance as a function of time.
+%
+%Training is done by running the controller in a particular environment for a period of time and recording the values of the learned decoders. % maybe explain this more??
+%These decoder values can then be loaded into the controller at the start of a new simulation, and the new controller will effectively start off with all of the information that the old controller had learned.
+%By taking snapshots of the decoder values at particular intervals throughout the training run, the new simulations can be run with different levels of pre-training to compare performance.
+%Each training run is completed with a different forcing function being applied to the quadcopter.
+%The particular forcing functions used in these experiments are detailed in \autoref{table:forcingfunctions}.
+%In order to explore the state space, the quadcopter is sent to a series of random target locations throughout the training run.
+%In the experiments shown below, 15 random targets were chosen during training.
+%These targets are sampled from a 6 by 6 area in the horizontal plane.
+%Every three seconds the quadcopter is commanded to move to the next target in the sequence. Once the end of the sequence has been reached, the sequence will start over again until the end of the training session. %TODO this is out of date, future runs have everything random, with no repeating of the sequence
+%Training sessions lasted 1000 seconds, with recordings taken every 10 seconds. %the recordings should really be on a more exponential scale, i.e. [0,5,10,50,100,500,1000]
+%
+%
+%% could also add and try out forces dependent on the vertical direction, or even rotation
+%
+%These trained controllers ran on the benchmark tasks from Section XXX.
+%The performance for different lengths of training time are shown in \autoref{fig:training_time} below.
+%
+%%put the figure with the different forcing functions and training time here
+%\begin{figure} \label{fig:training_time}
+%
+%\end{figure}
+%
+%These results show a clear improvement in the controller performance after training.
+%The amount of training needed to get good results is relatively small. 
+%After about XXX seconds, the controller performance does not improve significantly.
+%
+%%maybe show another figure with training done on more than 15 points? Highlight how exploring a large portion of the space is important
 
 
 % does this even need to be a section? Results go hand in hand with experiments

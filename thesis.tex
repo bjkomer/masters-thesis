@@ -1631,13 +1631,31 @@ These tools include a standard method for opening and closing the communication 
 \section{Discussion}
 
 While the majority of this work was conducted in an ideal environment with no sensor noise, the neural-adaptive controller can still function with noisy measurements.
-A few experiments were performed with Gaussian noise injected into the sensor measurements and the results compared to the reference PIDt controller are shown in Figure XXX.
+A few experiments were performed with Gaussian noise injected into the sensor measurements and the results compared to the reference PIDt controller are shown in \autoref{fig:noise_comparison}.
+
+\begin{figure}
+\centering
+\includegraphics[height=0.3\textheight]{./figures/HorizontalNoise.png}
+\caption{Horizontal Motion with Noise}
+\label{fig:noise_comparison}
+\end{figure}
 
 Another common goal of a control system is path following.
 This is where instead of the robot being instructed to move to a particular point, it is told to follow a particular path.
 A series of position/velocity pairs can be sequentially given as set-points rather than a single position set-point.
 The neural-adaptive controller was designed for point-to-point control, but it can also be given a path to follow as well.
-A simple example demonstrating this capability is shown in Figure XXX.
+A top-view screenshot from V-REP of a simple example demonstrating this capability is shown in \autoref{fig:circular_path_ff6}.
+Here the quadcopter is commanded to continuously fly along a circular path while being subjected to an external force along the y-axis (up/down) proportional to its velocity along the x-axis (left/right).
+In the beginning, the quadcopter's trajectory is very elliptical due to this external force, but as it continues to fly the adaptive component of the controller learns to compensate for this force, eventually producing very circular trajectories.
+
+
+\begin{figure}
+\centering
+\includegraphics[height=0.3\textheight]{./figures/CircularPathFF6.png}
+\caption{Circular Path with External Forces}
+\label{fig:circular_path_ff6}
+\end{figure}
+
 
 \section{Future Work}
 

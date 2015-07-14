@@ -180,6 +180,9 @@
 % Allow descriptions under tables
 \usepackage[flushleft]{threeparttable}
 
+% Allow symbol for degrees
+\usepackage{gensymb}
+
 % Include a Glossary
 %\usepackage[acronym]{glossaries}
 
@@ -1321,10 +1324,9 @@ Some processing overhead is incurred in ensuring the synchronization of these tw
 
 To get a sense of how well the neural adaptive controller performs, some reference implementations were created to use as benchmarks. 
 Five different non-neural controllers were used: a standard PD controller, a standard PID controller, an improved PID controller, an improved PID controller with a faster integral gain, and an adaptive controller. 
-%TODO
-[fix this sentence up, or just put them all in a table with a description].
+%TODO [fix this sentence up, or just put them all in a table with a description].
 % doublecheck that these are the ones you actually want to use, maybe narrow it down to only recording data for a few of them
-Several iterations of the neural adaptive controller are used in the benchmarking: the standard adaptive controller, the modified error adaptive controller, the angle corrective controller, the target modulated angle corrective controller, the allocentric controller, and the context sensitive controller. [just stick these in a table with descriptions as well] %TODO fix and re-work this sentence
+Several iterations of the neural adaptive controller are used in the benchmarking: the basic neural-adaptive controller, the angle corrective controller, the target modulated controller (TMC), and the target modulated controller with allocentric information (TMCA). %[just stick these in a table with descriptions as well] %TODO fix and re-work this sentence
 The controllers used in the benchmarking are listed in \autoref{table:controller_models}
 
 %[[show the math behind each of the controllers, mention the gravity compensation term used to account for the mass of the quadcopter, and how it is not needed in the adaptive models or PIDt. Have block diagrams or nengo diagrams of each]]
@@ -1343,9 +1345,10 @@ The adaptive controllers do not need this extra term as they are able to learn h
 \textbf{Task} & \textbf{Description} \\ \hline
 PD & Standard PD controller with gravity compensation term \\ \hline
 PID & Standard PID controller with gravity compensation term \\ \hline
-PIDt & PID controller where the error signal for the I term is in control space rather than state space \\ \hline
+PIDt & PID controller where the error signal for the I term is in task space rather than state space \\ \hline
 PIDtf & PIDt controller with a greater integral gain \\ \hline
 Adaptive &  Adaptive controller without using neurons. Derivation shown in \autoref{chap:nonneuraladaptive} \\ \hline %TODO should this even be here? run some tests with it if you have time
+%TODO put in single transform controller?
 Neural Adaptive & Simple adaptive neural controller. The network diagram can be seen in \autoref{fig:NetAdaptiveTransform} \\ \hline
 Neural Adaptive Angle Correction & Adaptive neural controller with an additional adaptive neural ensemble for determining stable roll and pitch. The network diagram can be see in \autoref{fig:NetAngleAdapt} \\ \hline
 Neural Adaptive TMC & The difference between the current target state and a time delayed target modulates the error signal that drives the learning. The network diagram can be seem in \autoref{fig:NetTMC} \\ \hline
@@ -1383,7 +1386,8 @@ The majority of the benchmarks performed in this thesis will report results usin
 
 A series of simple point-to-point control tasks were used to give an indication of performance:  movement in the vertical direction, movement in the horizontal direction, rotation about the yaw axis, and horizontal movement into a wind tunnel. %, and a movement that requires a change in x, y, and z position as well as yaw angle. 
 These tasks are summarized in \autoref{table:tasks} below.
-Experimental results obtained from the reference controllers and the neural adaptive controllers are shown for each of these tasks in \Cref{fig:bar_horizontal,fig:bar_vertical,fig:bar_rotational,fig:bar_wind}.
+Each task with translational motion was completed across five different target distances (every meter from 1m to 5m) and the task with rotational motion was completed across four different target angles (every 45 degrees from 45{\degree} to 180{\degree}).
+Experimental results (mean and standard error) obtained from the reference controllers and the neural adaptive controllers are shown for each of these tasks in \Cref{fig:bar_horizontal,fig:bar_vertical,fig:bar_rotational,fig:bar_wind}.
 %TODO find a way to colour the table with the description instead
 The legend for all of the bar plots in the remainder of this thesis is shown in \autoref{fig:bar_legend}.
 %\autoref{fig:bar_horizontal}, \autoref{fig:bar_vertical},\autoref{fig:bar_rotational}, \autoref{fig:bar_wind}.
@@ -1626,6 +1630,14 @@ These tools include a standard method for opening and closing the communication 
 %TODO possibly move this section to the previous chapter and combine with results
 \section{Discussion}
 
+While the majority of this work was conducted in an ideal environment with no sensor noise, the neural-adaptive controller can still function with noisy measurements.
+A few experiments were performed with Gaussian noise injected into the sensor measurements and the results compared to the reference PIDt controller are shown in Figure XXX.
+
+Another common goal of a control system is path following.
+This is where instead of the robot being instructed to move to a particular point, it is told to follow a particular path.
+A series of position/velocity pairs can be sequentially given as set-points rather than a single position set-point.
+The neural-adaptive controller was designed for point-to-point control, but it can also be given a path to follow as well.
+A simple example demonstrating this capability is shown in Figure XXX.
 
 \section{Future Work}
 
@@ -1637,7 +1649,10 @@ The more capabilities the model displays, the more variety in the applications i
 \subsection{Adaptive Prediction System}
 
 In addition to control, the inverse problem of predicting future states is important.
+An internal model of the system dynamics can be constructed using sensor measurements throughout time and updating its representation based on its own errors of future state prediction.
+If the environment changes, or the quadcopter or its sensors become damaged, the internal model can adapt to reflect those changes and give predictions for this augmented system.
 Integrating adaptive control with an adaptive method for system identification could lead to major improvements in overall system performance.
+
 
 \subsection{Integrated Navigation and Planning System}
 

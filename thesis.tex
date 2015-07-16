@@ -771,7 +771,7 @@ A simple example of using the PES learning rule to control an inverted pendulum 
 %======================================================================
 
 %======================================================================
-\chapter{Implementation} \label{chap:implementation}
+\chapter{Design} \label{chap:implementation}
 %======================================================================
 
 %TODO should the pure math adaptive controller be talked about here? Maybe put this as a subsection in adaptive control? This might make more sense to be after the basic controller model is introduced, but before all of the iterations
@@ -1273,6 +1273,16 @@ The network diagram for this model can be seen in \autoref{fig:NetTMC} and the p
 This controller performs extremely well in both operation under normal conditions and in the presence of unknown external forces.
 
 %TODO talk about the allocentric version too
+\subsection{Additional State Information}
+
+The state information represented by the adaptive ensemble does not have to be the same as the state information fed into the controller.
+This allows the adaptation to take advantage of any sensory information available.
+For example, a low battery could affect how the quadcopter flies or the accuracy of the sensor measurements. If the adaptive controller is aware of the battery state, it could learn to adapt its control signal to account for the kinds of dynamic changes that occur in this regime.
+Similarly, if there is a sensor that can detect weather information (strong winds, rain, snow, etc), this sensor can be used to provide context for the controller to learn how to best adapt to these situations.
+In the controllers described in the previous sections, the error with respect to the target is the only context used as this was all that was being measured.
+One useful piece of additional information available in the simulation is absolute position.
+If there are dynamic effects that vary with the position of the quadcopter, such as strong winds in a particular region, the controller will be able to learn the association of the dynamic effects with a particular location in order to adapt faster to those effects when the quadcopter enters that location.
+The network diagram is the same as in \autoref{fig:NetTMC}, but with additional allocentric information contained in the state and adaptation ensembles. This allocentric information is not passed on through the control transform.
 
 % This figure will be the same as the non-allocentric version, just with less dimensions in the state, so probably don't need a new figure for it
 %\begin{figure}
@@ -1631,7 +1641,12 @@ These tools include a standard method for opening and closing the communication 
 \section{Discussion}
 
 While the majority of this work was conducted in an ideal environment with no sensor noise, the neural-adaptive controller can still function with noisy measurements.
-A few experiments were performed with Gaussian noise injected into the sensor measurements and the results compared to the reference PIDt controller are shown in \autoref{fig:noise_comparison}.
+A few experiments were performed with Gaussian noise injected into the sensor measurements and the results compared to the reference PID and PIDtf controllers are shown in \autoref{fig:noise_comparison}.
+As expected, all of the controllers perform worse as the amount of noise in the system is increased.
+Each controller degrades at about the same rate with respect to the increase in noise, with the adaptive controller being affected slightly more than the others.
+%TODO make this make more sense
+One possible explanation for this is that the adaptive controller is attempting to learn something from the errors caused by noise, but cannot due so correctly because the noise is random.
+In future work, methods could be implemented to increase robustness to noise, such as smoothing measurements over time.
 
 \begin{figure}
 \centering

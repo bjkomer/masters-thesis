@@ -711,7 +711,7 @@ Any computable function can be approximated through a transform, and the degree 
 %TODO talk about dynamics here, might need to fix wording, and talk about recurrent connections?
 The neurons themselves are a part of a dynamical system where timing effects and filters across connections play a role in the behaviour of the system. 
 %It also specifies a means of performing transformation
-For more detail on the NEF, see \cite{eliasmith2007build, stewart2011neural, eliasmith2013build} % put this line in if you think the reader might want more details.
+For more detail on the NEF, see \cite{eliasmith2007build, stewart2011neural, eliasmith2013build}. % put this line in if you think the reader might want more details.
 
 Simulation of biological neurons is carried out by the software package Nengo \cite{bekolay2013nengo}.
 This software implements the algorithms in the NEF and provides an easy to use Python interface for building complex models under this framework.
@@ -725,6 +725,11 @@ Typically nodes are used as the inputs and outputs to a neural system.
 Connections specify transformations between representational components (ensembles and nodes) through one-way links where the information flows from the output of the first representational component (origin) to the input of the second representational component (termination).
 Connections may have a synapse model applied to them, where the information from one end of the connection is delayed by a time-step before reaching the other end and a filter with a particular time constant may be applied.
 If no synapse is applied, the value from the origin of the connection is sent directly to the termination of the connection during the same time step.
+
+Nengo supports a variety of underlying neuron models for its Ensembles.
+The most commonly used is the Leaky Integrate-and-Fire (LIF) neuron \cite{burkitt2006review}.
+[add a brief description?]. %TODO add this description
+Ensembles can also be run in direct mode, in which functions are computed explicitly rather than with neurons.
 
 Once the network structure has been specified, Nengo can build and run a simulation of this network for either a specified duration of time, or until a stop signal is generated. 
 All timing is measured as 'simulated time' with a specific time-step. 
@@ -742,7 +747,7 @@ An ensemble of simulated neurons is used as the set of basis functions for the p
 A learning rule known as the Prescribed Error Sensitivity (PES) rule is used to update the decoder values \cite{bekolay2013simultaneous}. 
 
 This learning method works by first creating a connection from an ensemble of spiking neurons representing the state of the system to a node representing the output of the controller. 
-This is known as the "learned connection" and can be initially set to perform any transformation, but is typically initialized for the output to be random or zero. 
+This is known as the 'learned connection' and can be initially set to perform any transformation, but is typically initialized for the output to be random or zero. 
 If the designer has an approximation of what the final learned transformation should look like, they can set this as the initial transformation. 
 Doing so will allow the system to converge to the final transformation more quickly.
 
@@ -1014,7 +1019,7 @@ This projection is done through a transformation by the 4x4 rotor matrix.
 This rotor velocity ensemble is connected to a node representing the physical quadcopter, which in turn feeds back into the state error ensemble. 
 The network diagram is shown in \autoref{fig:NetBasic}. 
 The network can be simplified further by multiplying the gain matrix with the rotor matrix to give a single transformation matrix from state error to rotor velocity. 
-This simplified and functionally equivalent network is shown in Figure XXX.
+This simplified and functionally equivalent network is shown in \autoref{fig:NetSimplified}.
 The larger network is used in the remainder of this thesis because it is more explicit with how each signal is used and allows greater flexibility for design improvements and system debugging.
 
 %[Figure of simple control model without adaptation]
@@ -1024,6 +1029,13 @@ The larger network is used in the remainder of this thesis because it is more ex
 \includegraphics[height=0.3\textheight]{./figures/NetBasic.png} %TODO get better quality figure
 \caption{Basic Quadcopter Controller Network}
 \label{fig:NetBasic}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[height=0.3\textheight]{./figures/NetSimplified.png} %TODO get better quality figure
+\caption{Simplified Quadcopter Controller Network}
+\label{fig:NetSimplified}
 \end{figure}
 
 \section{Iterations}
@@ -1037,8 +1049,20 @@ A projection from the adaptive ensemble to the task ensemble is modulated by the
 The PES learning rule is applied to this connection, which seeks to build a transformation that minimizes the error coming in from this modulatory connection. 
 The effect is similar to that of the I term in a PID controller, except that it uses all state information to come up with the integral gain, and can perform nonlinear transforms to accomplish this. Without this adaptive component, the quadcopter will have a large steady state error in the z direction, and will fall to the ground as soon as the simulation starts.
 
+The adaptive ensemble is the only component of the network that takes advantage of a neural representation, so that ensemble is constructed using spiking LIF neurons. The other ensembles are run in direct mode and store their exact mathematical values.
+The network diagram is shown in \autoref{fig:NetControlTransform}.
+%TODO put in explanation in text about what the colours mean
+
+\begin{figure}
+\centering
+\includegraphics[height=0.3\textheight]{./figures/NetControlTransform.png} %TODO get better quality figure
+\caption{Quadcopter Controller Network with Adaptation}
+\label{fig:NetControlTransform}
+\end{figure}
+
 This model is very effective at learning the weight of the quadcopter and adapting to any external forces in the z direction. 
-Gains were initially chosen manually by surveying other quadcopter models and trying a couple gains until reasonable results were found [reference v-rep quadcopter, and a few other places?]
+Gains were initially chosen manually by surveying other quadcopter models and trying a couple gains until reasonable results were found. %[reference v-rep quadcopter, and a few other places?]
+The starting gains were based on those present in the quadcopter PD controller provided with V-REP \cite{vrep}.
 %[[put in some plots showing adaptation speed at simulation start, talk about parameters that change this speed -> maybe show all gains used with the plot?]]
 
 When an external force is applied in the horizontal plane, this controller does a very bad job of correcting from it. 
@@ -1353,7 +1377,7 @@ The adaptive controllers do not need this extra term as they are able to learn h
 \begin{tabular}{| l | p{9cm} |}
 
 \hline
-\textbf{Task} & \textbf{Description} \\ \hline
+\textbf{Controller Name} & \textbf{Description} \\ \hline
 PD & Standard PD controller with gravity compensation term \\ \hline
 PID & Standard PID controller with gravity compensation term \\ \hline
 PIDt & PID controller where the error signal for the I term is in task space rather than state space \\ \hline
@@ -1363,7 +1387,7 @@ Adaptive &  Adaptive controller without using neurons. Derivation shown in \auto
 Neural Adaptive & Simple adaptive neural controller. The network diagram can be seen in \autoref{fig:NetAdaptiveTransform} \\ \hline
 Neural Adaptive Angle Correction & Adaptive neural controller with an additional adaptive neural ensemble for determining stable roll and pitch. The network diagram can be see in \autoref{fig:NetAngleAdapt} \\ \hline
 Neural Adaptive TMC & The difference between the current target state and a time delayed target modulates the error signal that drives the learning. The network diagram can be seem in \autoref{fig:NetTMC} \\ \hline
-Neural Adaptive Allocentric TMC & The same as above, but absolute position and orientation information is projected into the adaptive ensembles along with the relative error to the target. The network diagram can be seem in \autoref{fig:NetTMC} \\ \hline
+Neural Adaptive TMCA & The same as above, but absolute position and orientation information is projected into the adaptive ensembles along with the relative error to the target. The network diagram can be seem in \autoref{fig:NetTMC} \\ \hline
 
 \end{tabular}
 \end{center}
@@ -1416,7 +1440,7 @@ The legend for all of the bar plots in the remainder of this thesis is shown in 
 \begin{tabular}{| l | p{9cm} |}
 
 \hline
-Task & Description \\ \hline
+\textbf{Task} & \textbf{Description} \\ \hline
 Vertical & Fly upwards (between one and five meters) \\ \hline
 Horizontal & Fly in the x direction (between one and five meters) \\ \hline
 Rotation & Rotate about the yaw axis (between 45 and 135 degrees) \\ \hline
@@ -1654,6 +1678,9 @@ In future work, methods could be implemented to increase robustness to noise, su
 \includegraphics[height=0.3\textheight]{./figures/HorizontalNoise.png}
 \caption{Horizontal Motion with Noise}
 \label{fig:noise_comparison}
+\medskip
+\small
+Noise level indicates the variance on the Gaussian noise applied to the state measurements. The noise applied to the angular measurements is one tenth of the linear measurements. A noise level of 0.2 means that the variance on position and velocity measurements is 0.2 and the variance on orientation and angular velocity measurements is 0.02.
 \end{figure}
 
 Another common goal of a control system is path following.

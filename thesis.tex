@@ -246,6 +246,7 @@ This will change the dynamic properties of the hand and arm movements, yet the h
 Even if an object has never been encountered before, the human brain is able to calculate the correct changes in timing and muscle tensions in order to skilfully manipulate the object. %For example, humans are able to use hammers with a variety of styles and weights
 %When picking up a new object, there are a many unknown forces, torques, and inertial effects that this object will apply to the arm. 
 %Despite all of these unknowns, humans are very good at manipulating objects and the necessary changes in timing and muscle tensions to do so are calculated with ease, even if the object has never been encountered before. 
+%TODO EDIT1 more subtle claim here
 This ability can be largely attributed to the plasticity of neural connections in the motor control area of the brain.
 
 This ability for quick and easy adaptation to new dynamic properties of a system would be extremely useful in robotics. 
@@ -257,6 +258,7 @@ When the precise environment that the robot will operate in is not fully known, 
 
 Another advantage the brain has when it comes to control, is that it uses very little power, about 20 Watts on average \cite{hart1975brain}.
 % the motor is the majority of the power on a quadcopter, so neuromorphic hardware might not help much here
+%TODO EDIT1 fix up the end of this sentence and add some connections
 Hardware inspired by the brain is being designed to take advantage of this low power paradigm. 
 This style of hardware, known as neuromorphic hardware, is typically massively parallel and runs in an analog rather than digital domain.
 
@@ -281,6 +283,7 @@ Battery weight is one of the main issues hindering the maximum flight time of qu
 If a larger battery is used in attempts to increase the maximum flight time, the quadcopter will be heavier and therefore require more power to fly, which in turn will drain the battery faster. 
 Two possible solutions to this problem are lighter batteries and more energy-efficient operation.
 The latter can be achieved by the use of neuromorphic hardware to run the flight control system.
+%TODO EDIT1 quote power amount used by control system
 While the majority of the power consumed by a quadcopter goes towards the rotors, some is still used by the on-board control system.
 Reducing the power required for the control system can allow more of the power from the batteries to be used for the rotors.
 %TODO this seems like a really weak claim, and isn't the main focus of the thesis, should it still be included here as a possibility?
@@ -437,6 +440,7 @@ f_{i} = kw_{i}^{2}
 \tau_{M_{i}} = b\omega_{i}^{2} + I_{M}\dot{\omega_{i}}
 \end{equation}
 
+%TODO EDIT1 briefly explain why angular acceleration is considered small
 Typically the effect of the angular acceleration is considered small and is omitted in most analyses, so it will not be present in the remainder of the dynamics derivations.
 
 Note that the forces and torques generated are always proportional to the square of the rotor's angular velocity, thus working with this term instead of the angular velocity itself is simpler. %[put this part under simulation instead]?
@@ -469,7 +473,7 @@ lk(-w_{1}^{2}+w_{3}^{2}) \\
 \end{bmatrix}
 \end{equation}
 
-The governing equation for translational motion is \eqref{eq:translation}; where $\xi$ is the linear position vector, $T_{B}$ is the thrust from \eqref{eq:thrust}, $R$ is the rotation matrix from \eqref{eq:rotation_matrix}, and $A(\dot{\xi})$ is a matrix containing the drag force coefficients.
+The governing equation for translational motion is \eqref{eq:translation}; where $\xi$ is the linear position vector, $T_{B}$ is the thrust from \eqref{eq:thrust}, $R$ is the rotation matrix from \eqref{eq:rotation_matrix}, $A(\dot{\xi})$ is a matrix containing the drag force, and $G$ is the gravitational force.
 
 \begin{equation} \label{eq:translation}
 m\ddot{\xi} = T_{B}R - A(\dot{\xi})\dot{\xi} - G
@@ -538,6 +542,8 @@ Expanding \eqref{eq:rotation} and setting the equation in terms of angular accel
 \end{bmatrix}
 \end{equation}
 
+%TODO EDIT1 add a concluding sentence
+Equations \eqref{eq:translation_expanded} and \eqref{eq:rotation_expanded} are used throughout the remainder of this thesis to model the dynamics of the quadcopter during flight.
 
 \section{Simulation}
 
@@ -597,13 +603,24 @@ The simulation environment in V-REP is set up to be a large open space with smal
 The quadcopter model was initialized to start in the center of the space, 0.5 meters above the ground. 
 This model is the one provided with the V-REP software courtesy of Eric Rohmer and Lyall Randell. 
 The quadcopter's target is a small semi-transparent green sphere. The goal of the control system is to make the quadcopter move to the target's location with the target's orientation. 
-Throughout the environment there are various wind tunnels, which are zones of space which will exert an external force on the quadcopter in a particular direction if the quadcopter is within the zone. 
+For this thesis, and environment was created which includes various wind tunnels, which are zones of space which will exert an external force on the quadcopter in a particular direction if the quadcopter is within the zone. 
 There are also zones that can exert various nonlinear forces on the quadcopter. 
-For example, one zone could push the quadcopter in the z direction with a force proportional to the square of its horizontal velocity. 
+For example, one zone could push the quadcopter in the $z$ direction with a force proportional to the square of its horizontal velocity. 
 In addition to these zones, the quadcopter can also pick up and drop off boxes of various mass. 
 These wind zones and boxes are used to test how well the controller can adapt to changes in its dynamics.
+An example of a region within the simulation environment is shown in \autoref{fig:vrep_screenshot}.
 
 %TODO put in a screenshot here?
+%TODO EDIT1 yes, put a screenshot here
+\begin{figure}
+\centering
+\includegraphics[height=0.3\textheight]{./figures/VREPScreenshot.png}
+\caption{Simulation Environment in V-REP}
+\label{fig:vrep_screenshot}
+\medskip
+\small
+[TODO description of what is going on in the figure goes here]
+\end{figure}
 
 \chapter{Control} \label{chap:control}
 
@@ -621,7 +638,7 @@ One gain is applied directly to the error (proportional); a second gain is appli
 Each of these gains serves a unique purpose, and the careful tuning of all three is required to get the desired performance of the controller. 
 The proportional gain is the main driver of the system and responds directly to the error to bring the system towards its target point. 
 The larger the gain, the faster this response will be.
-However, using only this gain will not account for any inertia in the system and will often cause the entity being controlled to overshoot its target, especially when the gain is large. 
+However, using only this gain will not account for any inertia in the system and will often cause the system being controlled to overshoot its target, especially when the gain is large. 
 In some cases, the overshoot can be so large that the system becomes unstable and oscillates out of control.
 Thus, the derivative gain is usually used in addition, because it is sensitive to the rate of change of the error, and attempts to bring this rate towards zero. 
 The faster the system is moving towards its target state, the more this gain acts to slow it down, by effectively providing a form of damping and so reducing the amount of overshoot.
@@ -673,6 +690,7 @@ $\tau$ is the input required to keep the system in a steady state.
 Often the system parameters are not fully known and an estimate needs to be used instead.
 Many control applications also require the system to be able to transition to different states, rather than remain at a particular state.
 The adaptive control law in \eqref{eq:Y_and_control_law} uses an estimate of the parameter vector, $\hat{\theta}$, along with a standard control law to compute the desired input to the system. Here $e$ is the state error and $K$ is a gain matrix.
+%TODO EDIT1 add references to Slotine papers as well as a couple quick comments about the strengths of those controllers (guaranteed to converge with sufficient exploration of space, etc)
 
 \begin{equation} \label{eq:Y_and_control_law}
 \tau = Y(q,\dot{q})\hat{\theta} + Ke
@@ -688,11 +706,12 @@ The parameter estimates will eventually converge on values that allow the system
 
 
 Creating a mathematical model of a system with enough detail to account for everything is difficult. 
-Assumptions and approximations must be made if the model is to be manageable. 
+Assumptions and approximations must be made if the model is to be tractable. 
 Moreover, external forces from the environment may influence the model, and their form may be unknown as the environment can be largely unknown. 
 One way to overcome this problem is to use a set of basis functions as the model, and the weights applied to each element of the basis as the constant parameters. 
 If the basis is designed such that it can represent any computable function to a reasonable degree of accuracy, it will be effective in the adaptive control problem. 
 Gaussian basis functions are commonly used in adaptive control \cite{sanner1992gaussian}, but neural networks may be used as well \cite{barto1983neuronlike}.
+This thesis explores the application of this form of control law using basis functions that are biologically plausible spiking neurons.
 
 \section{Neural Simulation}
 
@@ -724,15 +743,17 @@ Nodes are used when a particular part of the network is doing a computation with
 Typically nodes are used as the inputs and outputs to a neural system.
 Connections specify transformations between representational components (ensembles and nodes) through one-way links where the information flows from the output of the first representational component (origin) to the input of the second representational component (termination).
 Connections may have a synapse model applied to them, where the information from one end of the connection is delayed by a time-step before reaching the other end and a filter with a particular time constant may be applied.
-If no synapse is applied, the value from the origin of the connection is sent directly to the termination of the connection during the same time step.
+If no synaptic filter is applied, the value from the origin of the connection is sent directly to the termination of the connection during the same time step.
 
 Nengo supports a variety of underlying neuron models for its Ensembles.
 The most commonly used is the Leaky Integrate-and-Fire (LIF) neuron \cite{burkitt2006review}.
 [add a brief description?]. %TODO add this description
 Ensembles can also be run in direct mode, in which functions are computed explicitly rather than with neurons.
+However, models in this mode are not implementable directly on neuromorphic hardware, and the behaviour of the system can be significantly different.
+Nevertheless, it can be useful for constructing working prototypes in simulation before converting the entire system to an underlying neural model. %TODO: this sounds gross, fix it... %TODO EDIT1
 
 Once the network structure has been specified, Nengo can build and run a simulation of this network for either a specified duration of time, or until a stop signal is generated. 
-All timing is measured as 'simulated time' with a specific time-step. 
+All timing is measured as `simulated time' with a specific time-step. 
 If the time-step is short, the simulation can capture minute timing details more accurately, but the system as a whole will run slower with respect to real-time. A default time step of 1ms is typically used in Nengo models, which provides a reasonable trade-off between accuracy and run-time.
 %TODO is there any justification for this?
 
@@ -742,12 +763,12 @@ If the time-step is short, the simulation can capture minute timing details more
 %[Talk about the PES rule, how it relates to the slotine stuff]
 %[talk about how there is no need to tune the KI term with the PES rule, this adaptive I term is easier to use]
 
-The adaptive control methods described above can be applied to a network built using Nengo. 
+In this thesis, we use the adaptive control methods described above to build a quadcopter controller using Nengo. 
 An ensemble of simulated neurons is used as the set of basis functions for the physical model, and the decoders of these neurons are used as the vector of unknown constant parameters. 
-A learning rule known as the Prescribed Error Sensitivity (PES) rule is used to update the decoder values \cite{bekolay2013simultaneous}. 
+A biologically plausible learning rule known as the Prescribed Error Sensitivity (PES) rule is used to update the decoder values \cite{bekolay2013simultaneous}. 
 
 This learning method works by first creating a connection from an ensemble of spiking neurons representing the state of the system to a node representing the output of the controller. 
-This is known as the 'learned connection' and can be initially set to perform any transformation, but is typically initialized for the output to be random or zero. 
+This is known as the `learned connection' and can be initially set to perform any transformation, but is typically initialized for the output to be random or zero. 
 If the designer has an approximation of what the final learned transformation should look like, they can set this as the initial transformation. 
 Doing so will allow the system to converge to the final transformation more quickly.
 
@@ -784,7 +805,7 @@ A larger number of neurons means that the changes will be greater, as there will
 \section{Derivation of Non-Neural Adaptive Controller} \label{chap:nonneuraladaptive} %TODO pick a better title
 %this section will be heavy on math, and go through how the adaptive python model was formed (from the equations on all of those sheets of paper)
 
-Based on the dynamics equations in \autoref{sec:dynamics} and the adaptive control theory presented in \autoref{sec:adaptive_control}, an adaptive controller for a quadcopter can be generated.
+Based on the dynamics equations in \autoref{sec:dynamics} and the adaptive control theory presented in \autoref{sec:adaptive_control}, an adaptive controller for a quadcopter can be generated using the methods described in \cite{cheah2006adaptive}. %TODO EDIT1 make sure the correct reference goes here, might need a couple
 The first step is to set up the governing equation for the system \eqref{eq:starting_equation}, and rearrange it so that the right side is in terms of the second derivative of the state \eqref{eq:rearranged_starting_equation}.
 
 
@@ -796,7 +817,7 @@ M(q)\ddot{q} + C(q,\dot{q})\dot{q} + g(q) = B(q)u
 \ddot{q} = M(q)^{-1}(-C(q,\dot{q})\dot{q} - g(q) + B(q)u)
 \end{equation}
 
-The relationship in \eqref{eq:internal_starting_equation} allows $\ddot{q}$ to be zero.
+We can then choose the relationship in \eqref{eq:internal_starting_equation} which allows $\ddot{q}$ to be zero, given the values of the terms in \eqref{eq:C} and \eqref{eq:g}.
 
 \begin{equation} \label{eq:internal_starting_equation}
 B(q)u = C(q,\dot{q})\dot{q} + g(q)
@@ -826,7 +847,8 @@ mg \\
 \end{bmatrix}
 \end{equation}
 
-$u$ is a vector containing the thrust force and the rotational torque in the body frame. $B(q)$ is the transformation matrix of the force and torque from the body frame to the inertial frame. $\omega$ is a vector containing the squared angular velocities of each rotor.
+Here, $u$ is a vector containing the thrust force and the rotational torque in the body frame, $B(q)$ is the transformation matrix of the force and torque from the body frame to the inertial frame, and $\omega$ is a vector containing the squared angular velocities of each rotor.
+Consequently, we can write:
 
 \begin{equation} \label{eq:u}
 u =
@@ -872,7 +894,7 @@ Expanding \eqref{eq:internal_starting_equation} and rearranging the equation in 
 \omega = Y(q,\dot{q})\hat{\theta} = A^{-1}B(q)^{-1}[C(q,\dot{q})\dot{q} + g(q)]
 \end{equation}
 
-The form of $Y(q,\dot{q})$ can be determined in \eqref{eq:Y_expanded} by pulling out a vector of the unknown constant parameters. The true values of these parameters is shown in \eqref{eq:parameters}.
+The form of $Y(q,\dot{q})$ can be determined as in \eqref{eq:Y_expanded} by pulling out a vector of the unknown constant parameters. The true value of these parameters assuming the model is perfect is shown in \eqref{eq:parameters}.
 
 %TODO may need to rearrange this equation to reflect the rotor orientation
 \begin{equation} \label{eq:Y_expanded} 
@@ -924,6 +946,7 @@ mg/4k \\
 \end{equation}
 
 The adaptive controller and parameter update equations are shown in \eqref{eq:adaptive_control_equation} and \eqref{eq:adaptive_update_equation} respectively.
+%TODO EDIT1 mention task space here and explain it well, or explain it earlier in the flight control section
 $K$ is the control gain matrix \eqref{eq:gain_matrix}, $T_{R}$ is the transformation from task space to rotor space \eqref{eq:rotor_transform}, $e$ is the state error, and $L$ is the learning rate.
 The value of $L$ can either be a constant or a 4x4 matrix.
 For simplicity a constant value of one is used.
@@ -938,7 +961,7 @@ For simplicity a constant value of one is used.
 \end{equation}
 
 
-\section{Controller Model}
+\section{Controller Implementation}
 
 %[show one model of the controller, the original one, talk about how it works]
 %[something about how it is a target controller, rather than path]
@@ -949,11 +972,11 @@ This position is specified as a set of x, y, and z coordinates and a particular 
 The controller is given the state error of the quadcopter and its target, as well as the current linear and angular velocities of the quadcopter. 
 It needs to use this information to generate a suitable control signal.
 
-First, a PD controller generates a four-dimensional output signal in the space of possible quadcopter motions. 
+The adaptive controller here consists of two parts. The first is a standard PD controller that generates a four-dimensional output signal in the space of possible quadcopter motions. 
 The gain matrix that performs this operation can be seen in \eqref{eq:gain_matrix}. 
-This signal multiplied by the matrix in \eqref{eq:rotor_transform}, is transformed into the four dimensional rotor velocity space to provide the actuation associated with the desired movement commands.
+This signal multiplied by the matrix in \eqref{eq:rotor_transform}, to transform it into the four dimensional rotor velocity space to provide the actuation associated with the desired movement commands.
 The design of this matrix depends upon the orientation of the rotor blades to the x and y axes. 
-This transformation matrix assumes that the rotor axes are offset from the x-y axes by 45 degrees.
+This transformation matrix assumes that the rotor axes are offset from the x-y axes by 45 degrees as the V-REP model used here.
 
 \begin{equation} \label{eq:gain_matrix}
 K =
@@ -1009,10 +1032,10 @@ The setpoint for each of the velocities as well as for roll and pitch is zero.
 %[gain matrix figures]
 
 %[talk about egocentric state as the error]
-The state error is measured relative to the body frame because most sensors on a real quadcopter would return measurements relative to the sensor device itself, which is located on the quadcopter. Absolute measurements could still be obtained with a GPS device, but would typically be much less accurate and such devices are harder to use for fine tuned control. With the preferred manner, localized sensors, the state of the quadcopter can be defined relative to its target, making the state the same as the error.
+The state error is measured relative to the body frame because most sensors on a real quadcopter would return measurements relative to the sensor device itself, which is located on the quadcopter. Absolute measurements could still be obtained with a GPS device, but would typically be much less accurate and such devices are harder to use for fine-tuned control. Using localized sensors, the state of the quadcopter can be defined relative to its target, making the state in the same coordinates as the error.
 
 %[talk about building the model in Nengo]
-This controller model can be designed with a Nengo network, in which a 12-dimensional ensemble representing the state error can be projected to a 4-dimensional ensemble representing the desired control command. 
+Here the controller is implemented with a Nengo network, in which a 12-dimensional ensemble representing the state error can be projected to a 4-dimensional ensemble representing the desired control command. 
 The transformation done through this projection will be by the 12x4 PD gain matrix of the controller. 
 This 4-dimensional ensemble is then projected to another 4-dimensional ensemble which represents the four desired angular velocities of the quadcopter's rotors. 
 This projection is done through a transformation by the 4x4 rotor matrix. 
@@ -1020,7 +1043,7 @@ This rotor velocity ensemble is connected to a node representing the physical qu
 The network diagram is shown in \autoref{fig:NetBasic}. 
 The network can be simplified further by multiplying the gain matrix with the rotor matrix to give a single transformation matrix from state error to rotor velocity. 
 This simplified and functionally equivalent network is shown in \autoref{fig:NetSimplified}.
-The larger network is used in the remainder of this thesis because it is more explicit with how each signal is used and allows greater flexibility for design improvements and system debugging.
+The larger network is used in the remainder of this thesis because it is more explicit regarding how each signal is used, and allows greater flexibility for design improvements and system debugging.
 
 %[Figure of simple control model without adaptation]
 %[Also figure of simplified model without task space representation]
@@ -1044,7 +1067,7 @@ The larger network is used in the remainder of this thesis because it is more ex
 %[have diagrams of each, similar to the powerpoint presentation]
 %[talk about Hyperopt parameter tuning]
 
-The first iteration of the controller uses an adaptive ensemble to influence the task space command. 
+The first version of the controller uses an adaptive ensemble to influence the task space command. 
 A projection from the adaptive ensemble to the task ensemble is modulated by the state error undergoing the control transform. 
 The PES learning rule is applied to this connection, which seeks to build a transformation that minimizes the error coming in from this modulatory connection. 
 The effect is similar to that of the I term in a PID controller, except that it uses all state information to come up with the integral gain, and can perform nonlinear transforms to accomplish this. Without this adaptive component, the quadcopter will have a large steady state error in the z direction, and will fall to the ground as soon as the simulation starts.
@@ -1060,12 +1083,12 @@ The network diagram is shown in \autoref{fig:NetControlTransform}.
 \label{fig:NetControlTransform}
 \end{figure}
 
-This model is very effective at learning the weight of the quadcopter and adapting to any external forces in the z direction. 
-Gains were initially chosen manually by surveying other quadcopter models and trying a couple gains until reasonable results were found. %[reference v-rep quadcopter, and a few other places?]
+This model is very effective at learning the unknown mass of the quadcopter and adapting to any external forces in the $z$ direction. 
+Gains were initially chosen manually by surveying other quadcopter models and trying gains until reasonable results were found. %[reference v-rep quadcopter, and a few other places?]
 The starting gains were based on those present in the quadcopter PD controller provided with V-REP \cite{vrep}.
 %[[put in some plots showing adaptation speed at simulation start, talk about parameters that change this speed -> maybe show all gains used with the plot?]]
 
-When an external force is applied in the horizontal plane, this controller does a very bad job of correcting from it. 
+When an external force is applied in the horizontal plane, this controller does a very bad job of correcting for it. 
 The quadcopter will settle to a stable point in space with a constant offset from the target location. 
 This behaviour results from how the error is specified:
 since both position and angle gains are being combined into the same dimension to produce the task space error, multiple pairs of measurements will produce the same error. 
@@ -1090,7 +1113,7 @@ As external forces are applied along the horizontal plane, this stable point shi
 \caption{Zero Control Signal Region}
 \label{fig:ZeroErrorSurface}
 \medskip
-\small %TODO make the formatting of subtext nicer
+\small %TODO make the formatting of subtext nicer %TODO EDIT1 fix the formatting
 This surface indicates the region of the quadcopter state where the control output is zero.
 The target position is at [0,0] and the angle shown is a combination of the pitch and roll angles where $angle = \sqrt{\phi^{2} + \theta^{2}}$.
 The quadcopter is only ever stable at one point on this surface.
@@ -1106,7 +1129,7 @@ The state velocities should all be zero as well.
 Since roll and pitch are not supposed to be controlled, they should really be left out of the error that the adaptive ensemble uses since they do not correspond to an actual error in the desired state. 
 This information is still important in allowing the quadcopter to fly properly, as the controller needs to know roll and pitch information for stable flight. If this information is removed from the controller entirely, it cannot fly.
 
-One implementation is to omit the roll and pitch information only from the adaptive ensemble, while still using it for the baseline controller. 
+Consequently, the first iteration of the original controller omits the roll and pitch information only from the adaptive ensemble, while still using it for the baseline controller. 
 This approach involves generating a separate gain matrix to use on the modulatory connection to the learned transformation. 
 The new network diagram of the controller is shown below in \autoref{fig:NetAdaptiveTransform}. 
 The form of the gain matrix for the modulatory connection is shown in \eqref{eq:adaptive_gain_matrix}.
@@ -1136,7 +1159,7 @@ K_{a} =
 
 This controller is now able to adapt to external horizontal forces, but normal flight is much less stable and prone to overshooting targets. 
 Possibly because the gains need to be re-tuned to work with this new controller setup. 
-However, as there are 12 different gains in this controller, tuning them manually is a difficult and laborious task, one well suited for automated parameter optimization, as described next.
+However, as there are 12 different gains in this controller, tuning them manually is a difficult and laborious task, one well-suited for automated parameter optimization, as described next.
 
 The tool that I chose to use for this optimization is Hyperopt \cite{bergstra2013hyperopt}. 
 Hyperopt is a python package designed to perform parameter optimization over a search space for a given function. 
@@ -1151,7 +1174,7 @@ Since each set of gains to evaluate requires a controller model to be generated 
 %TODO better title here??
 \subsection{Using Hyperopt}
 
-In order to use Hyperopt, the controller model must be encapsulated in some function that returns a useful metric of how well the controller works.
+In order to use Hyperopt, the controller model must be encapsulated in a function that returns a useful metric of how well the controller works.
 This was done by creating a set of target points for the quadcopter to move through over a period of time and an additional ensemble computing a scalar measure of the error of the quadcopter from the target. 
 This error metric was taken to be a weighted Euclidean norm of each of the dimensions of the state.
 States that were deemed more important (such as the x, y, and z position) were given higher weights in this calculation.
@@ -1213,9 +1236,10 @@ There is still much room for improvement of this controller.
 While it can adapt to horizontal forces, it does so quite slowly, as can be seen in \autoref{fig:PlotStandard}. 
 This is because the adaptive component of the controller is always fighting against the command given by the standard component. 
 There is an implicit target roll and pitch angle of zero radians that the controller is trying to achieve even if that is not the correct angle to be at. 
-One approach to overcoming this problem is to have a second adaptive ensemble that tries to learn what roll and pitch angle will allow the quadcopter to be stationary, and then feed these angles to the basic controller. 
+The second iteration of the controller applied an approach to overcoming this problem that employs a second adaptive ensemble that tries to learn what roll and pitch angle will allow the quadcopter to be stationary, and then feed these angles to the basic controller. 
 Thus, the controller will no longer be actively trying to bring the quadcopter away from its setpoint, yet still has the angle information required for it to be able to fly. 
 A network diagram of this controller is shown in \autoref{fig:NetAngleAdapt} and the performance of this controller is shown in \autoref{fig:PlotAngleAdapt}.
+As can be seen, control in the $x$ direction is significantly improved, with only slightly slower control in the $y$ direction.
 
 \begin{figure}
 \centering
@@ -1263,11 +1287,13 @@ Since the adaptive component is driven by state error, as soon as the target is 
 This error will cause the adaptive transformation to change, even if it was already at its optimal configuration. 
 This change can cause problems in control, such as the overshoot and oscillations seen in \autoref{fig:PlotAngleAdaptB}. 
 The summation of the control signal of the underlying controller and the signal from the adaptation to the error creates a control signal that is too large for the desired performance.
-To correct this behaviour, a time-delayed filter is first applied to an ensemble representing the target location. 
-This filtered location is then subtracted from an unfiltered location and stored in a new ensemble. The signal coming from this new ensemble can be used to inhibit the adaptive ensembles. 
+
+To correct this behaviour, the third iteration of the controller being developed here includes a time-delayed filter that is first applied to an ensemble representing the target location. 
+This filtered location is then subtracted from an unfiltered location and stored in a new ensemble. 
+The signal coming from this new ensemble can be used to inhibit the adaptive ensembles. 
 If the target has not moved recently, the value being projected from this filtered-difference ensemble will be close to zero, meaning there is no inhibition. 
 If the target is suddenly moved, this filtered-difference ensemble will begin to output the difference between the two target positions, thereby inhibiting the adaptation in any dimension that has a difference. 
-Over time the filtered target will start to match the unfiltered target, and the extent in which the adaptive ensembles can adapt to any errors increases. 
+Over time the filtered target will start to match the unfiltered target, and the extent to which the adaptive ensembles can adapt to any errors increases. 
 The network diagram for this model can be seen in \autoref{fig:NetTMC} and the performance of this controller is shown in \autoref{fig:PlotTMC}.
 
 %TODO should target following go anywhere?
@@ -1295,7 +1321,7 @@ The network diagram for this model can be seen in \autoref{fig:NetTMC} and the p
 \label{fig:PlotTMC}
 \end{figure}
 
-This controller performs extremely well in both operation under normal conditions and in the presence of unknown external forces.
+This controller has the best performance of those tested both for operation under normal conditions and in the presence of unknown external forces.
 
 %TODO talk about the allocentric version too
 \subsection{Additional State Information}
@@ -1307,7 +1333,7 @@ Similarly, if there is a sensor that can detect weather information (strong wind
 In the controllers described in the previous sections, the error with respect to the target is the only context used as this was all that was being measured.
 One useful piece of additional information available in the simulation is absolute position.
 If there are dynamic effects that vary with the position of the quadcopter, such as strong winds in a particular region, the controller will be able to learn the association of the dynamic effects with a particular location in order to adapt faster to those effects when the quadcopter enters that location.
-The network diagram is the same as in \autoref{fig:NetTMC}, but with additional allocentric information contained in the state and adaptation ensembles. This allocentric information is not passed on through the control transform.
+The final iteration of the controller design here has a network diagram that is the same as in \autoref{fig:NetTMC}, but with additional allocentric information contained in the state and adaptation ensembles. This allocentric information is not passed on through the control transform.
 
 % This figure will be the same as the non-allocentric version, just with less dimensions in the state, so probably don't need a new figure for it
 %\begin{figure}
@@ -1318,7 +1344,7 @@ The network diagram is the same as in \autoref{fig:NetTMC}, but with additional 
 %\end{figure}
 
 %TODO this section may need a new name
-\section{Implementation}
+\section{Software Simulation}
 
 %[talk about how Nengo is connected to V-REP?]
 %[Have a diagram about information flow?]
@@ -1385,9 +1411,9 @@ PIDtf & PIDt controller with a greater integral gain \\ \hline
 Adaptive &  Adaptive controller without using neurons. Derivation shown in \autoref{chap:nonneuraladaptive} \\ \hline %TODO should this even be here? run some tests with it if you have time
 %TODO put in single transform controller?
 Neural Adaptive & Simple adaptive neural controller. The network diagram can be seen in \autoref{fig:NetAdaptiveTransform} \\ \hline
-Neural Adaptive Angle Correction & Adaptive neural controller with an additional adaptive neural ensemble for determining stable roll and pitch. The network diagram can be see in \autoref{fig:NetAngleAdapt} \\ \hline
-Neural Adaptive TMC & The difference between the current target state and a time delayed target modulates the error signal that drives the learning. The network diagram can be seem in \autoref{fig:NetTMC} \\ \hline
-Neural Adaptive TMCA & The same as above, but absolute position and orientation information is projected into the adaptive ensembles along with the relative error to the target. The network diagram can be seem in \autoref{fig:NetTMC} \\ \hline
+Neural Adaptive Angle Correction & Adaptive neural controller with an additional adaptive neural ensemble for determining stable roll and pitch. The network diagram can be seen in \autoref{fig:NetAngleAdapt} \\ \hline
+Neural Adaptive TMC & The difference between the current target state and a time delayed target modulates the error signal that drives the learning. The network diagram can be seen in \autoref{fig:NetTMC} \\ \hline
+Neural Adaptive TMCA & The same as above, but absolute position and orientation information is projected into the adaptive ensembles along with the relative error to the target. The network diagram can be seen in \autoref{fig:NetTMC} \\ \hline
 
 \end{tabular}
 \end{center}
@@ -1505,12 +1531,12 @@ Wind & Fly in the y direction (between one and five meters). Enter a wind tunnel
 
 %[also do experiments moving throughout a weird force field, and seeing improvement the more times it does it. This will have to be the allocentric model]
 
-
+%TODO EDIT1 Some concluding sentences/observations to go here. there's a bit in the next section that could be brought here and expanded upon.
 
 % TODO: figure out a good name for this section
 \subsection{Benchmarks for Complex Environments}
 
-The performance of the adaptive controller is quite strong, but it's performance is still relatively close to that of the modified PID controllers. 
+The performance of the adaptive controller is quite strong, but its performance is still relatively close to that of the modified PID controllers. 
 Where the adaptive controller really excels is when there are external forces being applied that are functions of the system state. 
 The adaptive controller is designed to be able to account for both linear and nonlinear functions of the system state.
 
@@ -1533,7 +1559,7 @@ Horizontal Velocity & A force is applied in the y-direction proportional to the 
 \end{center}
 \end{table}
 
-Performance of the Neural Adaptive controller is compared to the reference controller on these tasks.
+Performance of the Neural Adaptive controllers is compared to the reference controllers on these tasks.
 The results are displayed in \autoref{fig:benchmark_complex}. 
 
 \begin{figure}
@@ -1566,6 +1592,8 @@ The results are displayed in \autoref{fig:benchmark_complex}.
 
 %Fill the rest of this subsection with the results of running models in these environments
 % could just put things in tables instead of having plots everywhere, or make the plots smaller so they don't take up an obnoxious amount of space
+
+%TODO EDIT1 put in some summary/comments talking about the results shown here.
 
 % this is where the loop figures will be. Talk about the controller getting better over time by learning the space
 \subsection{Improvement over Time} %TODO better title for this section
@@ -1639,6 +1667,8 @@ While the final iteration of the neural adaptive controller did not perform stri
 For the benchmarks that covered simple environments with no external forces, the neural controller performed on par with the reference controllers.
 For the benchmarks involving external forces, the neural controller achieved the lowest RMS error and the fastest time to reach the target for the majority of the tasks.
 
+%TODO EDIT1 some quantification of results should go here. Possibly a ranking system for each task, and show the overall winner.
+
  
 %======================================================================
 \chapter{Discussion and Future Work} \label{chap:discussion}
@@ -1653,7 +1683,7 @@ For the benchmarks involving external forces, the neural controller achieved the
 
 The main contribution of this thesis is an adaptive control system for a quadcopter using simulated biological neurons.
 This is a proof-of-concept that an ensemble of spiking neurons can be used to improve quadcopter control in the face of uncertain and changing environments through a biologically realistic learning mechanism.
-
+%TODO EDIT1 Say something about exploiting neuromorphic hardware, and being able to implement state of the art control on it
 A second contribution is the integration of the Nengo neural simulation software with the robotics and physics simulation capacity of V-REP.
 This union allows complex neural models to be embodied in a physical environment in a straightforward manner.
 The various tools developed over the course of this thesis work to support the integration of the simulated quadcopter with Nengo are general purpose enough to be applied to other simulated robotic models.
@@ -1686,7 +1716,7 @@ Noise level indicates the variance on the Gaussian noise applied to the state me
 Another common goal of a control system is path following.
 This is where instead of the robot being instructed to move to a particular point, it is told to follow a particular path.
 A series of position/velocity pairs can be sequentially given as set-points rather than a single position set-point.
-The neural-adaptive controller was designed for point-to-point control, but it can also be given a path to follow as well.
+The neural-adaptive controller was designed for point-to-point control, but it can also be given a path to follow.
 A top-view screenshot from V-REP of a simple example demonstrating this capability is shown in \autoref{fig:circular_path_ff6}.
 Here the quadcopter is commanded to continuously fly along a circular path while being subjected to an external force along the y-axis (up/down) proportional to its velocity along the x-axis (left/right).
 In the beginning, the quadcopter's trajectory is very elliptical due to this external force, but as it continues to fly the adaptive component of the controller learns to compensate for this force, eventually producing very circular trajectories.
@@ -1758,6 +1788,11 @@ The robustness of the adaptive control algorithm to changes in the sensor proper
 The most practical extension to this work would be to move beyond simulation and run the control system on physical hardware.
 Many challenges will arise in this undertaking, including selection of the particular hardware platform, sensors to use, and real-time requirements of the control algorithm.
 Overcoming these challenges to produce an adaptive neural quadcopter that can interact with the real world will be highly beneficial for exploring both practical applications of this work as well as guiding future research direction.
+
+\section{Conclusion}
+
+%TODO EDIT1
+[[insert a concluding paragraph that reiterates contributions and future directions]]
 
 % The \appendix statement indicates the beginning of the appendices.
 \appendix

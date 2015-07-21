@@ -183,6 +183,9 @@
 % Allow symbol for degrees
 \usepackage{gensymb}
 
+% For tables to be able to fill the whole text width
+\usepackage{tabularx}
+
 % Include a Glossary
 %\usepackage[acronym]{glossaries}
 
@@ -565,7 +568,7 @@ There are three robot simulators that were considered: Virtual Robotics Experime
 \begin{threeparttable}
 \caption{Robotic Simulator Candidates} \label{table:robot_simulators}
 %\begin{center}
-\begin{tabular}{| l | l | l | l |}
+\begin{tabularx}{\textwidth}{| X | l | l | l |}
 \hline
 \textbf{Feature} & \textbf{V-REP} & \textbf{MORSE} & \textbf{Gazebo} \\ \hline
 Python Support & **** & *** & * \\ \hline
@@ -574,7 +577,7 @@ Quality of Available Quadcopter Models & *** & ** & **** \\ \hline
 Timing Control & **** & * & ** \\ \hline
 Interactivity with Simulation & **** & ** & ** \\ \hline
 Community Support & **** & **** & **** \\ \hline
-\end{tabular}
+\end{tabularx}
 \begin{tablenotes}
 \footnotesize
 \item The number of stars indicate the extent to which the simulator demonstrates a particular feature.
@@ -617,9 +620,9 @@ An example of a region within the simulation environment is shown in \autoref{fi
 \includegraphics[height=0.3\textheight]{./figures/VREPScreenshot.png}
 \caption{Simulation Environment in V-REP}
 \label{fig:vrep_screenshot}
-\medskip
-\small
-[TODO description of what is going on in the figure goes here]
+\captionsetup{singlelinecheck=off,font=footnotesize}
+\caption*{
+Screen capture of an example environment in V-REP. The coloured areas with arrows represent regions of space where a wind force is applied to the quadcopter in the direction of the arrows. The blue region resembling a circuit board represents an area where an unknown non-linear force will be applied to the quadcopter. The semi-transparent green sphere is the target location. The quadcopter has reached its target in this example.}
 \end{figure}
 
 \chapter{Control} \label{chap:control}
@@ -1049,14 +1052,14 @@ The larger network is used in the remainder of this thesis because it is more ex
 %[Also figure of simplified model without task space representation]
 \begin{figure}
 \centering
-\includegraphics[height=0.3\textheight]{./figures/NetBasic.png} %TODO get better quality figure
+\includegraphics[height=0.3\textheight]{./figures/QuadcopterNetworkSimple.pdf} %TODO get better quality figure
 \caption{Basic Quadcopter Controller Network}
 \label{fig:NetBasic}
 \end{figure}
 
 \begin{figure}
 \centering
-\includegraphics[height=0.3\textheight]{./figures/NetSimplified.png} %TODO get better quality figure
+\includegraphics[height=0.3\textheight]{./figures/QuadcopterNetworkSimplified.pdf} %TODO get better quality figure
 \caption{Simplified Quadcopter Controller Network}
 \label{fig:NetSimplified}
 \end{figure}
@@ -1078,7 +1081,7 @@ The network diagram is shown in \autoref{fig:NetControlTransform}.
 
 \begin{figure}
 \centering
-\includegraphics[height=0.3\textheight]{./figures/NetControlTransform.png} %TODO get better quality figure
+\includegraphics[height=0.3\textheight]{./figures/QuadcopterNetworkSimpleAdaptive.pdf} %TODO get better quality figure
 \caption{Quadcopter Controller Network with Adaptation}
 \label{fig:NetControlTransform}
 \end{figure}
@@ -1112,14 +1115,14 @@ As external forces are applied along the horizontal plane, this stable point shi
 \includegraphics[height=0.3\textheight]{./figures/ZeroErrorSurface.png} %TODO get better quality figure
 \caption{Zero Control Signal Region}
 \label{fig:ZeroErrorSurface}
-\medskip
-\small %TODO make the formatting of subtext nicer %TODO EDIT1 fix the formatting
+\captionsetup{singlelinecheck=off,font=footnotesize}
+\caption*{
 This surface indicates the region of the quadcopter state where the control output is zero.
 The target position is at [0,0] and the angle shown is a combination of the pitch and roll angles where $angle = \sqrt{\phi^{2} + \theta^{2}}$.
 The quadcopter is only ever stable at one point on this surface.
 The location of that point is dependent on the external forces acting on the quadcopter.
 Under only the influence of gravity, the stable point is at the center of [0,0], but when an external force is applied along the horizontal plane, the stable point shifts in the direction of that force by an amount proportional to the magnitude of that force.
-The slope of this surface is the ratio of the linear and angular P gains of the controller, $k_{1}/k_{5}$.
+The slope of this surface is the ratio of the linear and angular P gains of the controller, $k_{1}/k_{5}$.}
 \end{figure}
 
 
@@ -1149,7 +1152,7 @@ K_{a} =
 %[[show network diagram with adaptive transform]]
 \begin{figure}
 \centering
-\includegraphics[height=0.3\textheight]{./figures/NetAdaptiveTransform.png} %TODO get better quality figure
+\includegraphics[height=0.3\textheight]{./figures/QuadcopterNetworkModifiedAdaptive.pdf} %TODO get better quality figure
 \caption{Quadcopter Controller Network with Adaptive Transformation}
 \label{fig:NetAdaptiveTransform}
 \end{figure}
@@ -1257,7 +1260,7 @@ As can be seen, control in the $x$ direction is significantly improved, with onl
 
 \begin{figure}
 \centering
-\includegraphics[height=0.3\textheight]{./figures/NetAngleAdapt.png} %TODO get better quality figure
+\includegraphics[height=0.3\textheight]{./figures/QuadcopterNetworkAdaptiveAngle.pdf} %TODO get better quality figure
 \caption{Quadcopter Controller Network with Angle Correction}
 \label{fig:NetAngleAdapt}
 \end{figure}
@@ -1302,7 +1305,7 @@ The network diagram for this model can be seen in \autoref{fig:NetTMC} and the p
 %[[put in network diagram, as well as one plot of performance]]
 \begin{figure}
 \centering
-\includegraphics[height=0.3\textheight]{./figures/NetTMC.png} %TODO get better quality figure
+\includegraphics[height=0.3\textheight]{./figures/QuadcopterNetworkTMC.pdf} %TODO get better quality figure
 \caption{Quadcopter Controller Network with Target Modulated Control}
 \label{fig:NetTMC}
 \end{figure}
@@ -1615,9 +1618,9 @@ The non-adaptive controllers show no such improvement over time.
 \includegraphics[width=0.32\textwidth]{./figures/pidtf_loop.png}
 \caption{Path of Quadcopter between Two Points with External Forces} %mention something about how the experiment was done here? it was 100 seconds total with 5 seconds before the point switches
 \label{fig:loop_path}
-\medskip
-\small
-RMS values for the Neural Adaptive, PD, and PIDtf controllers are 0.6729, 1.2827, and 1.7662 respectively. These values were calculated using the deviation from the line formed by the two target points as the error.
+\captionsetup{singlelinecheck=off,font=footnotesize}
+\caption*{
+RMS values for the Neural Adaptive, PD, and PIDtf controllers are 0.6729, 1.2827, and 1.7662 respectively. These values were calculated using the deviation from the line formed by the two target points as the error.}
 \end{figure}
 
 
@@ -1708,9 +1711,9 @@ In future work, methods could be implemented to increase robustness to noise, su
 \includegraphics[height=0.3\textheight]{./figures/HorizontalNoise.png}
 \caption{Horizontal Motion with Noise}
 \label{fig:noise_comparison}
-\medskip
-\small
-Noise level indicates the variance on the Gaussian noise applied to the state measurements. The noise applied to the angular measurements is one tenth of the linear measurements. A noise level of 0.2 means that the variance on position and velocity measurements is 0.2 and the variance on orientation and angular velocity measurements is 0.02.
+\captionsetup{singlelinecheck=off,font=footnotesize}
+\caption*{
+Noise level indicates the variance on the Gaussian noise applied to the state measurements. The noise applied to the angular measurements is one tenth of the linear measurements. A noise level of 0.2 means that the variance on position and velocity measurements is 0.2 and the variance on orientation and angular velocity measurements is 0.02.}
 \end{figure}
 
 Another common goal of a control system is path following.

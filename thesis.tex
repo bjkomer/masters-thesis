@@ -250,7 +250,8 @@ Even if an object has never been encountered before, the human brain is able to 
 %When picking up a new object, there are a many unknown forces, torques, and inertial effects that this object will apply to the arm. 
 %Despite all of these unknowns, humans are very good at manipulating objects and the necessary changes in timing and muscle tensions to do so are calculated with ease, even if the object has never been encountered before. 
 %TODO EDIT1 more subtle claim here
-This ability can be largely attributed to the plasticity of neural connections in the motor control area of the brain.
+The predictive capabilities of the brain, along with the plasticity of neural connections in the motor area help guide these sophisticated behaviours.
+%This ability can be largely attributed to the plasticity of neural connections in the motor control area of the brain.
 
 This ability for quick and easy adaptation to new dynamic properties of a system would be extremely useful in robotics. 
 Applying similar methods of control that have been developed over millions of years of evolution in the brain to a robotic control system could result in major improvements. 
@@ -261,9 +262,9 @@ When the precise environment that the robot will operate in is not fully known, 
 
 Another advantage the brain has when it comes to control, is that it uses very little power, about 20 Watts on average \cite{hart1975brain}.
 % the motor is the majority of the power on a quadcopter, so neuromorphic hardware might not help much here
-%TODO EDIT1 fix up the end of this sentence and add some connections
 Hardware inspired by the brain is being designed to take advantage of this low power paradigm. 
-This style of hardware, known as neuromorphic hardware, is typically massively parallel and runs in an analog rather than digital domain.
+This style of hardware, known as neuromorphic hardware, is typically massively parallel and consumes much less power than traditional hardware.
+The algorithms explored in this thesis focus on being adaptive and biologically inspired in order to take advantage of such hardware.
 
 \section{Quadcopters}
 
@@ -331,7 +332,7 @@ By varying the relative speeds of each rotor, the quadcopter is able to create a
 
 A quadcopter performs four common actions to move around in its environment, with a distinct pattern of rotor actuation for each one: 
 tilt forward/backward, tilt left/right, rotate, and move up/down. 
-A quadcopter can perform any combination of these actions, and with different magnitudes of each. The relative rotor speeds required for each are shown in \autoref{fig:actions}.
+A quadcopter can perform any combination of these actions, and with different magnitudes of each. The relative rotor speeds required for each are shown in \autoref{fig:actions}. This set of actions make up what is referred to as the `task space' of the quadcopter in the remainder of this thesis.
 
 \begin{figure}
 \centering
@@ -443,10 +444,10 @@ f_{i} = kw_{i}^{2}
 \tau_{M_{i}} = b\omega_{i}^{2} + I_{M}\dot{\omega_{i}}
 \end{equation}
 
-%TODO EDIT1 briefly explain why angular acceleration is considered small
-Typically the effect of the angular acceleration is considered small and is omitted in most analyses, so it will not be present in the remainder of the dynamics derivations.
+Typically the effect of the angular acceleration is considered small and is omitted in most analyses, so it will not be present in the remainder of the dynamics derivations. This is because during steady state flight the rotors will be maintaining a constant (or almost constant) velocity and will have approximately zero acceleration \cite{gibiansky}.
 
 Note that the forces and torques generated are always proportional to the square of the rotor's angular velocity, thus working with this term instead of the angular velocity itself is simpler. %[put this part under simulation instead]?
+The set of values making up the square of the rotor angular velocities is referred to as the `rotor space' in the remainder of this thesis.
 
 Combining the forces of all four rotors leads to \eqref{eq:thrust}, where $T$ is the thrust in the direction of the z-axis of the body. 
 Combining the torques of all four rotors leads to \eqref{eq:torque}, where the vector tau represents the torques across each of the principal body axes ($\tau_{\phi}$ for roll, $\tau_{\theta}$ for pitch, and $\tau_{\psi}$ for yaw). 
@@ -613,8 +614,6 @@ In addition to these zones, the quadcopter can also pick up and drop off boxes o
 These wind zones and boxes are used to test how well the controller can adapt to changes in its dynamics.
 An example of a region within the simulation environment is shown in \autoref{fig:vrep_screenshot}.
 
-%TODO put in a screenshot here?
-%TODO EDIT1 yes, put a screenshot here
 \begin{figure}
 \centering
 \includegraphics[height=0.3\textheight]{./figures/VREPScreenshot.png}
@@ -693,6 +692,7 @@ $\tau$ is the input required to keep the system in a steady state.
 Often the system parameters are not fully known and an estimate needs to be used instead.
 Many control applications also require the system to be able to transition to different states, rather than remain at a particular state.
 The adaptive control law in \eqref{eq:Y_and_control_law} uses an estimate of the parameter vector, $\hat{\theta}$, along with a standard control law to compute the desired input to the system. Here $e$ is the state error and $K$ is a gain matrix.
+More detail on this style of adaptive control law can be found in \cite{slotine1987adaptive, slotine1991applied, cheah2006adaptive}.
 %TODO EDIT1 add references to Slotine papers as well as a couple quick comments about the strengths of those controllers (guaranteed to converge with sufficient exploration of space, etc)
 
 \begin{equation} \label{eq:Y_and_control_law}
@@ -702,6 +702,7 @@ The adaptive control law in \eqref{eq:Y_and_control_law} uses an estimate of the
 The parameter estimates can be initialized to any stable value and are updated according to the relationship in \eqref{eq:Y_update_equation}.
 $L$ is a learning rate parameter that determines how quickly the parameter estimates change over time in proportion to the measured error.
 The parameter estimates will eventually converge on values that allow the system to be controlled with minimal error.
+Given sufficient exploration of the state space, the parameter estimates are guaranteed to converge to the real values if the real values are required for optimal control \cite{slotine1987adaptive}.
 
 \begin{equation} \label{eq:Y_update_equation}
 \dot{\hat{\theta}} = LY(q,\dot{q})^{T}Ke
@@ -750,7 +751,7 @@ If no synaptic filter is applied, the value from the origin of the connection is
 
 Nengo supports a variety of underlying neuron models for its Ensembles.
 The most commonly used is the Leaky Integrate-and-Fire (LIF) neuron \cite{burkitt2006review}.
-[add a brief description?]. %TODO add this description
+%[add a brief description?]. %TODO add this description
 Ensembles can also be run in direct mode, in which functions are computed explicitly rather than with neurons.
 However, models in this mode are not implementable directly on neuromorphic hardware, and the behaviour of the system can be significantly different.
 Nevertheless, it can be useful for constructing working prototypes in simulation before converting the entire system to an underlying neural model. %TODO: this sounds gross, fix it... %TODO EDIT1
@@ -1055,6 +1056,9 @@ The larger network is used in the remainder of this thesis because it is more ex
 \includegraphics[height=0.3\textheight]{./figures/QuadcopterNetworkSimple.pdf} %TODO get better quality figure
 \caption{Basic Quadcopter Controller Network}
 \label{fig:NetBasic}
+%TODO EDIT1.5 Use a legend on each figure to show what the colours mean
+\captionsetup{singlelinecheck=off,font=footnotesize}
+\caption*{Light gray rounded rectangles represent ensembles running in direct mode, dark grey rectangles represent transformations applied to connections, and the blue rounded rectangle represents a node that interacts with the V-REP simulator. }
 \end{figure}
 
 \begin{figure}
@@ -1084,6 +1088,7 @@ The network diagram is shown in \autoref{fig:NetControlTransform}.
 \includegraphics[height=0.3\textheight]{./figures/QuadcopterNetworkSimpleAdaptive.pdf} %TODO get better quality figure
 \caption{Quadcopter Controller Network with Adaptation}
 \label{fig:NetControlTransform}
+
 \end{figure}
 
 This model is very effective at learning the unknown mass of the quadcopter and adapting to any external forces in the $z$ direction. 
@@ -1444,6 +1449,8 @@ This metric does not worry about overshoot and non-optimal trajectories as long 
 The particular tolerance chosen for these experiments is maintaining an RMS error of less than 0.001 for a duration of one second.
 
 The majority of the benchmarks performed in this thesis will report results using the trajectory RMS error and the time-to-target metric.
+The RMS metrics were recorded over a 17 second simulation time.
+The time-to-target trials were run for a total of 30 seconds and a value of 30 is recorded if the quadcopter never reaches its target within tolerance over that duration.
 
 % TODO: maybe get a better title for this
 \subsection{Benchmarks for Simple Environments}
@@ -1686,7 +1693,8 @@ For the benchmarks involving external forces, the neural controller achieved the
 
 The main contribution of this thesis is an adaptive control system for a quadcopter using simulated biological neurons.
 This is a proof-of-concept that an ensemble of spiking neurons can be used to improve quadcopter control in the face of uncertain and changing environments through a biologically realistic learning mechanism.
-%TODO EDIT1 Say something about exploiting neuromorphic hardware, and being able to implement state of the art control on it
+Using this methodology, state of the art control can be implemented on the low power and highly parallel architecture of neuromorphic hardware.
+
 A second contribution is the integration of the Nengo neural simulation software with the robotics and physics simulation capacity of V-REP.
 This union allows complex neural models to be embodied in a physical environment in a straightforward manner.
 The various tools developed over the course of this thesis work to support the integration of the simulated quadcopter with Nengo are general purpose enough to be applied to other simulated robotic models.
@@ -1794,8 +1802,9 @@ Overcoming these challenges to produce an adaptive neural quadcopter that can in
 
 \section{Conclusion}
 
-%TODO EDIT1
-[[insert a concluding paragraph that reiterates contributions and future directions]]
+%TODO EDIT1 [[insert a concluding paragraph that reiterates contributions and future directions]]
+This project was undertaken to design an adaptive quadcopter controller capable of being implemented on neuromorphic hardware and evaluate its performance with respect to conventional controller design methods.
+The results obtained in simulation are highly promising and warrant future investigation of more sophisticated neural navigation and planning systems as well as implementation on physical hardware.
 
 % The \appendix statement indicates the beginning of the appendices.
 \appendix

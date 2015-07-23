@@ -1497,6 +1497,8 @@ Wind & Fly in the y direction (between one and five meters). Enter a wind tunnel
 \includegraphics[width=0.45\textwidth]{./figures/BarHorizontalPRMS.png}
 \includegraphics[width=0.45\textwidth]{./figures/BarHorizontalTime.png}
 \caption{Performance on Horizontal Movement Tasks}\label{fig:bar_horizontal}
+\captionsetup{singlelinecheck=off,font=footnotesize}
+\caption*{}
 \end{figure}
 
 \begin{figure}
@@ -1504,6 +1506,8 @@ Wind & Fly in the y direction (between one and five meters). Enter a wind tunnel
 \includegraphics[width=0.45\textwidth]{./figures/BarVerticalPRMS.png}
 \includegraphics[width=0.45\textwidth]{./figures/BarVerticalTime.png}
 \caption{Performance on Vertical Movement Tasks}\label{fig:bar_vertical}
+\captionsetup{singlelinecheck=off,font=footnotesize}
+\caption*{}
 \end{figure}
 
 \begin{figure}
@@ -1511,6 +1515,8 @@ Wind & Fly in the y direction (between one and five meters). Enter a wind tunnel
 \includegraphics[width=0.45\textwidth]{./figures/BarRotationalPRMS.png}
 \includegraphics[width=0.45\textwidth]{./figures/BarRotationalTime.png}
 \caption{Performance on Rotational Movement Tasks}\label{fig:bar_rotational}
+\captionsetup{singlelinecheck=off,font=footnotesize}
+\caption*{}
 \end{figure}
 
 \begin{figure}
@@ -1518,24 +1524,9 @@ Wind & Fly in the y direction (between one and five meters). Enter a wind tunnel
 \includegraphics[width=0.45\textwidth]{./figures/BarWindPRMS.png}
 \includegraphics[width=0.45\textwidth]{./figures/BarWindTime.png}
 \caption{Performance on Horizontal Movement Through Wind Tasks}\label{fig:bar_wind}
+\captionsetup{singlelinecheck=off,font=footnotesize}
+\caption*{}
 \end{figure}
-
-%\begin{figure}
-%\centering
-%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkSimpleReferencePRMS.png} %TODO get better quality figure
-%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkSimpleReferenceTime.png} %TODO get better quality figure
-%\caption{Performance on Benchmarks from Reference Controllers}
-%\label{fig:benchmark_simple_reference}
-%\end{figure}
-%
-%\begin{figure}
-%\centering
-%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkSimpleNeuralPRMS.png} %TODO get better quality figure
-%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkSimpleNeuralTime.png} %TODO get better quality figure
-%\caption{Performance on Benchmarks from Neural Adaptive Controllers}
-%\label{fig:benchmark_simple_neural}
-%\end{figure}
-
 
 %[put some stuff in here with noise as well?]
 
@@ -1543,12 +1534,16 @@ Wind & Fly in the y direction (between one and five meters). Enter a wind tunnel
 
 %TODO EDIT1 Some concluding sentences/observations to go here. there's a bit in the next section that could be brought here and expanded upon.
 
-% TODO: figure out a good name for this section
-\subsection{Benchmarks for Complex Environments}
+Overall the performance of all of the controllers tested are quite similar on the horizontal, vertical, and rotational tasks.
+On the task that involves movement in the presence of wind, the iterations of the neural-adaptive controller fare very well.
+The PID controller with a fast integral gain also does well on this task, so it is not clear from these tests if an adaptive controller has an advantage over a well tuned PID controller.
 
 The performance of the adaptive controller is quite strong, but its performance is still relatively close to that of the modified PID controllers. 
 Where the adaptive controller really excels is when there are external forces being applied that are functions of the system state. 
 The adaptive controller is designed to be able to account for both linear and nonlinear functions of the system state.
+
+% TODO: figure out a good name for this section
+\subsection{Benchmarks for Complex Environments}
 
 To quantify the performance of the quadcopter controllers under the influence of these more interesting forces, a new set of benchmark tasks is used.
 These tasks are listed in \autoref{table:forcingfunctions} below. %maybe just reference the forcing function table here? Have both places reference the same table
@@ -1570,7 +1565,13 @@ Horizontal Velocity & A force is applied in the y-direction proportional to the 
 \end{table}
 
 Performance of the Neural Adaptive controllers is compared to the reference controllers on these tasks.
-The results are displayed in \autoref{fig:benchmark_complex}. 
+The results are displayed in \autoref{fig:benchmark_complex}.
+The tasks that involved external forces in the horizontal direction tended to be the most difficult for the controllers tested here, likely due to the fact that these forces are more complicated to correct for.
+In these cases the final iteration of the neural-adaptive controller (TMCA) obtained the lowest RMS error.
+In the horizontal velocity case this controller was not the fastest to reach its target, but this can be attributed to the fact that once the target is close and the quadcopter velocity is low, there will be little external force (as they are a function of velocity) in this case. 
+A controller that does not adapt at all or adapts slowly will be able to reach steady state more quickly, explaining why the PD controller reached the target the fastest.
+The non-neural adaptive controller also did well here, which could be caused by a low learning rate.
+Performance on the task that involved a vertical force was almost the same as if there was no force at all. 
 
 \begin{figure}
 \centering
@@ -1580,30 +1581,15 @@ The results are displayed in \autoref{fig:benchmark_complex}.
 
 \caption{Performance on Benchmarks under different External Force Conditions}
 \label{fig:benchmark_complex}
+\captionsetup{singlelinecheck=off,font=footnotesize}
+\caption*{}
 \end{figure}
-
-%%TODO organize the layout better and get better quality figures
-%TODO possibly put all of this in an appendix, and put data for only a few controllers here
-%\begin{figure}
-%\centering
-%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF0PRMS.png}
-%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF0TIME.png}
-%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF1PRMS.png}
-%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF1TIME.png}
-%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF3PRMS.png}
-%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF3TIME.png}
-%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF5PRMS.png}
-%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF5TIME.png}
-%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF6PRMS.png}
-%\includegraphics[width=0.45\textwidth]{./figures/BenchmarkComplexFF6TIME.png}
-%\caption{Performance on Benchmarks under different External Force Conditions}
-%\label{fig:benchmark_complex}
-%\end{figure}
 
 %Fill the rest of this subsection with the results of running models in these environments
 % could just put things in tables instead of having plots everywhere, or make the plots smaller so they don't take up an obnoxious amount of space
 
 %TODO EDIT1 put in some summary/comments talking about the results shown here.
+
 
 % this is where the loop figures will be. Talk about the controller getting better over time by learning the space
 \subsection{Improvement over Time} %TODO better title for this section

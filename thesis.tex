@@ -1053,7 +1053,7 @@ The larger network is used in the remainder of this thesis because it is more ex
 %[Also figure of simplified model without task space representation]
 \begin{figure}
 \centering
-\includegraphics[height=0.3\textheight]{./figures/QuadcopterNetworkSimple.pdf} %TODO get better quality figure
+\includegraphics[height=0.3\textheight]{./figures/QuadcopterNetworkSimpleLegend.pdf} %TODO get better quality figure
 \caption{Basic Quadcopter Controller Network}
 \label{fig:NetBasic}
 %TODO EDIT1.5 Use a legend on each figure to show what the colours mean
@@ -1063,7 +1063,7 @@ The larger network is used in the remainder of this thesis because it is more ex
 
 \begin{figure}
 \centering
-\includegraphics[height=0.3\textheight]{./figures/QuadcopterNetworkSimplified.pdf} %TODO get better quality figure
+\includegraphics[height=0.20\textheight]{./figures/QuadcopterNetworkSimplifiedLegend.pdf} %TODO get better quality figure
 \caption{Simplified Quadcopter Controller Network}
 \label{fig:NetSimplified}
 \end{figure}
@@ -1085,7 +1085,7 @@ The network diagram is shown in \autoref{fig:NetControlTransform}.
 
 \begin{figure}
 \centering
-\includegraphics[height=0.3\textheight]{./figures/QuadcopterNetworkSimpleAdaptive.pdf} %TODO get better quality figure
+\includegraphics[height=0.3\textheight]{./figures/QuadcopterNetworkSimpleAdaptiveLegend.pdf} %TODO get better quality figure
 \caption{Quadcopter Controller Network with Adaptation}
 \label{fig:NetControlTransform}
 
@@ -1097,11 +1097,27 @@ The starting gains were based on those present in the quadcopter PD controller p
 %[[put in some plots showing adaptation speed at simulation start, talk about parameters that change this speed -> maybe show all gains used with the plot?]]
 
 When an external force is applied in the horizontal plane, this controller does a very bad job of correcting for it. 
-The quadcopter will settle to a stable point in space with a constant offset from the target location. 
+The quadcopter will settle to a stable point in space with a constant offset from the target location, as can be seen in \autoref{fig:PlotSimpleA}. 
 This behaviour results from how the error is specified:
 since both position and angle gains are being combined into the same dimension to produce the task space error, multiple pairs of measurements will produce the same error. 
 That is, the adaptive ensemble is being given an effective error reading of zero even though the quadcopter is not at the desired position. 
 For example, if wind is producing a force in the x-direction, in order for the quadcopter to remain stationary, it must have a pitch angle that allows its thrust to compensate for both the gravitational force and the translational force.
+
+\begin{figure} %TODO EDIT1.5 create these figures and use them
+\centering
+\begin{subfigure}[t]{0.48\textwidth}
+\includegraphics[height=0.40\textheight]{./figures/SimpleWindX.png} %TODO get better quality figure
+\caption{Displacement by Wind}
+\label{fig:PlotSimpleA}
+\end{subfigure}
+\begin{subfigure}[t]{0.48\textwidth}
+\includegraphics[height=0.40\textheight]{./figures/SimpleWindY.png}
+\caption{Trajectory to Target}
+\label{fig:PlotSimpleB}
+\end{subfigure}
+\caption{Performance of Original Adaptive Controller}
+\label{fig:PlotSimple}
+\end{figure}
 
 %[[show FBD of quadcopter with pitch angle and forces balancing]]
 
@@ -1157,7 +1173,7 @@ K_{a} =
 %[[show network diagram with adaptive transform]]
 \begin{figure}
 \centering
-\includegraphics[height=0.3\textheight]{./figures/QuadcopterNetworkModifiedAdaptive.pdf} %TODO get better quality figure
+\includegraphics[height=0.3\textheight]{./figures/QuadcopterNetworkModifiedAdaptiveLegend.pdf} %TODO get better quality figure
 \caption{Quadcopter Controller Network with Adaptive Transformation}
 \label{fig:NetAdaptiveTransform}
 \end{figure}
@@ -1265,7 +1281,7 @@ As can be seen, control in the $x$ direction is significantly improved, with onl
 
 \begin{figure}
 \centering
-\includegraphics[height=0.3\textheight]{./figures/QuadcopterNetworkAdaptiveAngle.pdf} %TODO get better quality figure
+\includegraphics[height=0.3\textheight]{./figures/QuadcopterNetworkAdaptiveAngleLegend.pdf} %TODO get better quality figure
 \caption{Quadcopter Controller Network with Angle Correction}
 \label{fig:NetAngleAdapt}
 \end{figure}
@@ -1304,14 +1320,10 @@ If the target is suddenly moved, this filtered-difference ensemble will begin to
 Over time the filtered target will start to match the unfiltered target, and the extent to which the adaptive ensembles can adapt to any errors increases. 
 The network diagram for this model can be seen in \autoref{fig:NetTMC} and the performance of this controller is shown in \autoref{fig:PlotTMC}.
 
-%TODO should target following go anywhere?
-%Its performance on the target following task can be seen in Figure XXX.
-
-%[[put in network diagram, as well as one plot of performance]]
 \begin{figure}
 \centering
-\includegraphics[height=0.3\textheight]{./figures/QuadcopterNetworkTMC.pdf} %TODO get better quality figure
-\caption{Quadcopter Controller Network with Target Modulated Control}
+\includegraphics[height=0.4\textheight]{./figures/QuadcopterNetworkTMCLegend.pdf} %TODO get better quality figure
+\caption{Quadcopter Controller Network with Target Modulated Control} %TODO EDIT1.5 figure is slightly incorrect and needs updating
 \label{fig:NetTMC}
 \end{figure}
 
@@ -1568,7 +1580,7 @@ Performance of the Neural Adaptive controllers is compared to the reference cont
 The results are displayed in \autoref{fig:benchmark_complex}.
 The tasks that involved external forces in the horizontal direction tended to be the most difficult for the controllers tested here, likely due to the fact that these forces are more complicated to correct for.
 In these cases the final iteration of the neural-adaptive controller (TMCA) obtained the lowest RMS error.
-In the horizontal velocity case this controller was not the fastest to reach its target, but this can be attributed to the fact that once the target is close and the quadcopter velocity is low, there will be little external force (as they are a function of velocity) in this case. 
+In the horizontal velocity case this controller was not the fastest to reach its target, but this can be attributed to the fact that once the target is close and the quadcopter velocity is low, there will be little external force (as it is a function of velocity) in this case. 
 A controller that does not adapt at all or adapts slowly will be able to reach steady state more quickly, explaining why the PD controller reached the target the fastest.
 The non-neural adaptive controller also did well here, which could be caused by a low learning rate.
 Performance on the task that involved a vertical force was almost the same as if there was no force at all. 
@@ -1658,6 +1670,55 @@ RMS values for the Neural Adaptive, PD, and PIDtf controllers are 0.6729, 1.2827
 \section{Results}
 
 %[Talk about the results, give advantages and disadvantages of each]
+
+Several ranking methods are presented in order to determine which controller had the best overall performance.
+The first assigns a numerical ranking to each controller for each metric (RMS error and time-to-target) on each of the seven tasks and computes the sum of those rankings.
+A rank of 1 is given to the controller with the best performance, a rank of 2 to the second best, a rank of 3 to the third best, and a rank of 4 to all others.
+As can be seen in \autoref{fig:task_ranking}, the neural-adaptive TMCA controller obtains the best overall rank.
+
+\begin{figure}
+\centering
+\includegraphics[height=0.30\textheight]{./figures/task_ranking.png}
+
+\caption{Controller Performance Ranking}
+\label{fig:task_ranking}
+\captionsetup{singlelinecheck=off,font=footnotesize}
+\caption*{Final rank is obtained from the sum of the controller's rank on each task. Lower ranks indicate better performance. There are seven tasks with two performance metrics each, resulting in fourteen tasks in total.}
+\end{figure}
+
+This ranking method can be useful, but it does not do a good job at taking into account results that are in close proximity or far apart from one another.
+One approach to overcoming this issue is to compute the mean across all tasks and use that as the ranking.
+Directly using the mean is sometimes not informative, as the results of each task can be on very different scales.
+By normalizing the data before taking the mean, the different scales become less of an issue.
+These results are shown in \autoref{table:mean_task_ranking}.
+The neural-adaptive TMCA controller performs the best in all categories except for the normalized RMS error, in which it comes in second to the neural-adaptive TMC controller.
+
+\begin{table}
+\begin{threeparttable}
+\caption{Mean Controller Performance} \label{table:mean_task_ranking}
+\begin{tabular}{| l | l | l | l | l |}
+%\toprule
+\hline
+\textbf{Controller Name} & \multicolumn{2}{l|}{\textbf{Time-to-Target}} & \multicolumn{2}{l|}{\textbf{Trajectory RMS}} \\ \cline{2-5}
+& \textbf{Direct} & \textbf{Normalized} & \textbf{Direct} & \textbf{Normalized} \\ \hline
+%\midrule
+Basic Neural Adaptive & 6.58 & 0.41 & 7.19 & 0.25 \\ \hline
+Neural Adaptive Angle Correction & 6.84 & 0.43 & 9.03 & 0.31 \\ \hline
+Neural Adaptive TMC & 6.13 & 0.38 & 3.87 & \textbf{0.20} \\ \hline
+Neural Adaptive TMCA & \textbf{5.96} & \textbf{0.37} & \textbf{3.34} & 0.21 \\ \hline
+Non-Neural Adaptive & 6.73 & 0.42 & 10.45 & 0.30 \\ \hline
+PD & 6.07 & 0.38 & 9.15 & 0.29 \\ \hline
+PID & 7.67 & 0.48 & 9.77 & 0.36 \\ \hline
+PIDt & 6.70 & 0.41 & 7.72 & 0.26 \\ \hline
+PIDtf & 6.17 & 0.38 & 8.42 & 0.27 \\ \hline
+%\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\footnotesize
+\item The \textit{Direct} method computes the mean across all tasks by using the mean for each task directly. The \textit{Normalized} method first normalizes the mean for each task by dividing it by the maximum mean in that task and then uses the mean of that result.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
 
 While the final iteration of the neural adaptive controller did not perform strictly the best in all tasks, it had the strongest overall performance.
 For the benchmarks that covered simple environments with no external forces, the neural controller performed on par with the reference controllers.

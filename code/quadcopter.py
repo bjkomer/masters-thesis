@@ -9,9 +9,6 @@ sim_dt = 0.01
 dt = 0.001
 
 SYNC = True
-TUNING_PREDICTION = False#True
-DODGING = False
-
 vrep_mode = vrep.simx_opmode_oneshot
 
 def b( num ):

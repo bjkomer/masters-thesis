@@ -607,7 +607,7 @@ The simulation environment in V-REP is set up to be a large open space with smal
 The quadcopter model was initialized to start in the center of the space, 0.5 meters above the ground. 
 This model is the one provided with the V-REP software courtesy of Eric Rohmer and Lyall Randell. 
 The quadcopter's target is a small semi-transparent green sphere. The goal of the control system is to make the quadcopter move to the target's location with the target's orientation. 
-For this thesis, and environment was created which includes various wind tunnels, which are zones of space which will exert an external force on the quadcopter in a particular direction if the quadcopter is within the zone. 
+For this thesis, an environment was created which includes various wind tunnels, which are zones of space which will exert an external force on the quadcopter in a particular direction if the quadcopter is within the zone. 
 There are also zones that can exert various nonlinear forces on the quadcopter. 
 For example, one zone could push the quadcopter in the $z$ direction with a force proportional to the square of its horizontal velocity. 
 In addition to these zones, the quadcopter can also pick up and drop off boxes of various mass. 
@@ -1056,7 +1056,6 @@ The larger network is used in the remainder of this thesis because it is more ex
 \includegraphics[height=0.3\textheight]{./figures/QuadcopterNetworkSimpleLegend.pdf} %TODO get better quality figure
 \caption{Basic Quadcopter Controller Network}
 \label{fig:NetBasic}
-%TODO EDIT1.5 Use a legend on each figure to show what the colours mean
 \captionsetup{singlelinecheck=off,font=footnotesize}
 \caption*{Light gray rounded rectangles represent ensembles running in direct mode, dark grey rectangles represent transformations applied to connections, and the blue rounded rectangle represents a node that interacts with the V-REP simulator. }
 \end{figure}
@@ -1103,7 +1102,7 @@ since both position and angle gains are being combined into the same dimension t
 That is, the adaptive ensemble is being given an effective error reading of zero even though the quadcopter is not at the desired position. 
 For example, if wind is producing a force in the x-direction, in order for the quadcopter to remain stationary, it must have a pitch angle that allows its thrust to compensate for both the gravitational force and the translational force.
 
-\begin{figure} %TODO EDIT1.5 create these figures and use them
+\begin{figure}
 \centering
 \begin{subfigure}[t]{0.48\textwidth}
 \includegraphics[height=0.40\textheight]{./figures/SimpleWindX.png} %TODO get better quality figure
@@ -1723,9 +1722,6 @@ PIDtf & 6.17 & 0.38 & 8.42 & 0.27 \\ \hline
 While the final iteration of the neural adaptive controller did not perform strictly the best in all tasks, it had the strongest overall performance.
 For the benchmarks that covered simple environments with no external forces, the neural controller performed on par with the reference controllers.
 For the benchmarks involving external forces, the neural controller achieved the lowest RMS error and the fastest time to reach the target for the majority of the tasks.
-
-%TODO EDIT1 some quantification of results should go here. Possibly a ranking system for each task, and show the overall winner.
-
  
 %======================================================================
 \chapter{Discussion and Future Work} \label{chap:discussion}

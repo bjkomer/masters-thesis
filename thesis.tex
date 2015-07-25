@@ -1318,11 +1318,12 @@ If the target has not moved recently, the value being projected from this filter
 If the target is suddenly moved, this filtered-difference ensemble will begin to output the difference between the two target positions, thereby inhibiting the adaptation in any dimension that has a difference. 
 Over time the filtered target will start to match the unfiltered target, and the extent to which the adaptive ensembles can adapt to any errors increases. 
 The network diagram for this model can be seen in \autoref{fig:NetTMC} and the performance of this controller is shown in \autoref{fig:PlotTMC}.
+In this case the filtered-difference ensemble feeds into just the angle correction system.
 
 \begin{figure}
 \centering
-\includegraphics[height=0.4\textheight]{./figures/QuadcopterNetworkTMCLegend.pdf} %TODO get better quality figure
-\caption{Quadcopter Controller Network with Target Modulated Control} %TODO EDIT1.5 figure is slightly incorrect and needs updating
+\includegraphics[height=0.4\textheight]{./figures/QuadcopterNetworkAngleTMCLegend.pdf} %TODO get better quality figure
+\caption{Quadcopter Controller Network with Target Modulated Control}
 \label{fig:NetTMC}
 \end{figure}
 
@@ -1352,7 +1353,9 @@ Similarly, if there is a sensor that can detect weather information (strong wind
 In the controllers described in the previous sections, the error with respect to the target is the only context used as this was all that was being measured.
 One useful piece of additional information available in the simulation is absolute position.
 If there are dynamic effects that vary with the position of the quadcopter, such as strong winds in a particular region, the controller will be able to learn the association of the dynamic effects with a particular location in order to adapt faster to those effects when the quadcopter enters that location.
-The final iteration of the controller design here has a network diagram that is the same as in \autoref{fig:NetTMC}, but with additional allocentric information contained in the state and adaptation ensembles. This allocentric information is not passed on through the control transform.
+The final iteration of the controller design here has the network diagram shown in \autoref{fig:NetTMCA}.
+It is similar to the previous iteration, but the target modulation is applied to both adaptive populations and additional allocentric information is contained in the state and adaptation ensembles. 
+This allocentric information is not passed on through the control transform.
 
 % This figure will be the same as the non-allocentric version, just with less dimensions in the state, so probably don't need a new figure for it
 %\begin{figure}
@@ -1361,6 +1364,13 @@ The final iteration of the controller design here has a network diagram that is 
 %\caption{Quadcopter Controller Network with Allocentric Target Modulated Control}
 %\label{fig:NetAlloTMC}
 %\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[height=0.4\textheight]{./figures/QuadcopterNetworkTMCALegend.pdf} %TODO get better quality figure
+\caption{Quadcopter Controller Network with Allocentric Target Modulated Control}
+\label{fig:NetTMCA}
+\end{figure}
 
 %TODO this section may need a new name
 \section{Software Simulation}

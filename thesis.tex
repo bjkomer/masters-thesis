@@ -244,7 +244,7 @@
 Humans have an exceptional ability to be able to adapt to their surroundings.
 In particular the human motor control system is able to compensate for changes in forces, torques, and inertial effects on the body.
 For example, when picking up an object such as a hammer, the weight of the hammer will apply external forces to the hand.
-This will change the dynamic properties of the hand and arm movements, yet the human motor control system is able to easily compensate for these changes and control their movement with the object.
+This will change the dynamic properties of the hand and arm movements, yet the human motor control system is able to easily compensate for these changes and accurately control movement with the object.
 %Skilfully manipulating an object requires
 Even if an object has never been encountered before, the human brain is able to calculate the correct changes in timing and muscle tensions in order to skilfully manipulate the object. %For example, humans are able to use hammers with a variety of styles and weights
 %When picking up a new object, there are a many unknown forces, torques, and inertial effects that this object will apply to the arm. 
@@ -291,7 +291,7 @@ The latter can be achieved by the use of neuromorphic hardware to run the flight
 While the majority of the power consumed by a quadcopter goes towards the rotors, some is still used by the on-board control system.
 As the sophistication of the control system increases, the computational demands will follow, leading to less overall flight time.
 Computational efficiency improvements in traditional digital computation is beginning to stagnate and is expected to soon approach a limit where minimal improvement is expected.
-On the contrary, computational power efficiency for biological systems is 8-9 orders of magnitude lower than the power efficiency for digital computation \cite{hasler2013finding}.
+On the contrary, computational power efficiency for biological systems is 8-9 orders of magnitude better than the power efficiency for digital computation \cite{hasler2013finding}.
 Reducing the power required for the control system can allow more of the power from the batteries to be used for the rotors.
 
 %TODO this seems like a really weak claim, and isn't the main focus of the thesis, should it still be included here as a possibility?
@@ -320,7 +320,7 @@ The final section discusses the results and outlines areas of future work.
 %[thrust is always perpendicular to the body]
 %[two ways to do it, rotor aligned axis, and 45 degrees from that]
 
-The system state of a quadcopter is six dimensional: three for position (x, y, and z) and three for orientation (roll, pitch, and yaw). 
+The system state of a quadcopter is six dimensional: three for position ($x$, $y$, and $z$) and three for orientation (roll, pitch, and yaw). 
 There are four control inputs, which are typically taken to be the rotational velocity of each of the four rotors. 
 For a physical quadcopter, these inputs are the voltages applied to each of these rotors.
 A transformation in these voltages can be obtained using the physical rotor parameters to estimate the rotor velocity.
@@ -424,7 +424,7 @@ S_{\psi}C_{\theta} & S_{\psi}S_{\theta}S_{\phi} + C_{\psi}C_{\phi} & S_{\psi}S_{
 %\end{equation}
 
 The quadcopter is assumed to be symmetrical with equal length arms for each rotor. 
-Aligning the arms along the body's x and y axes gives the diagonal inertia matrix in \eqref{eq:inertia_matrix}. 
+Aligning the arms along the body's $x$ and $y$ axes gives the diagonal inertia matrix in \eqref{eq:inertia_matrix}. 
 Due to symmetry, $I_{xx} = I_{yy}$.
 
 %[put inertial matrix here]
@@ -454,7 +454,7 @@ Note that the forces and torques generated are always proportional to the square
 The set of values making up the square of the rotor angular velocities is referred to as the `rotor space' in the remainder of this thesis.
 
 Combining the forces of all four rotors leads to \eqref{eq:thrust}, where $T$ is the thrust in the direction of the z-axis of the body. 
-Combining the torques of all four rotors leads to \eqref{eq:torque}, where the vector tau represents the torques across each of the principal body axes ($\tau_{\phi}$ for roll, $\tau_{\theta}$ for pitch, and $\tau_{\psi}$ for yaw). 
+Combining the torques of all four rotors leads to \eqref{eq:torque}, where the vector $\tau_{B}$ represents the torques across each of the principal body axes ($\tau_{\phi}$ for roll, $\tau_{\theta}$ for pitch, and $\tau_{\psi}$ for yaw). 
 The distance between the rotor and the center of mass of the quadcopter is denoted by $l$. 
 
 %[put the two equations here]
@@ -649,9 +649,9 @@ In some cases, the overshoot can be so large that the system becomes unstable an
 Thus, the derivative gain is usually used in addition, because it is sensitive to the rate of change of the error, and attempts to bring this rate towards zero. 
 The faster the system is moving towards its target state, the more this gain acts to slow it down, by effectively providing a form of damping and so reducing the amount of overshoot.
 Depending on how this parameter is tuned, and the properties of the system at hand, it can remove overshooting entirely. 
-Due to unmodelled disturbances or changing external inputs, there may be a steady state error in the system, wherein the controller has reached a stable state, yet there is still an error being measured. 
-The integral term is designed to account for this steady state error by keeping a running sum of the error over time. 
-Eventually, this integral error should be large enough that it will drive the system to close the steady state error gap.
+Due to unmodelled disturbances or changing external inputs, there may be a steady-state error in the system, wherein the controller has reached a stable state, yet there is still an error being measured. 
+The integral term is designed to account for this steady-state error by keeping a running sum of the error over time. 
+Eventually, this integral error should be large enough that it will drive the system to close the steady-state error gap.
 
 \section{Adaptive Control} \label{sec:adaptive_control}
 
@@ -731,7 +731,7 @@ This thesis explores the application of this form of control law using basis fun
 %TODO go through and edit this section later for those common grammar things
 
 The Neural Engineering Framework (NEF)\cite{eliasmith2004neural} provides a means of representing arbitrary vectors using the properties of neurons as a basis.
-This is done through a nonlinear encoding mechanism carried out by the tuning curves of the neurons, and a weighted linear decoding of the neurons responses to retrieve an approximation of the vector being encoded.
+This is done through a nonlinear encoding mechanism carried out by the tuning curves of the neurons, and a weighted linear decoding of the responses of the neurons to retrieve an approximation of the vector being encoded.
 A transformation can be applied to the underlying representation by specifying different weights on the linear decoding.
 Any computable function can be approximated through a transform, and the degree of accuracy of the decoding is dependent on the number of neurons used and the complexity of the function.
 %TODO put some simple example here about x and x**2?
@@ -775,7 +775,7 @@ In this thesis, we use the adaptive control methods described above to build a q
 An ensemble of simulated neurons is used as the set of basis functions for the physical model, and the decoders of these neurons are used as the vector of unknown constant parameters. 
 A biologically plausible learning rule known as the Prescribed Error Sensitivity (PES) rule is used to update the decoder values \cite{bekolay2013simultaneous}. 
 
-This learning method works by first creating a connection from an ensemble of spiking neurons representing the state of the system to a node representing the output of the controller. 
+This learning method works by first creating a connection from an ensemble of spiking neurons representing the state of the system to an ensemble or node representing the output of the controller. 
 This is known as the `learned connection' and can be initially set to perform any transformation, but is typically initialized for the output to be random or zero. 
 If the designer has an approximation of what the final learned transformation should look like, they can set this as the initial transformation. 
 Doing so will allow the system to converge to the final transformation more quickly.
@@ -783,12 +783,12 @@ Doing so will allow the system to converge to the final transformation more quic
 The learned connection will be modulated by an error signal, which can come from anywhere in the network. 
 The PES learning rule will attempt to reduce the error signal by changing the value of the decoders on the learned connection. 
 The direction in which the decoder values change is dependent on the sign of the error. 
-The magnitude of the change in decoder values at each time step is dependant on both the magnitude of the error and a learning-rate parameter. 
+The magnitude of the change in decoder values at each time step is dependent on both the magnitude of the error and a learning-rate parameter. 
 The learning rate is a dimensionless parameter that needs to be tuned for the specific application. 
-It is dependant on the simulation time step, the number of neurons in the state ensemble, as well as how responsive the model needs to be to changes. 
+It is dependent on the simulation time step, the number of neurons in the state ensemble, as well as how responsive the model needs to be to changes. 
 %TODO [[check to make sure this is true!!]] 
 A larger learning rate will cause larger reactions to error, effectively making the system trust its current measurements more than historical ones. 
-A smaller timestep means that these changes will occur more frequently, so the net change over time will be greater. 
+A smaller time-step means that these changes will occur more frequently, so the net change over time will be greater. 
 A larger number of neurons means that the changes will be greater, as there will be more decoders changing. The overall transformation is a sum of these decoders. 
 %TODO [[check to make sure this is true!!]].
 %[[talk about differing dimensions in these populations?]]
@@ -976,15 +976,15 @@ For simplicity a constant value of one is used.
 %[maybe put some bit explaining the rationale behind the gains? Stuff like what increasing and decreasing specific gains does (might be better to just have this in the PID control section above)]
 
 The goal of the controller is to actuate the quadcopter in such a way that it travels to a desired position in a reasonable amount of time. 
-This position is specified as a set of x, y, and z coordinates and a particular yaw direction. 
+This position is specified as a set of $x$, $y$, and $z$ coordinates and a particular yaw direction. 
 The controller is given the state error of the quadcopter and its target, as well as the current linear and angular velocities of the quadcopter. 
 It needs to use this information to generate a suitable control signal.
 
-The adaptive controller here consists of two parts. The first is a standard PD controller that generates a four-dimensional output signal in the space of possible quadcopter motions. 
+The adaptive controller here consists of two parts. The first is a standard PD controller that generates a four-dimensional output signal in the space of possible quadcopter motions (task space). 
 The gain matrix that performs this operation can be seen in \eqref{eq:gain_matrix}. 
-This signal multiplied by the matrix in \eqref{eq:rotor_transform}, to transform it into the four dimensional rotor velocity space to provide the actuation associated with the desired movement commands.
-The design of this matrix depends upon the orientation of the rotor blades to the x and y axes. 
-This transformation matrix assumes that the rotor axes are offset from the x-y axes by 45 degrees as the V-REP model used here.
+This signal is then multiplied by the matrix in \eqref{eq:rotor_transform} to transform it into the four dimensional rotor velocity space, providing the actuation associated with the desired movement commands.
+The design of this matrix depends upon the orientation of the rotor blades to the $x$ and $y$ axes. 
+This transformation matrix assumes that the rotor axes are offset from the $x$ and $y$ axes by 45 degrees as the V-REP model used here.
 
 \begin{equation} \label{eq:gain_matrix}
 K =
@@ -1033,7 +1033,7 @@ z \\
 \end{equation}
 %TODO make this equation look prettier on paper. There also might need to be tildes and things on the variables to show that they are state error.
 
-Translation in the x and y directions is dependent on the states of both x and y as well as roll and pitch, because a roll in the quadcopter causes a component of thrust to be applied in the y direction, and a pitch causes a component of thrust to be applied in the x direction.
+Translation in the $x$ and $y$ directions is dependent on the states of both $x$ and $y$ as well as roll and pitch, because a roll in the quadcopter causes a component of thrust to be applied in the $y$ direction, and a pitch causes a component of thrust to be applied in the $x$ direction.
 A delicate balance needs to be found between each of the gains in order to create a stable, functioning controller. 
 The setpoint for each of the velocities as well as for roll and pitch is zero.
 
@@ -1044,9 +1044,9 @@ The state error is measured relative to the body frame because most sensors on a
 
 %[talk about building the model in Nengo]
 Here the controller is implemented with a Nengo network, in which a 12-dimensional ensemble representing the state error can be projected to a 4-dimensional ensemble representing the desired control command. 
-The transformation done through this projection will be by the 12x4 PD gain matrix of the controller. 
+The transformation done through this projection will be by the 12x4 PD gain matrix of the controller \eqref{eq:gain_matrix}. 
 This 4-dimensional ensemble is then projected to another 4-dimensional ensemble which represents the four desired angular velocities of the quadcopter's rotors. 
-This projection is done through a transformation by the 4x4 rotor matrix. 
+This projection is done through a transformation by the 4x4 rotor matrix \eqref{eq:rotor_transform}. 
 This rotor velocity ensemble is connected to a node representing the physical quadcopter, which in turn feeds back into the state error ensemble. 
 The network diagram is shown in \autoref{fig:NetBasic}. 
 The network can be simplified further by multiplying the gain matrix with the rotor matrix to give a single transformation matrix from state error to rotor velocity. 
@@ -1061,7 +1061,7 @@ The larger network is used in the remainder of this thesis because it is more ex
 \caption{Basic Quadcopter Controller Network}
 \label{fig:NetBasic}
 \captionsetup{singlelinecheck=off,font=footnotesize}
-\caption*{Light gray rounded rectangles represent ensembles running in direct mode, dark grey rectangles represent transformations applied to connections, and the blue rounded rectangle represents a node that interacts with the V-REP simulator. }
+\caption*{Light gray rounded rectangles represent ensembles running in direct mode, dark grey rectangles represent transformations applied to connections, and the blue rounded rectangle represents a node that interacts with the V-REP simulator.}
 \end{figure}
 
 \begin{figure}
@@ -1080,7 +1080,8 @@ The larger network is used in the remainder of this thesis because it is more ex
 The first version of the controller uses an adaptive ensemble to influence the task space command. 
 A projection from the adaptive ensemble to the task ensemble is modulated by the state error undergoing the control transform. 
 The PES learning rule is applied to this connection, which seeks to build a transformation that minimizes the error coming in from this modulatory connection. 
-The effect is similar to that of the I term in a PID controller, except that it uses all state information to come up with the integral gain, and can perform nonlinear transforms to accomplish this. Without this adaptive component, the quadcopter will have a large steady state error in the z direction, and will fall to the ground as soon as the simulation starts.
+The effect is similar to that of the I term in a PID controller, except that it uses all state information to come up with the integral gain, and can perform nonlinear transforms to accomplish this. 
+Without this adaptive component, the quadcopter will have a large steady state error in the $z$ direction, and will fall to the ground as soon as the simulation starts.
 
 The adaptive ensemble is the only component of the network that takes advantage of a neural representation, so that ensemble is constructed using spiking LIF neurons. The other ensembles are run in direct mode and store their exact mathematical values.
 The network diagram is shown in \autoref{fig:NetControlTransform}.
@@ -1104,7 +1105,7 @@ The quadcopter will settle to a stable point in space with a constant offset fro
 This behaviour results from how the error is specified:
 since both position and angle gains are being combined into the same dimension to produce the task space error, multiple pairs of measurements will produce the same error. 
 That is, the adaptive ensemble is being given an effective error reading of zero even though the quadcopter is not at the desired position. 
-For example, if wind is producing a force in the x-direction, in order for the quadcopter to remain stationary, it must have a pitch angle that allows its thrust to compensate for both the gravitational force and the translational force.
+For example, if wind is producing a force in the $x$ direction, in order for the quadcopter to remain stationary, it must have a pitch angle that allows its thrust to compensate for both the gravitational force and the translational force.
 
 \begin{figure}
 \centering
@@ -1125,8 +1126,8 @@ For example, if wind is producing a force in the x-direction, in order for the q
 %[[show FBD of quadcopter with pitch angle and forces balancing]]
 
 Since the quadcopter has a non-zero pitch, the control signal produced by this pitch multiplied by its gain will be non-zero. 
-In order to have zero error, the product of the x-position error and its gain must match this value. 
-The quadcopter will consequently move away from the target x-position in order to maintain zero control error, an undesirable side-effect of this controller design. 
+In order to have zero error, the product of the $x$ position error and its gain must match this value. 
+The quadcopter will consequently move away from the target $x$ position in order to maintain zero control error, an undesirable side-effect of this controller design. 
 In fact, there is a whole space of angle-position measurement pairs that produce zero error.
 A visualization of this space is depicted in \autoref{fig:ZeroErrorSurface}. 
 The reason this controller works so well under normal operation despite this flaw is that only one point in that space is ever stable at any particular time. 
@@ -1151,7 +1152,7 @@ The slope of this surface is the ratio of the linear and angular P gains of the 
 
 
 One way to overcome the above problem is to modify the error signal that the adaptive ensemble uses. 
-The only important state variables that need to match the target are the x, y, z position and yaw angle. 
+The only important state variables that need to match the target are the $x$, $y$, $z$ position and yaw angle. 
 The state velocities should all be zero as well. 
 Since roll and pitch are not supposed to be controlled, they should really be left out of the error that the adaptive ensemble uses since they do not correspond to an actual error in the desired state. 
 This information is still important in allowing the quadcopter to fly properly, as the controller needs to know roll and pitch information for stable flight. If this information is removed from the controller entirely, it cannot fly.
@@ -1204,9 +1205,9 @@ Since each set of gains to evaluate requires a controller model to be generated 
 In order to use Hyperopt, the controller model must be encapsulated in a function that returns a useful metric of how well the controller works.
 This was done by creating a set of target points for the quadcopter to move through over a period of time and an additional ensemble computing a scalar measure of the error of the quadcopter from the target. 
 This error metric was taken to be a weighted Euclidean norm of each of the dimensions of the state.
-States that were deemed more important (such as the x, y, and z position) were given higher weights in this calculation.
+States that were deemed more important (such as the $x$, $y$, and $z$ position) were given higher weights in this calculation.
 States that were less important (such as roll and pitch) were given lower weights. 
-Paired with this error was a status signal of whether the quadcopter should be at the target at a given time or en route.
+Paired with this error was a status signal of whether the quadcopter should be at the target at a given time or en-route.
 As the quadcopter cannot be expected to move instantaneously between targets, it should not be penalized for having an error when it has just been told to move to a different location. 
 This status signal is set to 0 right after a new target is introduced, and then set to 1 again about the time when the quadcopter is expected to have reached the new target. The error at each time step is multiplied by this status signal before being recorded. 
 The delay in switching back on the status signal can be used to indicate how important it is for the quadcopter to reach the target quickly. 
@@ -1385,23 +1386,23 @@ This allocentric information is not passed on through the control transform.
 
 Each of these controllers is implemented as a Nengo model in Python. 
 The main communication channel between V-REP and Nengo is the Quadcopter Node. 
-This Node contains a callable Python class that manages the communication between the two systems at every time step and, from the Nengo network's point of view, represents the entirety of the physics simulation. 
-Connections can be made to and from this node just like any other Node in a Nengo network. 
-A connection to the V-REP remote API server is established when this Node is created. 
+This node contains a callable Python class that manages the communication between the two systems at every time step and, from the Nengo network's point of view, represents the entirety of the physics simulation. 
+Connections can be made to and from this node just like any other node in a Nengo network. 
+A connection to the V-REP remote API server is established when this node is created. 
 This node outputs the 6 dimensional state of the quadcopter, the 6 dimensional derivative of the state of the quadcopter, as well as the 6 dimensional state of the target. 
 These values are obtained by making a remote API call to read these values from the current state of the simulation. The input to the Quadcopter Node is a 4 dimensional signal representing the velocity commands to give to each of the four rotors. 
 These commands are packed into a string signal and sent to the V-REP simulation. 
 A Lua script is run within V-REP each time step, and this script unpacks these velocity commands. 
-It then issues them to the physical quadcopter model. The physics engine calculates the appropriate forces and torques that will be applied to the quadcopter as well as the resulting changes in state (position, velocity, orientation, and angular velocity) after one time step. 
-This new state will now be read by the Nengo script in its next time step.
+It then issues them to the physical quadcopter model. The physics engine calculates the appropriate forces and torques that will be applied to the quadcopter as well as the resulting changes in state (position, velocity, orientation, and angular velocity) after one time-step. 
+This new state will now be read by the Nengo script in its next time-step.
 
-Nengo is run with a time step of 1ms, as this is the standard time step for most models and is sufficient for modelling spike timing effects in ensembles of LIF neurons while still running at a reasonable speed on most computer processors. 
-The V-REP simulation on the other hand is run at a 10ms time step. 
+Nengo is run with a time-step of 1ms, as this is the standard time-step for most models and is sufficient for modelling spike timing effects in ensembles of LIF neurons while still running at a reasonable speed on most computer processors. 
+The V-REP simulation on the other hand is run at a 10ms time-step. 
 Ideally it would also be run at 1ms, but the simulator has trouble rendering and making calculations that quickly. 
-To account for this, Nengo only communicates with V-REP every 10 of its time steps. 
-A synchronization trigger command is also issued every 10 time steps from Nengo. 
-The V-REP simulation can move forward only after a trigger is issued, and only by one time step. 
-Nengo pauses simulation until V-REP has completed this time step. 
+To account for this, Nengo only communicates with V-REP every 10 of its time-steps. 
+A synchronization trigger command is also issued every 10 time-steps from Nengo. 
+The V-REP simulation can move forward only after a trigger is issued, and only by one time-step. 
+Nengo pauses simulation until V-REP has completed this time-step. 
 This sequence ensures that the timing of each simulation is always synchronized. 
 Some processing overhead is incurred in ensuring the synchronization of these two systems, but the improved accuracy of the overall simulation justifies this expense. 
 
@@ -1425,7 +1426,7 @@ The controllers used in the benchmarking are listed in \autoref{table:controller
 
 %[[show the math behind each of the controllers, mention the gravity compensation term used to account for the mass of the quadcopter, and how it is not needed in the adaptive models or PIDt. Have block diagrams or nengo diagrams of each]]
 
-For each reference implementation, a gravity compensation term had to be calculated and applied to the controllers in order to obtain reasonable performance. 
+For each non-adaptive reference implementation, a gravity compensation term had to be calculated and applied to the controllers in order to obtain reasonable performance. 
 The magnitude of this term was determined empirically and is proportional to the mass of the quadcopter. 
 The rotor velocity signal is the sum of the gravity compensation term and the output of the controller.
 The adaptive controllers do not need this extra term as they are able to learn how to compensate for the effects of gravity very quickly.
@@ -1458,8 +1459,8 @@ Neural Adaptive TMCA & The same as above, but absolute position and orientation 
 Three metrics are used to evaluate performance on these tasks. 
 The first is the Root Mean Squared (RMS) error of the difference between the quadcopter's current state and its target state.
 The quadcopter's state consists of position, velocity, orientation, and angular velocity.
-These state variables are combined by computing the length of the resulting 12 dimensional error vector to produce a single quantity.
-This value is calculated at each time step for the duration of the run and then averaged by the number of time steps in the run.
+These state variables are combined by computing the length of the resulting 12-dimensional error vector to produce a single quantity.
+This value is calculated at each time-step for the duration of the run and then averaged by the number of time-steps in the run.
 For point to point control this error is sometimes not the most informative because as soon as the target point has changed a large error value will be recorded even if the quadcopter is moving optimally towards its target.
 
 The second metric is a modified version of the RMS error designed to take the desired trajectory into account.
@@ -1503,9 +1504,9 @@ The legend for all of the bar plots in the remainder of this thesis is shown in 
 \hline
 \textbf{Task} & \textbf{Description} \\ \hline
 Vertical & Fly upwards (between one and five meters) \\ \hline
-Horizontal & Fly in the x direction (between one and five meters) \\ \hline
+Horizontal & Fly in the $x$ direction (between one and five meters) \\ \hline
 Rotation & Rotate about the yaw axis (between 45 and 135 degrees) \\ \hline
-Wind & Fly in the y direction (between one and five meters). Enter a wind tunnel after 0.75 meters. This wind tunnel exerts a force of 0.6 N in the x direction \\ \hline
+Wind & Fly in the $y$ direction (between one and five meters). Enter a wind tunnel after 0.75 meters. This wind tunnel exerts a force of 0.6 N in the $x$ direction \\ \hline
 
 \end{tabular}
 \end{center}
@@ -1559,7 +1560,7 @@ Wind & Fly in the y direction (between one and five meters). Enter a wind tunnel
 
 %TODO EDIT1 Some concluding sentences/observations to go here. there's a bit in the next section that could be brought here and expanded upon.
 
-Overall the performance of all of the controllers tested are quite similar on the horizontal, vertical, and rotational tasks.
+Overall, the performance of all of the controllers tested are quite similar on the horizontal, vertical, and rotational tasks.
 On the task that involves movement in the presence of wind, the iterations of the neural-adaptive controller fare very well.
 The PID controller with a fast integral gain also does well on this task, so it is not clear from these tests if an adaptive controller has an advantage over a well tuned PID controller.
 
@@ -1583,8 +1584,8 @@ These tasks are listed in \autoref{table:forcingfunctions} below. %maybe just re
 None & No external forces applied \\ \hline
 Constant & A constant horizontal force is applied in a direction perpendicular to the quadcopter's desired trajectory\\ \hline
 Vertical Velocity & A downward force is applied proportional to the quadcopter's horizontal velocity \\ \hline
-Horizontal Position & A force is applied in the y-direction proportional to the quadcopter's x-position \\ \hline
-Horizontal Velocity & A force is applied in the y-direction proportional to the quadcopter's x-velocity \\ \hline
+Horizontal Position & A force is applied in the $y$ direction proportional to the quadcopter's $x$ position \\ \hline
+Horizontal Velocity & A force is applied in the $y$ direction proportional to the quadcopter's $x$ velocity \\ \hline
 \end{tabular}
 \end{center}
 \end{table}
@@ -1623,7 +1624,7 @@ The previous experiments only track performance for a single short run.
 The Neural Adaptive Controller is able to learn how to move throughout its environment better over time.
 An example of this ability is shown in \autoref{fig:loop_path}.
 The quadcopter is commanded to move back and forth between two points on the x-y plane ([0,0] and [3,0]) with a 5 second delay between each new command.
-An external force is being applied to the quadcopter along the y-direction proportional to its x-direction velocity.
+An external force is being applied to the quadcopter along the $y$ direction proportional to its $x$ direction velocity.
 This causes the path of the quadcopter to become curved rather than a straight line.
 Over time, the Neural Adaptive Controller begins to compensate for this external force, and the path between the two points starts to converge towards a straight line.
 The non-adaptive controllers show no such improvement over time.
@@ -1728,7 +1729,7 @@ PIDtf & 6.17 & 0.38 & 8.42 & 0.27 \\ \hline
 \end{tabular}
 \begin{tablenotes}
 \footnotesize
-\item The \textit{Direct} method computes the mean across all tasks by using the mean for each task directly. The \textit{Normalized} method first normalizes the mean for each task by dividing it by the maximum mean in that task and then uses the mean of that result.
+\item The \textit{Direct} method computes the mean across all tasks by using the mean for each task directly. The \textit{Normalized} method first normalizes the mean for each task by dividing it by the maximum mean in that task and then uses the mean of that result. The best result for each method is bolded.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}

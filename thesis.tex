@@ -1423,7 +1423,7 @@ To get a sense of how well the neural adaptive controller performs, some referen
 Five different non-neural controllers were used: a standard PD controller, a standard PID controller, an improved PID controller, an improved PID controller with a faster integral gain, and an adaptive controller. 
 %TODO [fix this sentence up, or just put them all in a table with a description].
 % doublecheck that these are the ones you actually want to use, maybe narrow it down to only recording data for a few of them
-Several iterations of the neural adaptive controller are used in the benchmarking: the basic neural-adaptive controller, the angle corrective controller, the target modulated controller (TMC), and the target modulated controller with allocentric information (TMCA). %[just stick these in a table with descriptions as well] %TODO fix and re-work this sentence
+Several iterations of the neural adaptive controller are used in the benchmarking: the basic neural adaptive controller, the angle corrective controller, the target modulated controller (TMC), and the target modulated controller with allocentric information (TMCA). %[just stick these in a table with descriptions as well] %TODO fix and re-work this sentence
 The controllers used in the benchmarking are listed in \autoref{table:controller_models}
 
 %[[show the math behind each of the controllers, mention the gravity compensation term used to account for the mass of the quadcopter, and how it is not needed in the adaptive models or PIDt. Have block diagrams or nengo diagrams of each]]
@@ -1485,7 +1485,7 @@ The time-to-target trials were also run for a total of 30 seconds and a value of
 
 A series of simple point-to-point control tasks were used to give an indication of performance:  movement in the vertical direction, movement in the horizontal direction, rotation about the yaw axis, and horizontal movement into a wind tunnel. %, and a movement that requires a change in x, y, and z position as well as yaw angle. 
 These tasks are summarized in \autoref{table:tasks} below.
-Each task with translational motion was completed across five different target distances (every meter from 1m to 5m) and the task with rotational motion was completed across four different target angles (every 45 degrees from 45{\degree} to 180{\degree}).
+Each task with translational motion was completed across four different target distances (every meter from 1m to 4m) and the task with rotational motion was completed across three different target angles (every 45 degrees from 45{\degree} to 135{\degree}).
 Experimental results (mean and standard error) obtained from the reference controllers and the neural adaptive controllers are shown for each of these tasks in \Cref{fig:bar_horizontal,fig:bar_vertical,fig:bar_rotational,fig:bar_wind}.
 %TODO find a way to colour the table with the description instead
 The legend for all of the bar plots in the remainder of this thesis is shown in \autoref{fig:bar_legend}.
@@ -1567,12 +1567,12 @@ Four of the controllers tested were not able to reach the target within the 30 s
 %TODO EDIT1 Some concluding sentences/observations to go here. there's a bit in the next section that could be brought here and expanded upon.
 
 Overall, the performance of all of the controllers tested are quite similar on the horizontal, vertical, and rotational tasks.
-On the task that involves movement in the presence of wind, the iterations of the neural-adaptive controller fare very well.
+On the task that involves movement in the presence of wind, the iterations of the neural adaptive controller fare very well.
 The PID controller with a fast integral gain also does well on this task, so it is not clear from these tests if an adaptive controller has an advantage over a well tuned PID controller.
 
-The performance of the adaptive controller is quite strong, but its performance is still relatively close to that of the modified PID controllers. 
-Where the adaptive controller really excels is when there are external forces being applied that are functions of the system state. 
-The adaptive controller is designed to be able to account for both linear and nonlinear functions of the system state.
+The performance of the neural adaptive controller is quite strong, but its performance is still relatively close to that of the modified PID controllers. 
+Where the neural adaptive controller really excels is when there are external forces being applied that are functions of the system state. 
+The neural adaptive controller is designed to be able to account for both linear and nonlinear functions of the system state.
 
 % TODO: figure out a good name for this section
 \subsection{Benchmarks for Complex Environments}
@@ -1596,10 +1596,10 @@ Horizontal Velocity & A force is applied in the $y$ direction proportional to th
 \end{center}
 \end{table}
 
-Performance of the Neural Adaptive controllers is compared to the reference controllers on these tasks.
+Performance of the neural adaptive controllers is compared to the reference controllers on these tasks.
 The results are displayed in \autoref{fig:benchmark_complex}.
 The tasks that involved external forces in the horizontal direction tended to be the most difficult for the controllers tested here, likely due to the fact that these forces are more complicated to correct for.
-In these cases the final iteration of the neural-adaptive controller (TMCA) obtained the lowest RMS error.
+In these cases the final iteration of the neural adaptive controller (TMCA) obtained a relatively low RMS error and was the fastest to reach the target in most trials.
 In the horizontal velocity case this controller was not the fastest to reach its target, but this can be attributed to the fact that once the target is close and the quadcopter velocity is low, there will be little external force (as it is a function of velocity) in this case. 
 A controller that does not adapt at all or adapts slowly will be able to reach steady state more quickly, explaining why the PD controller reached the target the fastest.
 The non-neural adaptive controller also did well here, which could be caused by a low learning rate.
@@ -1629,12 +1629,12 @@ Performance on the task that involved a vertical force was almost the same as if
 \subsection{Improvement over Time} %TODO better title for this section
 
 The previous experiments only track performance for a single short run. 
-The Neural Adaptive Controller is able to learn how to move throughout its environment better over time.
+The neural adaptive controllers are able to learn how to move throughout their environment better over time.
 An example of this ability is shown in \autoref{fig:loop_path}.
 The quadcopter is commanded to move back and forth between two points on the x-y plane ([0,0] and [3,0]) with a 5 second delay between each new command.
 An external force is being applied to the quadcopter along the $y$ direction proportional to its $x$ direction velocity.
 This causes the path of the quadcopter to become curved rather than a straight line.
-Over time, the Neural Adaptive Controller begins to compensate for this external force, and the path between the two points starts to converge towards a straight line.
+Over time, the neural adaptive TMCA controller begins to compensate for this external force, and the path between the two points starts to converge towards a straight line.
 The non-adaptive controllers show no such improvement over time.
 
 %TODO include numeric RMS values to accompany the plots
@@ -1647,7 +1647,7 @@ The non-adaptive controllers show no such improvement over time.
 \label{fig:loop_path}
 \captionsetup{singlelinecheck=off,font=footnotesize}
 \caption*{
-RMS values for the Neural Adaptive, PD, and PIDtf controllers are 0.6729, 1.2827, and 1.7662 respectively. These values were calculated using the deviation from the line formed by the two target points as the error.}
+RMS values for the Neural Adaptive TMCA, PD, and PIDtf controllers are 0.6729, 1.2827, and 1.7662 respectively. These values were calculated using the deviation from the line formed by the two target points as the error.}
 \end{figure}
 
 
@@ -1696,7 +1696,7 @@ RMS values for the Neural Adaptive, PD, and PIDtf controllers are 0.6729, 1.2827
 Several ranking methods are presented in order to determine which controller had the best overall performance.
 The first assigns a numerical ranking to each controller for each metric (RMS error and time-to-target) on each of the seven tasks and computes the sum of those rankings.
 A rank of 1 is given to the controller with the best performance, a rank of 2 to the second best, a rank of 3 to the third best, and a rank of 4 to all others.
-As can be seen in \autoref{fig:task_ranking}, the neural-adaptive TMCA controller obtains the best overall rank.
+As can be seen in \autoref{fig:task_ranking}, the neural adaptive TMCA controller obtains the best overall rank.
 
 \begin{figure}
 \centering
@@ -1713,7 +1713,7 @@ One approach to overcoming this issue is to compute the mean across all tasks an
 Directly using the mean is sometimes not informative, as the results of each task can be on very different scales.
 By normalizing the data before taking the mean, the different scales become less of an issue.
 These results are shown in \autoref{table:mean_task_ranking}.
-The neural-adaptive TMCA controller performs the best in all categories except for the normalized RMS error, in which it comes in second to the neural-adaptive TMC controller.
+The neural adaptive TMCA controller performs the best in all categories except for the normalized RMS error, in which it is tied with the neural adaptive TMC controller.
 
 \begin{table}
 \begin{threeparttable}
@@ -1733,7 +1733,7 @@ The neural-adaptive TMCA controller performs the best in all categories except f
 %PIDtf & 6.17 & 0.38 & 8.42 & 0.27 \\ \hline
 Basic Neural Adaptive & 6.77 & 0.29 & 0.54 & 0.12 \\ \hline
 Neural Adaptive Angle Correction & 5.88 & 0.27 & 0.69 & 0.26 \\ \hline
-Neural Adaptive TMC & 4.36 & 0.21 & 0.13 & 0.08 \\ \hline
+Neural Adaptive TMC & 4.36 & 0.21 & 0.13 & \textbf{0.08} \\ \hline
 Neural Adaptive TMCA & \textbf{4.11} & \textbf{0.20} & \textbf{0.10} & \textbf{0.08} \\ \hline
 Non-Neural Adaptive & 7.20 & 0.32 & 2.64 & 0.21 \\ \hline
 PD & 6.78 & 0.29 & 1.73 & 0.21 \\ \hline
@@ -1778,7 +1778,7 @@ These tools include a standard method for opening and closing the communication 
 %TODO possibly move this section to the previous chapter and combine with results
 \section{Discussion}
 
-While the majority of this work was conducted in an ideal environment with no sensor noise, the neural-adaptive controller can still function with noisy measurements.
+While the majority of this work was conducted in an ideal environment with no sensor noise, the neural adaptive controller can still function with noisy measurements.
 A few experiments were performed with Gaussian noise injected into the sensor measurements and the results compared to the reference PID and PIDtf controllers are shown in \autoref{fig:noise_comparison}.
 As expected, all of the controllers perform worse as the amount of noise in the system is increased.
 Each controller degrades at about the same rate with respect to the increase in noise, with the adaptive controller being affected slightly more than the others.
@@ -1799,7 +1799,7 @@ Noise level indicates the variance on the Gaussian noise applied to the state me
 Another common goal of a control system is path following.
 This is where instead of the robot being instructed to move to a particular point, it is told to follow a particular path.
 A series of position/velocity pairs can be sequentially given as set-points rather than a single position set-point.
-The neural-adaptive controller was designed for point-to-point control, but it can also be given a path to follow.
+The neural adaptive controller was designed for point-to-point control, but it can also be given a path to follow.
 A top-view screenshot from V-REP of a simple example demonstrating this capability is shown in \autoref{fig:circular_path_ff6}.
 Here the quadcopter is commanded to continuously fly along a circular path while being subjected to an external force along the y-axis (up/down) proportional to its velocity along the x-axis (left/right).
 In the beginning, the quadcopter's trajectory is very elliptical due to this external force, but as it continues to fly the adaptive component of the controller learns to compensate for this force, eventually producing very circular trajectories.

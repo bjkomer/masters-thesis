@@ -46,4 +46,4 @@ A list of available commands you can use from Python can be found [here](http://
 
 ### Scene Files for the Quadcopter
 
-This is the quadcopter_experiments_simple.ttt file, located in the code folder.
+This is the quadcopter_experiments_simple.ttt file, attached to the release.

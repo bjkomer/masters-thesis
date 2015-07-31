@@ -1505,10 +1505,10 @@ The legend for all of the bar plots in the remainder of this thesis is shown in 
 
 \hline
 \textbf{Task} & \textbf{Description} \\ \hline
-Vertical & Fly upwards (between one and five meters) \\ \hline
-Horizontal & Fly in the $x$ direction (between one and five meters) \\ \hline
+Vertical & Fly upwards (between one and four meters) \\ \hline
+Horizontal & Fly in the $x$ direction (between one and four meters) \\ \hline
 Rotation & Rotate about the yaw axis (between 45 and 135 degrees) \\ \hline
-Wind & Fly in the $y$ direction (between one and five meters). Enter a wind tunnel after 0.75 meters. This wind tunnel exerts a force of 0.6 N in the $x$ direction \\ \hline
+Wind & Fly in the $y$ direction (between one and four meters). Enter a wind tunnel after 0.75 meters. This wind tunnel exerts a force of 0.6 N in the $x$ direction \\ \hline
 
 \end{tabular}
 \end{center}
@@ -1522,8 +1522,8 @@ Wind & Fly in the $y$ direction (between one and five meters). Enter a wind tunn
 
 \begin{figure}
 \centering
-\includegraphics[width=0.45\textwidth]{./figures/BarHorizontalPRMS.png}
-\includegraphics[width=0.45\textwidth]{./figures/BarHorizontalTime.png}
+\includegraphics[width=0.45\textwidth]{./figures/BarHorizontalPRMS30.png}
+\includegraphics[width=0.45\textwidth]{./figures/BarHorizontalTime30.png}
 \caption{Performance on Horizontal Movement Tasks}\label{fig:bar_horizontal}
 \captionsetup{singlelinecheck=off,font=footnotesize}
 \caption*{}
@@ -1531,17 +1531,19 @@ Wind & Fly in the $y$ direction (between one and five meters). Enter a wind tunn
 
 \begin{figure}
 \centering
-\includegraphics[width=0.45\textwidth]{./figures/BarVerticalPRMS.png}
-\includegraphics[width=0.45\textwidth]{./figures/BarVerticalTime.png}
+\includegraphics[width=0.45\textwidth]{./figures/BarVerticalPRMS30.png}
+\includegraphics[width=0.45\textwidth]{./figures/BarVerticalTime30.png}
 \caption{Performance on Vertical Movement Tasks}\label{fig:bar_vertical}
 \captionsetup{singlelinecheck=off,font=footnotesize}
-\caption*{}
+\caption*{
+The PID controller fared quite poorly on this task because it would overshoot the target on every trial. The trajectory RMS error is truncated in the plot to allow the performance of the other controllers to be easily seen.
+}
 \end{figure}
 
 \begin{figure}
 \centering
-\includegraphics[width=0.45\textwidth]{./figures/BarRotationalPRMS.png}
-\includegraphics[width=0.45\textwidth]{./figures/BarRotationalTime.png}
+\includegraphics[width=0.45\textwidth]{./figures/BarRotationalPRMS30.png}
+\includegraphics[width=0.45\textwidth]{./figures/BarRotationalTime30.png}
 \caption{Performance on Rotational Movement Tasks}\label{fig:bar_rotational}
 \captionsetup{singlelinecheck=off,font=footnotesize}
 \caption*{}
@@ -1549,11 +1551,13 @@ Wind & Fly in the $y$ direction (between one and five meters). Enter a wind tunn
 
 \begin{figure}
 \centering
-\includegraphics[width=0.45\textwidth]{./figures/BarWindPRMS.png}
-\includegraphics[width=0.45\textwidth]{./figures/BarWindTime.png}
+\includegraphics[width=0.45\textwidth]{./figures/BarWindPRMS30.png}
+\includegraphics[width=0.45\textwidth]{./figures/BarWindTime30.png}
 \caption{Performance on Horizontal Movement Through Wind Tasks}\label{fig:bar_wind}
 \captionsetup{singlelinecheck=off,font=footnotesize}
-\caption*{}
+\caption*{
+Four of the controllers tested were not able to reach the target within the 30 second time limit. A value of 30 seconds is reported in these cases. This was due to these controllers being unable to compensate for the steady-state error in the horizontal direction caused by the wind.
+}
 \end{figure}
 
 %[put some stuff in here with noise as well?]
@@ -1604,13 +1608,15 @@ Performance on the task that involved a vertical force was almost the same as if
 \begin{figure}
 \centering
 %TODO change the ordering of tasks on the figures
-\includegraphics[width=1\textwidth]{./figures/BarForcesPRMS_legend_complete.png}
-\includegraphics[width=1\textwidth]{./figures/BarForcesTime_legend_complete.png}
+\includegraphics[width=1\textwidth]{./figures/BarForcesPRMS30.png}
+\includegraphics[width=1\textwidth]{./figures/BarForcesTime30.png}
 
 \caption{Performance on Benchmarks under different External Force Conditions}
 \label{fig:benchmark_complex}
 \captionsetup{singlelinecheck=off,font=footnotesize}
-\caption*{}
+\caption*{
+
+}
 \end{figure}
 
 %Fill the rest of this subsection with the results of running models in these environments
@@ -1694,7 +1700,7 @@ As can be seen in \autoref{fig:task_ranking}, the neural-adaptive TMCA controlle
 
 \begin{figure}
 \centering
-\includegraphics[height=0.30\textheight]{./figures/task_ranking.png}
+\includegraphics[height=0.30\textheight]{./figures/task_ranking30.png}
 
 \caption{Controller Performance Ranking}
 \label{fig:task_ranking}
@@ -1713,25 +1719,31 @@ The neural-adaptive TMCA controller performs the best in all categories except f
 \begin{threeparttable}
 \caption{Mean Controller Performance} \label{table:mean_task_ranking}
 \begin{tabular}{| l | l | l | l | l |}
-%\toprule
 \hline
 \textbf{Controller Name} & \multicolumn{2}{l|}{\textbf{Time-to-Target}} & \multicolumn{2}{l|}{\textbf{Trajectory RMS}} \\ \cline{2-5}
 & \textbf{Direct} & \textbf{Normalized} & \textbf{Direct} & \textbf{Normalized} \\ \hline
-%\midrule
-Basic Neural Adaptive & 6.58 & 0.41 & 7.19 & 0.25 \\ \hline
-Neural Adaptive Angle Correction & 6.84 & 0.43 & 9.03 & 0.31 \\ \hline
-Neural Adaptive TMC & 6.13 & 0.38 & 3.87 & \textbf{0.20} \\ \hline
-Neural Adaptive TMCA & \textbf{5.96} & \textbf{0.37} & \textbf{3.34} & 0.21 \\ \hline
-Non-Neural Adaptive & 6.73 & 0.42 & 10.45 & 0.30 \\ \hline
-PD & 6.07 & 0.38 & 9.15 & 0.29 \\ \hline
-PID & 7.67 & 0.48 & 9.77 & 0.36 \\ \hline
-PIDt & 6.70 & 0.41 & 7.72 & 0.26 \\ \hline
-PIDtf & 6.17 & 0.38 & 8.42 & 0.27 \\ \hline
-%\bottomrule
+%Basic Neural Adaptive & 6.58 & 0.41 & 7.19 & 0.25 \\ \hline
+%Neural Adaptive Angle Correction & 6.84 & 0.43 & 9.03 & 0.31 \\ \hline
+%Neural Adaptive TMC & 6.13 & 0.38 & 3.87 & \textbf{0.20} \\ \hline
+%Neural Adaptive TMCA & \textbf{5.96} & \textbf{0.37} & \textbf{3.34} & 0.21 \\ \hline
+%Non-Neural Adaptive & 6.73 & 0.42 & 10.45 & 0.30 \\ \hline
+%PD & 6.07 & 0.38 & 9.15 & 0.29 \\ \hline
+%PID & 7.67 & 0.48 & 9.77 & 0.36 \\ \hline
+%PIDt & 6.70 & 0.41 & 7.72 & 0.26 \\ \hline
+%PIDtf & 6.17 & 0.38 & 8.42 & 0.27 \\ \hline
+Basic Neural Adaptive & 6.77 & 0.29 & 0.54 & 0.12 \\ \hline
+Neural Adaptive Angle Correction & 5.88 & 0.27 & 0.69 & 0.26 \\ \hline
+Neural Adaptive TMC & 4.36 & 0.21 & 0.13 & 0.08 \\ \hline
+Neural Adaptive TMCA & \textbf{4.11} & \textbf{0.20} & \textbf{0.10} & \textbf{0.08} \\ \hline
+Non-Neural Adaptive & 7.20 & 0.32 & 2.64 & 0.21 \\ \hline
+PD & 6.78 & 0.29 & 1.73 & 0.21 \\ \hline
+PID & 10.85 & 0.47 & 1.61 & 0.29 \\ \hline
+PIDt & 6.51 & 0.28 & 0.51 & 0.12 \\ \hline
+PIDtf & 4.32 & 0.21 & 0.38 & 0.16 \\ \hline
 \end{tabular}
 \begin{tablenotes}
 \footnotesize
-\item The \textit{Direct} method computes the mean across all tasks by using the mean for each task directly. The \textit{Normalized} method first normalizes the mean for each task by dividing it by the maximum mean in that task and then uses the mean of that result. The best result for each method is bolded.
+\item The \textit{Direct} method computes the mean across all tasks by using the mean for each task directly. The \textit{Normalized} method first normalizes the mean for each task by dividing it by the maximum mean in that task and then uses the mean of that result. Displayed values are rounded to two decimal places. The best result for each method is bolded.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}

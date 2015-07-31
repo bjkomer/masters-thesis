@@ -245,13 +245,9 @@ Humans have an exceptional ability to be able to adapt to their surroundings.
 In particular the human motor control system is able to compensate for changes in forces, torques, and inertial effects on the body.
 For example, when picking up an object such as a hammer, the weight of the hammer will apply external forces to the hand.
 This will change the dynamic properties of the hand and arm movements, yet the human motor control system is able to easily compensate for these changes and accurately control movement with the object.
-%Skilfully manipulating an object requires
-Even if an object has never been encountered before, the human brain is able to calculate the correct changes in timing and muscle tensions in order to skilfully manipulate the object. %For example, humans are able to use hammers with a variety of styles and weights
-%When picking up a new object, there are a many unknown forces, torques, and inertial effects that this object will apply to the arm. 
-%Despite all of these unknowns, humans are very good at manipulating objects and the necessary changes in timing and muscle tensions to do so are calculated with ease, even if the object has never been encountered before. 
-%TODO EDIT1 more subtle claim here
+Even if an object has never been encountered before, the human brain is able to calculate the correct changes in timing and muscle tensions in order to skilfully manipulate the object.
 The predictive capabilities of the brain, along with the plasticity of neural connections in the motor area help guide these sophisticated behaviours.
-%This ability can be largely attributed to the plasticity of neural connections in the motor control area of the brain.
+
 
 This ability for quick and easy adaptation to new dynamic properties of a system would be extremely useful in robotics. 
 Applying similar methods of control that have been developed over millions of years of evolution in the brain to a robotic control system could result in major improvements. 
@@ -287,7 +283,6 @@ Battery weight is one of the main issues hindering the maximum flight time of qu
 If a larger battery is used in attempts to increase the maximum flight time, the quadcopter will be heavier and therefore require more power to fly, which in turn will drain the battery faster. 
 Two possible solutions to this problem are lighter batteries and more energy-efficient operation.
 The latter can be achieved by the use of neuromorphic hardware to run the flight control system.
-%TODO EDIT1 quote power amount used by control system
 While the majority of the power consumed by a quadcopter goes towards the rotors, some is still used by the on-board control system.
 As the sophistication of the control system increases, the computational demands will follow, leading to less overall flight time.
 Computational efficiency improvements in traditional digital computation is beginning to stagnate and is expected to soon approach a limit where minimal improvement is expected.
@@ -550,7 +545,6 @@ Expanding \eqref{eq:rotation} and setting the equation in terms of angular accel
 \end{bmatrix}
 \end{equation}
 
-%TODO EDIT1 add a concluding sentence
 Equations \eqref{eq:translation_expanded} and \eqref{eq:rotation_expanded} are used throughout the remainder of this thesis to model the dynamics of the quadcopter during flight.
 
 \section{Simulation}
@@ -813,7 +807,7 @@ A larger number of neurons means that the changes will be greater, as there will
 \section{Derivation of Non-Neural Adaptive Controller} \label{chap:nonneuraladaptive} %TODO pick a better title
 %this section will be heavy on math, and go through how the adaptive python model was formed (from the equations on all of those sheets of paper)
 
-Based on the dynamics equations in \autoref{sec:dynamics} and the adaptive control theory presented in \autoref{sec:adaptive_control}, an adaptive controller for a quadcopter can be generated using the methods described in \cite{cheah2006adaptive}. %TODO EDIT1 make sure the correct reference goes here, might need a couple
+Based on the dynamics equations in \autoref{sec:dynamics} and the adaptive control theory presented in \autoref{sec:adaptive_control}, an adaptive controller for a quadcopter can be generated using the methods described in \cite{cheah2006adaptive}.
 The first step is to set up the governing equation for the system \eqref{eq:starting_equation}, and rearrange it so that the right side is in terms of the second derivative of the state \eqref{eq:rearranged_starting_equation}.
 
 
@@ -954,7 +948,6 @@ mg/4k \\
 \end{equation}
 
 The adaptive controller and parameter update equations are shown in \eqref{eq:adaptive_control_equation} and \eqref{eq:adaptive_update_equation} respectively.
-%TODO EDIT1 mention task space here and explain it well, or explain it earlier in the flight control section
 $K$ is the control gain matrix \eqref{eq:gain_matrix}, $T_{R}$ is the transformation from task space to rotor space \eqref{eq:rotor_transform}, $e$ is the state error, and $L$ is the learning rate.
 The value of $L$ can either be a constant or a 4x4 matrix.
 For simplicity a constant value of one is used.
@@ -1564,8 +1557,6 @@ Four of the controllers tested were not able to reach the target within the 30 s
 
 %[also do experiments moving throughout a weird force field, and seeing improvement the more times it does it. This will have to be the allocentric model]
 
-%TODO EDIT1 Some concluding sentences/observations to go here. there's a bit in the next section that could be brought here and expanded upon.
-
 Overall, the performance of all of the controllers tested are quite similar on the horizontal, vertical, and rotational tasks.
 On the task that involves movement in the presence of wind, the iterations of the neural adaptive controller fare very well.
 The PID controller with a fast integral gain also does well on this task, so it is not clear from these tests if an adaptive controller has an advantage over a well tuned PID controller.
@@ -1621,9 +1612,6 @@ Performance on the task that involved a vertical force was almost the same as if
 
 %Fill the rest of this subsection with the results of running models in these environments
 % could just put things in tables instead of having plots everywhere, or make the plots smaller so they don't take up an obnoxious amount of space
-
-%TODO EDIT1 put in some summary/comments talking about the results shown here.
-
 
 % this is where the loop figures will be. Talk about the controller getting better over time by learning the space
 \subsection{Improvement over Time} %TODO better title for this section
@@ -1874,7 +1862,6 @@ Overcoming these challenges to produce an adaptive neural quadcopter that can in
 
 \section{Conclusion}
 
-%TODO EDIT1 [[insert a concluding paragraph that reiterates contributions and future directions]]
 This project was undertaken to design an adaptive quadcopter controller capable of being implemented on neuromorphic hardware and evaluate its performance with respect to conventional controller design methods.
 The results obtained in simulation are highly promising and warrant future investigation of more sophisticated neural navigation and planning systems as well as implementation on physical hardware.
 

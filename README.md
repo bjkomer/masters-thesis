@@ -46,4 +46,4 @@ A list of available commands you can use from Python can be found [here](http://
 
 ### Scene Files for the Quadcopter
 
-This is the quadcopter_experiments_simple.ttt file, attached to the release.
+This is either the quadcopter_experiments_simple.ttt or quadcopter_demo.ttt file, attached to the release (there's a button near the top of the github page to access it). The former is a blank environment used for testing, the latter is a more interesting environment that can also display some plots (but will run slower). To use the plots, run the demo.py file.

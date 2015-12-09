@@ -35,6 +35,10 @@
 
 *.png
 
+# Python created files
+
+*.pyc
+
 # Ignore uw-ethesis reference material
 
 uw-ethesis*

@@ -7,7 +7,6 @@ import nengo
 import subprocess
 import os
 import signal
-import benchmark
 from controller import PD, PID, PIDt
 import cPickle as pickle
 import numpy as np
@@ -183,7 +182,7 @@ if __name__ == "__main__":
         if count == 10:
           count = 0
           state.append(m.get_copter().get_state())
-      benchmark.save(fname, state)
+      save(fname, state)
     else:
       while True:
         sim.step()

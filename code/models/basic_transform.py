@@ -11,8 +11,7 @@ class Model( object ):
                 noise_std=None ):
 
     gain_matrix, adaptive_filter, task_to_rotor = gain_sets.get_gain_matrices( gain_set='hybrid_fast' )
-
-
+    
     self.model = nengo.Network( label='V-REP Adaptive Quadcopter', seed=13 )
     with self.model:
       
@@ -34,18 +33,17 @@ class Model( object ):
 
       nengo.Connection(state, adaptation, synapse=None)
 
-      error_conn = nengo.Connection(state, task, transform=gain_matrix,
-                                    modulatory=True)
-      
       if decoder_solver is None:
         self.a_conn = nengo.Connection(adaptation, task, function=lambda x: [0,0,0,0],
-                         learning_rule_type=nengo.PES(error_conn,
-                                                      learning_rate=1e-7))
+                         learning_rule_type=nengo.PES(learning_rate=1e-4))
       else:
         self.a_conn = nengo.Connection(adaptation, task, function=lambda x: [0,0,0,0],
                                        solver=decoder_solver[0],
-                         learning_rule_type=nengo.PES(error_conn,
-                                                      learning_rate=1e-7))
+                         learning_rule_type=nengo.PES(learning_rate=1e-4))
+      
+      # Sign of the error changed in newer versions of Nengo since this work
+      error_conn = nengo.Connection(state, self.a_conn.learning_rule,
+                                    transform=-1*gain_matrix)
 
       nengo.Connection(state, task, transform=gain_matrix)
       nengo.Connection(task, motor, transform=task_to_rotor)

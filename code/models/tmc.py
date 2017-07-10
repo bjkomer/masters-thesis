@@ -14,6 +14,9 @@ class Model( object ):
 
     gain_matrix, adaptive_filter, task_to_rotor = gain_sets.get_gain_matrices( gain_set='hybrid_fast' )
 
+    # Sign of the error changed in newer versions of Nengo since this work
+    adaptive_filter = -1 * adaptive_filter
+    
     k1 = 0.43352026190263104
     k2 = 2.0 * 2
     k3 = 0.5388202808181405
@@ -75,20 +78,17 @@ class Model( object ):
 
       nengo.Connection(state, adaptation, synapse=None)
 
-      error_conn = nengo.Connection(state, task, transform=adaptive_filter,
-      #error_conn = nengo.Connection(state, task, transform=gain_matrix,
-                                    modulatory=True)
-      
       if decoder_solver is None:
         self.a_conn = nengo.Connection(adaptation, task, function=lambda x: [0,0,0,0],
-                         learning_rule_type=nengo.PES(error_conn,
-                                                      learning_rate=1e-7))
+                         learning_rule_type=nengo.PES(learning_rate=1e-4))
       else:
         self.a_conn = nengo.Connection(adaptation, task, 
                                        function=lambda x: [0,0,0,0],
                                        solver=decoder_solver[0],
-                         learning_rule_type=nengo.PES(error_conn,
-                                                      learning_rate=1e-7))
+                         learning_rule_type=nengo.PES(learning_rate=1e-4))
+      
+      error_conn = nengo.Connection(state, self.a_conn.learning_rule, 
+                                    transform=adaptive_filter)
 
       # Angle Correction
       angle_adapt = nengo.Ensemble(n_neurons=1000, dimensions=12)
@@ -105,19 +105,17 @@ class Model( object ):
       nengo.Connection(state, state_with_target[:12], synapse=None)
       nengo.Connection(target_difference, state_with_target[12:], synapse=None)
       
-      error_conn = nengo.Connection(state_with_target, angle_correction,
-                                    function=target_modulation,
-                                    modulatory=True)
       if decoder_solver is None:
         self.aa_conn = nengo.Connection(angle_adapt, angle_correction, function=lambda x: [0,0],
-                         learning_rule_type=nengo.PES(error_conn,
-                                                      learning_rate=1e-7))
+                         learning_rule_type=nengo.PES(learning_rate=1e-4))
       else:
         self.aa_conn = nengo.Connection(angle_adapt, angle_correction,
                                         function=lambda x: [0,0],
                                         solver=decoder_solver[1],
-                         learning_rule_type=nengo.PES(error_conn,
-                                                      learning_rate=1e-7))
+                         learning_rule_type=nengo.PES(learning_rate=1e-4))
+      
+      error_conn = nengo.Connection(state_with_target, self.aa_conn.learning_rule,
+                                    function=target_modulation)
 
       nengo.Connection(corrected_state, task, transform=gain_matrix)
       nengo.Connection(task, motor, transform=task_to_rotor)

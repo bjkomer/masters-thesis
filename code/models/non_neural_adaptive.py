@@ -2,7 +2,7 @@
 
 import nengo
 import gain_sets
-from quadcopter import Quadcopter, AdaptiveController, EnhancedAdaptiveController
+from quadcopter import Quadcopter, AdaptiveController
 
 class Model( object ):
 
